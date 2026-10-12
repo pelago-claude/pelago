@@ -50,6 +50,18 @@ Every release lists the **SHA-256** of `pelago.exe`: compare it with `Get-FileHa
 
 > If something is wrong with your file, **never attach your real CSV** to a report: it contains all your transactions. Describe the problem, or start from `samples/esempio-operazioni.csv`.
 
+## Data on your PC and how to uninstall
+
+Pelago is a **single portable file**: there is no installer, it does not write to the Windows registry and it does not start with your computer. To remove it, just delete `pelago.exe`.
+
+What it stores on your PC:
+
+- `%LOCALAPPDATA%\DPOper`: preferences, downloaded quotes, the instrument names you choose, the copy of the transactions archive and the `webview2` folder of the embedded browser. To wipe everything, delete this folder.
+- An **automatic backup** (unless you turn it off in *Data and files*): a compressed copy of your data every 7 days, keeping the last 8, in `Documents\Pelago backup`. In *Data and files* you can change the folder or switch it off.
+- The **price update on startup** (when prices are older than 12 hours) can be switched off on the *Quotes* page.
+
+Your CSV files are never modified.
+
 ## Building from source
 
 You need Windows and the .NET 8 SDK.

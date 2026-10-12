@@ -55,6 +55,18 @@ Ogni versione pubblicata riporta l'impronta **SHA-256** di `pelago.exe`: confron
 
 > Se qualcosa non torna con il tuo file, **non allegare mai il tuo CSV vero** a una segnalazione: contiene tutte le tue operazioni. Descrivi il problema, o parti da `samples/esempio-operazioni.csv`.
 
+## Dati sul PC e come disinstallare
+
+Pelago è un **singolo file portabile**: non ha un installatore, non scrive nel registro di Windows e non si avvia con il computer. Per rimuoverlo basta cancellare `pelago.exe`.
+
+Quello che salva, sul tuo PC:
+
+- `%LOCALAPPDATA%\DPOper`: preferenze, quotazioni scaricate, i nomi dei titoli che scegli, la copia dell'archivio delle operazioni e la cartella `webview2` del browser incorporato. Per cancellare tutto, elimina questa cartella.
+- Un **backup automatico** (se non lo spegni in *Dati e file*): una copia compressa dei dati ogni 7 giorni, nelle ultime 8 versioni, in `Documenti\Pelago backup`. Da *Dati e file* puoi cambiare la cartella o disattivarlo.
+- L'**aggiornamento dei prezzi all'apertura** (se i prezzi hanno più di 12 ore) si spegne dalla pagina *Quotazioni*.
+
+I tuoi file CSV non vengono mai modificati.
+
 ## Compilare dal sorgente
 
 Servono Windows e l'SDK .NET 8.
