@@ -1,0 +1,12 @@
+@* Bandiera di un Paese (immagine SVG incorporata: su Windows le bandiere «emoji» non si vedono, compaiono solo due lettere) *@
+@if (Src is not null)
+{
+    <img class="flag" src="@Src" alt="" width="20" height="15" />
+}
+
+@code {
+    /// <summary>Codice del Paese (IT, US…) oppure «eu» per l'Unione Europea / area euro.</summary>
+    [Parameter] public string? Code { get; set; }
+
+    private string? Src => string.IsNullOrWhiteSpace(Code) ? null : $"img/flags/{Code.ToLowerInvariant()}.svg";
+}

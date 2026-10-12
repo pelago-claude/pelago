@@ -1,0 +1,154 @@
+@implements IAsyncDisposable
+@inject AssistState Assist
+@inject IJSRuntime JS
+
+@if (Assist.Enabled)
+{
+    @if (Assist.Open)
+    {
+        <div class="assistant">
+            <div class="as-head">
+                <i class="ti ti-help-hexagon"></i>
+                <span>@T("Assistente")</span>
+                <div class="grow"></div>
+                <button class="as-icon @(Assist.PinnedKey is not null ? "on" : "")" title="@(Assist.PinnedKey is not null ? T("Sblocca") : T("Fissa questa spiegazione"))" @onclick="Assist.TogglePin">
+                    <i class="ti @(Assist.PinnedKey is not null ? "ti-pinned-filled" : "ti-pin")"></i>
+                </button>
+                <button class="as-icon" title="@T("Riduci")" @onclick="() => Assist.SetOpen(false)"><i class="ti ti-minus"></i></button>
+                <button class="as-icon" title="@T("Spegni la modalità assistita")" @onclick="() => Assist.SetEnabled(false)"><i class="ti ti-x"></i></button>
+            </div>
+
+            <div class="as-body" id="as-body">
+                @if (Assist.ActiveKey is { } key && HelpTexts.Find(key) is { } entry)
+                {
+                    <div class="as-context">
+                        <div class="as-ctx-label">@(Assist.PinnedKey is not null ? T("Fissato") : T("Stai guardando"))</div>
+                        <div class="as-title">@entry.Title</div>
+                        <div class="as-text">@Assist.Resolve(entry.Short)</div>
+                        @if (entry.More is not null)
+                        {
+                            @* la spiegazione completa si vede sempre: per arrivare a un «Altro…» si attraversano altri riquadri e il contesto cambierebbe *@
+                            <div class="as-text">@Assist.Resolve(entry.More)</div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="as-context">
+                        <div class="as-text">@T("Ciao! Muovi il mouse su una colonna, una scheda o un grafico e ti spiego cos'è. Oppure scrivimi una domanda, per esempio «cosa vuol dire tel quel?».")</div>
+                    </div>
+                }
+
+                @for (var i = 0; i < Assist.Messages.Count; i++)
+                {
+                    var index = i;
+                    var message = Assist.Messages[i];
+                    @if (message.FromUser)
+                    {
+                        <div class="as-msg user">@message.Text</div>
+                    }
+                    else
+                    {
+                        <div class="as-msg bot">
+                            @if (message.EntryKey is { } k && HelpTexts.Find(k) is { } e)
+                            {
+                                <div class="as-title">@e.Title</div>
+                                <div class="as-text">@Assist.Resolve(e.Short)</div>
+                                @if (e.More is not null)
+                                {
+                                    <div class="as-text">@Assist.Resolve(e.More)</div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="as-text">@message.Text</div>
+                            }
+                            @if (message.SuggestedKeys is { Count: > 0 } suggestions)
+                            {
+                                <div class="as-sugg">@T("Forse cercavi anche:")
+                                    @foreach (var s in suggestions)
+                                    {
+                                        var sk = s;
+                                        <button class="as-chip" @onclick="() => ShowAsync(sk)">@HelpTexts.Find(sk)?.Title</button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+
+            <form class="as-input" @onsubmit="SendAsync" @onsubmit:preventDefault>
+                <input id="as-input" type="text" placeholder="@T("Chiedi cosa significa una voce…")" autocomplete="off" @bind="_question" @bind:event="oninput" />
+                <button type="submit" class="as-send" title="@T("Invia")" disabled="@(string.IsNullOrWhiteSpace(_question))"><i class="ti ti-send"></i></button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <button class="as-bubble" title="@T("Apri l'assistente (F1 per spegnerlo)")" @onclick="() => Assist.SetOpen(true)"><i class="ti ti-help-hexagon"></i></button>
+    }
+}
+
+@code {
+    private DotNetObjectReference<AssistantPanel>? _self;
+    private string _question = "";
+    private bool _lastEnabled;
+    private int _lastMessageCount;
+
+    protected override void OnInitialized() => Assist.Changed += OnChanged;
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _self = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("DPAssist.init", _self);
+            await JS.InvokeVoidAsync("DPAssist.setEnabled", Assist.Enabled);
+            _lastEnabled = Assist.Enabled;
+        }
+        else if (_lastEnabled != Assist.Enabled)
+        {
+            _lastEnabled = Assist.Enabled;
+            await JS.InvokeVoidAsync("DPAssist.setEnabled", Assist.Enabled);
+        }
+
+        if (Assist.Messages.Count != _lastMessageCount)
+        {
+            _lastMessageCount = Assist.Messages.Count;
+            await JS.InvokeVoidAsync("DPAssist.scrollToEnd", "as-body");
+        }
+    }
+
+    [JSInvokable]
+    public Task Hover(string key)
+    {
+        return InvokeAsync(() => Assist.Hover(key));
+    }
+
+    [JSInvokable]
+    public Task ToggleFromKey() => InvokeAsync(Assist.Toggle);
+
+    private async Task SendAsync()
+    {
+        var q = _question;
+        _question = "";
+        Assist.Ask(q);
+        await JS.InvokeVoidAsync("DPAssist.focusInput", "as-input");
+    }
+
+    private Task ShowAsync(string key)
+    {
+        Assist.ShowEntry(key);
+        return Task.CompletedTask;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Assist.Changed -= OnChanged;
+        _self?.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}

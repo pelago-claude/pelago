@@ -1,0 +1,48 @@
+@inherits StatePage
+
+@if (State.LastMerge is { } m)
+{
+    <div class="modal-back" @onclick="State.DismissMerge">
+        <div class="modal merge" @onclick:stopPropagation="true" data-help="merge.dialog">
+            <h2><i class="ti ti-file-plus"></i> @(m.CreatedArchive ? T("Storico delle operazioni creato") : T("Movimenti aggiunti"))</h2>
+
+            <ul class="merge-list">
+                <li class="@(m.Added > 0 ? "ok" : "")"><i class="ti ti-circle-plus"></i> @Plural(m.Added, "{0} operazione nuova aggiunta", "{0} operazioni nuove aggiunte")</li>
+                <li><i class="ti ti-copy"></i> @Plural(m.AlreadyPresent, "{0} operazione già presente (ignorata)", "{0} operazioni già presenti (ignorate)")</li>
+                @if (m.Conflicts > 0)
+                {
+                    <li class="warn-line"><i class="ti ti-alert-triangle"></i> @T("{0} righe hanno lo stesso identificativo di una già presente ma contenuto diverso: ho tenuto quelle già presenti ({1}).", m.Conflicts, string.Join("; ", m.ConflictExamples))</li>
+                }
+                <li><i class="ti ti-database"></i> @T("Lo storico ora ha {0} operazioni.", m.TotalAfter)</li>
+            </ul>
+
+            @if (m.Added == 0 && m.Conflicts == 0)
+            {
+                <p class="muted">@T("Nessuna novità: il file non contiene movimenti che non avessi già.")</p>
+            }
+
+            @if (m.IncomingFirst is { } first && m.IncomingLast is { } last)
+            {
+                <p class="muted">@T("Il file aggiunto va dal {0:dd/MM/yyyy} al {1:dd/MM/yyyy}.", first, last)</p>
+            }
+
+            @if (m.ExistingLast is not null && m.Overlaps)
+            {
+                <div class="banner ok-banner"><i class="ti ti-circle-check"></i> @T("I due insiemi di movimenti si sovrappongono: tra l'uno e l'altro non manca nulla.")</div>
+            }
+            else if (m.ExistingLast is { } existingLast && m.GapDays > 3)
+            {
+                <div class="warn">@T("Tra gli ultimi movimenti già presenti ({0:dd/MM/yyyy}) e quelli del nuovo file passano {1} giorni senza sovrapposizione: potrebbero mancare dei movimenti nel mezzo. Se la liquidità risulta negativa, scarica anche il periodo mancante e aggiungilo.", existingLast, m.GapDays)</div>
+            }
+
+            @if (m.CreatedArchive)
+            {
+                <p class="muted">@T("Da ora l'app usa lo storico, salvato nella cartella dati. I tuoi file CSV non vengono mai modificati.")</p>
+            }
+
+            <div class="actions">
+                <button class="btn primary" @onclick="State.DismissMerge">@T("Chiudi")</button>
+            </div>
+        </div>
+    </div>
+}

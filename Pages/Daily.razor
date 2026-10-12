@@ -1,0 +1,28 @@
+@page "/daily"
+@inherits StatePage
+
+<div class="page fill">
+    <h1><i class="ti ti-calendar-stats"></i>@T("Andamento giornaliero")</h1>
+    <p class="sub">@T("Il saldo del conto giorno per giorno, diviso per tipologia.")</p>
+
+    <NeedData>
+        <DataTable TableId="daily" Items="_rows" Columns="_columns" ExportName="andamento-giornaliero"
+                   DefaultSortTitle="Data" DefaultDescending="true" />
+    </NeedData>
+</div>
+
+@code {
+    private List<DailySnapshot> _rows = new();
+
+    private static readonly List<Column<DailySnapshot>> _columns = new()
+    {
+        Col.Date<DailySnapshot>("Data", s => s.Date.ToDateTime(TimeOnly.MinValue)),
+        Col.Money<DailySnapshot>("Disponibilità", s => s.Cash),
+        Col.Money<DailySnapshot>("Titoli", s => s.Securities),
+        Col.Money<DailySnapshot>("Obbligazioni", s => s.Bonds),
+        Col.Money<DailySnapshot>("Crypto", s => s.Crypto),
+        Col.Money<DailySnapshot>("Totale", s => s.Total, cellCss: "strong"),
+    };
+
+    protected override void Rebuild() => _rows = State.Snapshots.ToList();
+}

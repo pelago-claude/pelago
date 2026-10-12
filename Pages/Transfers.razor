@@ -1,0 +1,49 @@
+@page "/transfers"
+@inherits StatePage
+
+<div class="page fill">
+    <h1><i class="ti ti-arrows-exchange"></i>@T("Entrate / Uscite")</h1>
+    <p class="sub">@T("Bonifici da e verso conti esterni.")</p>
+
+    <NeedData>
+        <div class="cards">
+            <div class="card" data-help="transfers.in"><div class="label"><i class="ti ti-arrow-down-left"></i> @T("Entrate")</div><div class="value pos">@Fmt.Money(_in)</div></div>
+            <div class="card" data-help="transfers.out"><div class="label"><i class="ti ti-arrow-up-right"></i> @T("Uscite")</div><div class="value neg">@Fmt.Money(_out)</div></div>
+            <div class="card" data-help="transfers.net"><div class="label"><i class="ti ti-scale"></i> @T("Netto versato")</div><div class="value">@Fmt.Money(_in + _out)</div></div>
+            <div class="card" data-help="count"><div class="label"><i class="ti ti-list"></i> @T("Movimenti")</div><div class="value">@_rows.Count</div></div>
+        </div>
+        <DataTable TableId="transfers" Items="_rows" Columns="_columns" ExportName="entrate-uscite"
+                   DefaultSortTitle="Data" DefaultDescending="true" />
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(DateTime Date, string Direction, decimal Amount, string Counterparty, string Iban, string Reference, string Description);
+
+    private List<Row> _rows = new();
+    private decimal _in;
+    private decimal _out;
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Date<Row>("Data", r => r.Date, "dd/MM/yyyy HH:mm"),
+        Col.Text<Row>("Direzione", r => r.Direction),
+        Col.Money<Row>("Importo", r => r.Amount, signColor: true, total: rows => rows.Sum(r => r.Amount)),
+        Col.Text<Row>("Contropartita", r => r.Counterparty),
+        Col.Text<Row>("IBAN", r => r.Iban),
+        Col.Text<Row>("Riferimento", r => r.Reference),
+        Col.Text<Row>("Descrizione", r => r.Description),
+    };
+
+    protected override void Rebuild()
+    {
+        _rows = State.Operations!
+            .Where(o => o.Category == "CASH" && o.Type.Contains("TRANSFER", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(o => o.DateTime)
+            .Select(o => new Row(o.DateTime, o.NetCashImpact >= 0 ? T("Entrata") : T("Uscita"), o.NetCashImpact,
+                o.CounterpartyName, o.CounterpartyIban, o.PaymentReference, o.Description))
+            .ToList();
+        _in = _rows.Where(r => r.Amount >= 0).Sum(r => r.Amount);
+        _out = _rows.Where(r => r.Amount < 0).Sum(r => r.Amount);
+    }
+}

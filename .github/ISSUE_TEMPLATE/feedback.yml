@@ -1,0 +1,28 @@
+name: Feedback e idee / Feedback and ideas
+description: Che cosa ti serve, che cosa non si capisce, che cosa manca
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Grazie! Il tuo parere serve a migliorare Pelago. **Non allegare dati veri del tuo conto** (CSV, importi, ISIN): questa pagina è pubblica.
+        *Thanks! Please do not attach real account data: this page is public.*
+  - type: textarea
+    id: serve
+    attributes:
+      label: Che cosa ti serve di più / What you need most
+    validations:
+      required: true
+  - type: textarea
+    id: capire
+    attributes:
+      label: Che cosa non si capisce / What is unclear
+  - type: textarea
+    id: manca
+    attributes:
+      label: Che cosa manca / What is missing
+  - type: input
+    id: uso
+    attributes:
+      label: Come la usi (opzionale) / How you use it (optional)
+      placeholder: "Ogni quanto, per quale scopo, con quanti anni di operazioni..."

@@ -1,0 +1,148 @@
+@page "/charts"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-chart-area-line"></i>@T("Grafici")</h1>
+    <p class="sub">@T("Passa il mouse sulle colonne per i dettagli; clicca la legenda per nascondere una voce; trascina la barra in basso per ingrandire.")</p>
+
+    <NeedData>
+        <div class="tabs">
+            <button class="tab @(_tab == "trend" ? "on" : "")" data-help="tab:trend" @onclick='() => SetTab("trend")'>@T("Andamento")</button>
+            <button class="tab @(_tab == "comp" ? "on" : "")" data-help="tab:comp" @onclick='() => SetTab("comp")'>@T("Composizione e scostamento")</button>
+            <button class="tab @(_tab == "gap" ? "on" : "")" data-help="tab:gap" @onclick='() => SetTab("gap")'>@T("Sopra / sotto i versamenti")</button>
+        </div>
+
+        @if (_tab == "trend")
+        {
+            <div class="panel"><EChart Kind="lines" Data="_trend" Height="560px" Help="chart:trend" /></div>
+        }
+        else if (_tab == "comp")
+        {
+            <div class="chips" data-help="period">
+                @foreach (var (type, label) in PeriodPointsGenerator.Options)
+                {
+                    var t = type;
+                    <button class="chip @(_period == t ? "on" : "")" data-help="@("period:" + t)" @onclick="() => SetPeriod(t)">@T(label)</button>
+                }
+            </div>
+            @if (_busy)
+            {
+                <div class="empty" style="padding:40px"><i class="ti ti-loader-2 spin"></i><h2>@T("Calcolo in corso…")</h2></div>
+            }
+            else
+            {
+                <div class="panel">
+                    <EChart Kind="composition" Data="_comp" Height="560px" Help="chart:composition" />
+                    <div class="note">@_compNote</div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="panel">
+                <EChart Kind="gap" Data="_gap" Height="560px" Help="chart:gap" />
+                <div class="note">@T("Una colonna per mese (ultimo giorno registrato). Base blu = Totale fino ai versamenti, cappello verde/rosso = scostamento; linea tratteggiata = versamenti netti (gli interessi restano nel Totale, non contano come versamento).")</div>
+            </div>
+        }
+    </NeedData>
+</div>
+
+@code {
+    private string _tab = "trend";
+    private PeriodType _period = PeriodType.Monthly;
+    private bool _busy;
+    private object? _trend;
+    private object? _gap;
+    private object? _comp;
+    private string _compNote = "";
+    private readonly Dictionary<PeriodType, (object Data, string Note)> _cache = new();
+
+    [SupplyParameterFromQuery(Name = "tab")] public string? TabParam { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (TabParam is "trend" or "comp" or "gap" && TabParam != _tab)
+        {
+            _tab = TabParam;
+            Prefs.Set("charts.tab", _tab);
+            if (_tab == "comp" && State.HasData)
+            {
+                _ = LoadCompositionAsync();
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _tab = Prefs.Get("charts.tab") ?? "trend";
+        if (Enum.TryParse<PeriodType>(Prefs.Get("charts.period"), out var p))
+        {
+            _period = p;
+        }
+        base.OnInitialized();
+    }
+
+    protected override void Rebuild()
+    {
+        var ordered = State.Snapshots.OrderBy(s => s.Date).ToList();
+        _trend = ChartData.Trend(ordered, State.Goal);
+        _gap = ChartData.Gap(ChartData.LastOfEachMonth(ordered));
+        _cache.Clear();
+        _comp = null;
+        if (_tab == "comp")
+        {
+            _ = LoadCompositionAsync();
+        }
+    }
+
+    private async Task SetTab(string tab)
+    {
+        _tab = tab;
+        Prefs.Set("charts.tab", tab);
+        if (tab == "comp")
+        {
+            await LoadCompositionAsync();
+        }
+    }
+
+    private async Task SetPeriod(PeriodType period)
+    {
+        _period = period;
+        Prefs.Set("charts.period", period.ToString());
+        await LoadCompositionAsync();
+    }
+
+    private async Task LoadCompositionAsync()
+    {
+        if (_cache.TryGetValue(_period, out var cached))
+        {
+            (_comp, _compNote) = cached;
+            return;
+        }
+
+        _busy = true;
+        StateHasChanged();
+
+        var ops = State.Operations!;
+        var quotes = State.Quotes;
+        var min = State.MinDate;
+        var max = State.MaxDate;
+        var period = _period;
+
+        var (data, note) = await Task.Run(() =>
+        {
+            var dates = PeriodPointsGenerator.Generate(max, min, period);
+            var points = dates.Select(d => PortfolioCalculator.ComputeAsOf(ops, d, quotes)).ToList();
+            return ((object)ChartData.Composition(points),
+                T("{0} colonne — linea tratteggiata = versamenti netti; triangolo sopra la colonna: verde ▲ = sopra i versamenti, rosso ▼ = sotto (importo e percentuale nel tooltip).", points.Count));
+        });
+
+        _cache[period] = (data, note);
+        if (period == _period)
+        {
+            (_comp, _compNote) = (data, note);
+        }
+        _busy = false;
+        StateHasChanged();
+    }
+}

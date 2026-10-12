@@ -1,0 +1,380 @@
+@page "/bonds"
+@page "/bonds/{Code}"
+@inherits StatePage
+@using System.Globalization
+
+<div class="page">
+    <h1><i class="ti ti-building-bank"></i>@T("Titoli di Stato")</h1>
+    <p class="sub">@T("Scegli lo Stato: rendimenti, curva e confronto con la Germania. Per l'Italia c'è l'elenco dei BTP con il calcolatore.")</p>
+
+    <BondCountryBar Selected="@_code" />
+
+    @if (_country is null)
+    {
+        @if (!string.IsNullOrWhiteSpace(Code))
+        {
+            <div class="err">@T("Stato non riconosciuto.")</div>
+        }
+    }
+    else
+    {
+        <div class="row" style="margin:14px 0 12px">
+            <h2 style="margin:0"><Flag Code="@_country.Flag" />@T(_country.Name)</h2>
+            <button class="btn" data-help="bonds.refresh" disabled="@_busy" @onclick="() => LoadAsync(true)">
+                <i class="ti ti-refresh @(_busy ? "spin" : "")"></i> @T("Aggiorna")
+            </button>
+            @if (_country.Code == "IT")
+            {
+                <a class="btn primary" href="btp" data-help="bonds.btplist"><i class="ti ti-list-details"></i> @T("Elenco BTP e calcolatore")</a>
+            }
+            <span class="muted">@_info</span>
+        </div>
+
+        @if (_error is not null)
+        {
+            <div class="@(_data is null ? "err" : "warn")">@_error</div>
+        }
+
+        @if (_data is null)
+        {
+            <div class="panel"><span class="muted">@(_busy ? T("Scarico i dati…") : T("Nessun dato disponibile."))</span></div>
+        }
+        else
+        {
+            @if (_cards.Count > 0)
+            {
+                <div class="cards">
+                    @foreach (var card in _cards)
+                    {
+                        <div class="card" data-help="@card.Help">
+                            <div class="label"><i class="ti @card.Icon"></i> @card.Label</div>
+                            <div class="value">@card.Value</div>
+                            <div class="delta muted">@card.Sub</div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (_yieldChart is not null)
+            {
+                <div class="panel" style="margin-bottom:16px" data-help="bonds.chart.yield">
+                    <div class="row" style="margin-bottom:8px">
+                        <h2 style="margin:0">@T("Rendimento a 10 anni")</h2>
+                        <span class="muted">@_yieldNote</span>
+                        <div class="chips" style="margin-left:auto">
+                            @foreach (var (label, years) in RangesFor())
+                            {
+                                <button class="chip @(_rangeYears == years ? "on" : "")" @onclick="() => SetRange(years)">@T(label)</button>
+                            }
+                        </div>
+                    </div>
+                    <EChart Kind="lines" Data="_yieldChart" Height="320px" />
+                </div>
+            }
+
+            @if (_spreadChart is not null)
+            {
+                <div class="panel" style="margin-bottom:16px" data-help="bonds.chart.spread">
+                    <h2>@T("Spread sui Bund tedeschi")</h2>
+                    <p class="muted" style="margin:0 0 6px">@T("La differenza tra il rendimento a 10 anni di questo Stato e quello della Germania, in punti base (100 punti base = 1%). Più è alto, più il mercato chiede in più per prestargli soldi.")</p>
+                    <EChart Kind="lines" Data="_spreadChart" Height="260px" />
+                </div>
+            }
+
+            @if (_curveChart is not null)
+            {
+                <div class="panel" style="margin-bottom:16px" data-help="bonds.chart.curve">
+                    <h2>@T("Curva dei rendimenti")</h2>
+                    <p class="muted" style="margin:0 0 6px">@T("Il rendimento per ogni scadenza, da 1 anno a 30. {0}", _curveNote)</p>
+                    <EChart Kind="lines" Data="_curveChart" Height="300px" />
+                </div>
+            }
+
+            @if (_data.Auctions.Count > 0)
+            {
+                <div class="panel" style="margin-bottom:16px" data-help="bonds.auctions">
+                    <h2>@T("Ultime aste del Tesoro USA")</h2>
+                    <p class="muted" style="margin:0 0 6px">@T("Note, Bond, TIPS e FRN messi all'asta negli ultimi 120 giorni (TreasuryDirect): rendimento e prezzo sono quelli dell'asta, non quotazioni di mercato di oggi.")</p>
+                    <table class="grid">
+                        <thead><tr><th>@T("Tipo")</th><th>@T("Durata")</th><th>@T("Emissione")</th><th>@T("Scadenza")</th><th class="r">@T("Cedola")</th><th class="r">@T("Rendimento asta")</th><th class="r">@T("Prezzo (per 100)")</th><th class="r" data-help="bonds.btc"><span>@T("Copertura")</span></th></tr></thead>
+                        <tbody>
+                            @foreach (var a in _data.Auctions.Where(a => a.Type != "FRN").Take(40))
+                            {
+                                <tr>
+                                    <td>@a.Type</td><td>@a.Term</td><td>@a.Issue.ToString("dd/MM/yyyy")</td><td>@a.Maturity.ToString("dd/MM/yyyy")</td>
+                                    <td class="r">@Pct(a.Coupon)</td><td class="r">@Pct(a.Yield)</td>
+                                    <td class="r">@(a.Price is { } p ? p.ToString("N3", It) : "—")</td>
+                                    <td class="r">@(a.BidToCover is { } b ? b.ToString("N2", It) + "×" : "—")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+
+        @if (_held.Count > 0)
+        {
+            <div class="panel" style="margin-bottom:16px" data-help="bonds.held">
+                <h2>@T("I tuoi titoli · {0}", T(_country.Name))</h2>
+                <table class="grid">
+                    <thead><tr><th>@T("Titolo")</th><th class="r">@T("Nominale")</th><th class="r">@T("Prezzo")</th><th class="r">@T("Valore")</th><th class="r">@T("Plus/minus latente")</th></tr></thead>
+                    <tbody>
+                        @foreach (var h in _held)
+                        {
+                            <tr class="clickable" @onclick="() => OpenSecurity(h.Key)">
+                                <td>@State.FullNameOf(h.Key, h.Name)</td>
+                                <td class="r">@Fmt.Num(h.Shares, 0)</td>
+                                <td class="r">@Fmt.Money4(h.LastPrice)</td>
+                                <td class="r">@Fmt.Money(h.Value)</td>
+                                <td class="r @(Gain(h) is { } g ? (g >= 0 ? "pos" : "neg") : "")">@(Gain(h) is { } gain ? Fmt.Money(gain) : "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="panel" data-help="bonds.sources">
+            <h2>@T("Da dove arrivano i dati")</h2>
+            <ul class="credit-list">
+                <li>@H("<b>Rendimento a 10 anni mensile</b>: statistiche della BCE sui tassi a lungo termine (media del mese, di tutti gli Stati UE). Escono con circa un mese e mezzo di ritardo.")</li>
+                <li>@H("<b>Germania</b>: curva giornaliera dei Bund dalla Bundesbank. <b>Stati Uniti</b>: curva giornaliera del Tesoro USA e aste da TreasuryDirect. <b>Area euro</b>: curva dei titoli AAA della BCE, giornaliera.")</li>
+                <li>@H("<b>Italia</b>: l'elenco dei singoli BTP con prezzo di mercato arriva da Borsa Italiana.")</li>
+                <li>@T("Per i titoli singoli degli altri Stati (cedola, scadenza, prezzo di mercato) non esiste una fonte gratuita e ufficiale: l'app mostra i rendimenti di riferimento, non i prezzi dei singoli titoli. Sono dati informativi, non consigli di investimento.")</li>
+            </ul>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record InfoCard(string Icon, string Label, string Value, string Sub, string Help);
+
+    private static CultureInfo It => Culture;
+
+    [Parameter] public string? Code { get; set; }
+
+    private string _code = "IT";
+    private GovCountry? _country;
+    private GovCountryData? _data;
+    private GovCountryData? _bund;
+    private bool _busy;
+    private string? _error;
+    private string _info = "";
+    private int _rangeYears;
+    private List<InfoCard> _cards = new();
+    private object? _yieldChart, _spreadChart, _curveChart;
+    private string _yieldNote = "", _curveNote = "";
+    private List<Holding> _held = new();
+    private string? _loadedCode;
+    private int _loadId;
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(Code))
+        {
+            // «Titoli di Stato» dal menu senza paese: si riparte dall'ultimo scelto
+            var last = Prefs.Get("bonds.country");
+            Nav.NavigateTo(BondCountryBar.HrefFor(string.IsNullOrEmpty(last) ? "IT" : last), replace: true);
+            return;
+        }
+
+        _code = Code.ToUpperInvariant();
+        _country = GovBonds.Find(_code);
+        if (_country is null || _loadedCode == _code)
+        {
+            return;
+        }
+
+        _loadedCode = _code;
+        _rangeYears = DefaultRange();
+        _data = GovBonds.Cached(_code);
+        _bund = _country.Kind == GovKind.Euro && _code != "DE" ? GovBonds.Cached("DE") : null;
+        _error = null;
+        BuildView();
+        _ = LoadAsync(false);
+    }
+
+    protected override void Rebuild() => BuildHeld();
+
+    private async Task LoadAsync(bool force)
+    {
+        var country = _country;
+        if (country is null)
+        {
+            return;
+        }
+
+        var id = ++_loadId;
+        _busy = true;
+        _error = null;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            var main = GovBonds.GetAsync(country.Code, CancellationToken.None, force);
+            var bund = country.Kind == GovKind.Euro && country.Code != "DE" ? GovBonds.GetAsync("DE", CancellationToken.None, force) : null;
+            var data = await main;
+            var bundData = bund is null ? null : await bund;
+            if (id != _loadId)
+            {
+                return; // nel frattempo ha cambiato Stato
+            }
+
+            _data = data;
+            _bund = bundData;
+        }
+        catch (Exception ex)
+        {
+            if (id != _loadId)
+            {
+                return;
+            }
+
+            _error = _data is null
+                ? T("Impossibile scaricare i dati ({0}).", ex.Message)
+                : T("Aggiornamento non riuscito ({0}): mostro gli ultimi dati salvati.", ex.Message);
+        }
+        finally
+        {
+            if (id == _loadId)
+            {
+                _busy = false;
+            }
+        }
+
+        BuildView();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void SetRange(int years)
+    {
+        _rangeYears = years;
+        BuildView();
+    }
+
+    private bool Daily => _data is { Daily.Count: > 0 };
+
+    private int DefaultRange() => _country?.Kind is GovKind.Usa or GovKind.EuroAggregate || _code == "DE" ? 2 : 5;
+
+    private IEnumerable<(string Label, int Years)> RangesFor() => Daily
+        ? new[] { ("1 anno", 1), ("2 anni", 2), ("5 anni", 5) }
+        : new[] { ("2 anni", 2), ("5 anni", 5), ("10 anni", 10) };
+
+    // ---- costruzione di riquadri e grafici
+
+    private void BuildView()
+    {
+        _cards = new();
+        _yieldChart = _spreadChart = _curveChart = null;
+        BuildHeld();
+        if (_data is null || _country is null)
+        {
+            _info = "";
+            return;
+        }
+
+        _info = T("Scaricato alle {0:HH:mm}", _data.FetchedUtc.ToLocalTime());
+        var daily = Daily;
+        var series = daily ? _data.Daily : _data.Monthly;
+        if (series.Count == 0)
+        {
+            return;
+        }
+
+        var last = series[^1];
+        var source = daily ? _data.DailySource : GovBonds.EcbSource;
+        _cards.Add(new("ti-percentage", T("Rendimento a 10 anni"), Pct(last.Value),
+            daily ? $"{last.Date:dd/MM/yyyy} · {T(source ?? "")}" : T("{0} · media mensile {1}", last.Date.ToString("MMMM yyyy", It), T(source ?? "")), "bonds.card.yield"));
+
+        var yearAgo = series.LastOrDefault(p => p.Date <= last.Date.AddYears(-1));
+        if (yearAgo is not null)
+        {
+            var diff = last.Value - yearAgo.Value;
+            _cards.Add(new("ti-timeline", T("Rispetto a un anno fa"), Signed(diff, " pp"), T("era {0} ({1})", Pct(yearAgo.Value), yearAgo.Date.ToString(daily ? "dd/MM/yyyy" : "MMMM yyyy", It)), "bonds.card.change"));
+        }
+
+        if (_data.Curve is { } curve && curve.Points.FirstOrDefault(p => p.Years == 2) is { } two && curve.Points.FirstOrDefault(p => p.Years == 10) is { } ten)
+        {
+            var slope = ten.Yield - two.Yield;
+            _cards.Add(new("ti-chart-line", T("Curva 10 − 2 anni"), Signed(slope, " pp"), slope >= 0 ? T("curva normale: le scadenze lunghe rendono di più") : T("curva invertita: le scadenze brevi rendono di più"), "bonds.card.slope"));
+        }
+
+        // spread sui Bund (solo Stati dell'area euro)
+        List<YieldPoint>? spread = null;
+        if (_country.Kind == GovKind.Euro && _code != "DE" && _bund is { Monthly.Count: > 0 })
+        {
+            spread = GovBonds.SpreadBasisPoints(_data.Monthly, _bund.Monthly);
+            if (spread.Count > 0)
+            {
+                var s = spread[^1];
+                _cards.Add(new("ti-arrows-diff", T("Spread sui Bund"), T("{0}{1} pb", s.Value >= 0 ? "+" : "−", Math.Abs(s.Value).ToString("N0", It)), T("{0} · punti base sul rendimento tedesco", s.Date.ToString("MMMM yyyy", It)), "bonds.card.spread"));
+            }
+        }
+        else if (_country.Kind == GovKind.OtherEu)
+        {
+            _cards.Add(new("ti-currency-euro", T("Valuta"), _country.Currency, T("valuta propria: il confronto diretto con i Bund non ha senso"), "bonds.card.currency"));
+        }
+
+        // grafico del rendimento
+        var from = last.Date.AddYears(-_rangeYears);
+        var windowed = series.Where(p => p.Date >= from).ToList();
+        if (!daily && _bund is { Monthly.Count: > 0 } bund)
+        {
+            _yieldChart = ChartData.YieldLines(true, "%", 2,
+                (T(_country.Name), "#3b6ef5", false, windowed),
+                (T("Germania"), "#9aa6bd", true, bund.Monthly.Where(p => p.Date >= from).ToList()));
+        }
+        else
+        {
+            _yieldChart = ChartData.YieldLines(!daily, "%", 2, (T(_country.Name), "#3b6ef5", false, windowed));
+        }
+        _yieldNote = daily ? T("un dato al giorno · {0}", T(source ?? "")) : T("un dato al mese · BCE (media del mese)");
+
+        if (spread is { Count: > 1 })
+        {
+            _spreadChart = ChartData.YieldLines(true, " pb", 0, (T("Spread"), "#e0a100", false, spread.Where(p => p.Date >= from).ToList()));
+        }
+
+        // curva dei rendimenti
+        if (_data.Curve is { Points.Count: > 1 } now)
+        {
+            var labels = now.Points.Select(p => MaturityLabel(p.Years)).ToList();
+            decimal?[] Align(YieldCurve? c) => now.Points.Select(p => c?.Points.FirstOrDefault(q => q.Years == p.Years) is { } q ? (decimal?)q.Yield : null).ToArray();
+            var list = new List<(string, string, bool, decimal?[])> { (T("Oggi ({0:dd/MM/yy})", now.Date), "#3b6ef5", false, Align(now)) };
+            if (_data.CurveMonthAgo is { } m && m.Date != now.Date)
+            {
+                list.Add((T("Un mese fa ({0:dd/MM/yy})", m.Date), "#e0a100", true, Align(m)));
+            }
+            if (_data.CurveYearAgo is { } y && y.Date != now.Date)
+            {
+                list.Add((T("Un anno fa ({0:dd/MM/yy})", y.Date), "#9aa6bd", true, Align(y)));
+            }
+            _curveChart = ChartData.Curves(labels, list.ToArray());
+            _curveNote = T("Fonte: {0}, dati del {1:dd/MM/yyyy}.", T(now.Source), now.Date);
+        }
+    }
+
+    private void BuildHeld()
+    {
+        _held = new();
+        if (_country is null || !State.HasData || string.IsNullOrEmpty(_country.IsinPrefix))
+        {
+            return;
+        }
+
+        _held = State.Holdings
+            .Where(h => h.AssetClass == "BOND" && h.Shares > 0m && h.Key.StartsWith(_country.IsinPrefix, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(h => h.Value)
+            .ToList();
+    }
+
+    private void OpenSecurity(string key) => Nav.NavigateTo($"security?key={Uri.EscapeDataString(key)}");
+
+    private decimal? Gain(Holding h) => State.OpenPositions.TryGetValue(h.Key, out var p) ? h.Value - p.Cost : null;
+
+    private static string Pct(decimal? v) => v is { } x ? x.ToString("N2", It) + "%" : "—";
+
+    private static string Signed(decimal v, string unit) => (v >= 0 ? "+" : "−") + Math.Abs(v).ToString("N2", It) + unit;
+
+    private static string MaturityLabel(decimal years) => years < 1m ? T("{0} m", Math.Round(years * 12m)) : T("{0:0.#} a", years);
+}

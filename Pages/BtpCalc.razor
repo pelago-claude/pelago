@@ -1,0 +1,228 @@
+@page "/btp/calc"
+@inherits StatePage
+
+<div class="page">
+    <a class="back" @onclick='() => Nav.NavigateTo("btp")'><i class="ti ti-arrow-left"></i> @T("Elenco BTP")</a>
+
+    @if (_bond is null)
+    {
+        <div class="empty"><i class="ti ti-search-off"></i><h2>@T("BTP non trovato")</h2><p>@T("Torna all'elenco e aggiornalo.")</p></div>
+    }
+    else
+    {
+        <h1>@_bond.Description</h1>
+        <p class="sub">@T("Calcolatore, come il foglio Calcolatore_BTP.xlsx: lo stesso acquisto al prezzo di mercato e come se il titolo quotasse 100.")</p>
+
+        <div class="panel" style="margin-bottom:14px">
+            <div class="row">
+                <div class="field" data-help="btp.capital">@T("Capitale da investire (€)")<input type="number" step="1000" @bind="_capital" @bind:after="Recalculate" /></div>
+                <div class="field" data-help="btp.commission">@T("Commissioni (€)")<input type="number" step="1" @bind="_commission" @bind:after="Recalculate" /></div>
+                <div class="field" data-help="btp.tax">@T("Aliquota (%)")<input type="number" step="0.5" @bind="_taxPercent" @bind:after="Recalculate" /></div>
+                <div class="field" data-help="btp.lot">@T("Taglio minimo (€)")<input type="number" step="1000" @bind="_lot" @bind:after="Recalculate" /></div>
+                <div class="field" data-help="btp.settlement">@T("Regolamento")<input type="date" @bind="_settlement" @bind:format="yyyy-MM-dd" @bind:after="Recalculate" /></div>
+            </div>
+        </div>
+
+        @if (_context is null)
+        {
+            <div class="warn">@T("Il titolo è già scaduto alla data di regolamento scelta: cambia la data per il calcolo.")</div>
+        }
+        else
+        {
+            <div class="info">@_header</div>
+            <div class="summary" data-help="btp.summary">@_summary</div>
+
+            <div class="table-card">
+                <div class="table-wrap">
+                    <table class="grid">
+                        <thead>
+                            <tr><th>@T("Voce")</th><th class="r" data-help="btp.col.market">@T("Prezzo di mercato")</th><th class="r" data-help="btp.col.at100">@T("Se quotasse 100")</th><th class="r" data-help="btp.col.diff">@T("Differenza")</th><th>@T("Nota")</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var line in _lines)
+                            {
+                                <tr class="@(line.Highlight ? "hl-row" : "")" data-help="@HelpKeyFor(line.Label)">
+                                    <td>@T(line.Label, line.Args)</td>
+                                    <td class="r">@line.Market</td>
+                                    <td class="r">@line.At100</td>
+                                    <td class="r">@line.Diff</td>
+                                    <td class="wrap-cell">@line.Note</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private enum Kind { Price, Money, Count, Percent }
+
+    private sealed record Line(string Label, string Market, string At100, string Diff, string Note, bool Highlight, object[] Args);
+
+    [SupplyParameterFromQuery(Name = "isin")] public string? Isin { get; set; }
+
+    private BtpData _data = BtpStore.Load();
+    private BtpBond? _bond;
+    private BtpContext? _context;
+    private List<Line> _lines = new();
+    private string _header = "";
+    private string _summary = "";
+
+    private decimal _capital;
+    private decimal _commission;
+    private decimal _taxPercent;
+    private decimal _lot;
+    private DateOnly _settlement;
+    private bool _inputsLoaded;
+
+    protected override void OnParametersSet()
+    {
+        _data = BtpStore.Load();
+        _bond = _data.Bonds.FirstOrDefault(b => b.Isin == Isin);
+        if (!_inputsLoaded)
+        {
+            _inputsLoaded = true;
+            _capital = _data.Inputs.Capital;
+            _commission = _data.Inputs.Commission;
+            _taxPercent = _data.Inputs.TaxRate * 100m;
+            _lot = _data.Inputs.Lot;
+            _settlement = BondMath.AddWorkdays(DateOnly.FromDateTime(DateTime.Today), 2);
+        }
+        Recalculate();
+    }
+
+    private void Recalculate()
+    {
+        if (_bond is null)
+        {
+            return;
+        }
+
+        _data.Inputs.Capital = _capital;
+        _data.Inputs.Commission = _commission;
+        _data.Inputs.TaxRate = _taxPercent / 100m;
+        _data.Inputs.Lot = _lot;
+        BtpStore.Save(_data);
+
+        var parameters = new BtpParams(_capital, _commission, _taxPercent / 100m, _lot, _settlement);
+        _context = BtpCalculator.CreateContext(_bond, parameters);
+        if (_context is null)
+        {
+            _lines = new();
+            return;
+        }
+
+        var it = Fmt.It;
+        var market = BtpCalculator.Compute(_context, _bond.Price);
+        var at100 = BtpCalculator.Compute(_context, 100m);
+        var taxLabel = string.Create(it, $"{_taxPercent:0.##}%");
+
+        var priceTime = _data.UpdatedAt is { } pt ? T("  |  prezzo Borsa Italiana del {0:dd/MM/yyyy HH:mm}", pt) : "";
+        _header = T("{0}  |  cedola lorda {1:0.0##%}  |  scadenza {2:dd/MM/yyyy}  |  corso secco {3:0.00#}  |  " +
+            "rateo maturato {4:0.####} per 100  |  prezzo tel quel {5:0.00##}  |  " +
+            "prossimo stacco {6:dd/MM/yyyy}  |  cedole semestrali ancora da incassare {7}  |  " +
+            "anni residui {8:0.00}{9}",
+            _bond.Isin, _bond.Coupon, _bond.Maturity, _bond.Price, _context.AccruedPer100, _bond.Price + _context.AccruedPer100,
+            _context.Coupon.Next, _context.Coupon.Remaining, _context.YearsRemaining, priceTime);
+
+        var couponGain = market.AnnualCoupon - at100.AnnualCoupon;
+        var plus = couponGain >= 0 ? "+" : "";
+        _summary = T("Con {0:N0} € compri {1:N0} € nominali: incassi {2:N2} € lordi di cedola l'anno " +
+            "({3}{4:N2} € rispetto al prezzo 100) e a scadenza hai un surplus di {5:N2} €.",
+            _capital, market.Nominal, market.AnnualCoupon, plus, couponGain, market.Surplus);
+
+        _lines = new List<Line>
+        {
+            L("Prezzo secco pagato (per 100)", Kind.Price, market.Price, at100.Price),
+            L("Costo di un taglio minimo (tel quel)", Kind.Money, market.LotCost, at100.LotCost, T("Prezzo + rateo, applicati al lotto minimo.")),
+            L("Numero di tagli acquistabili", Kind.Count, market.Lots, at100.Lots, T("Quanti lotti da taglio minimo ci stanno nel capitale, al netto delle commissioni.")),
+            L("Valore nominale acquistato (= rimborso a scadenza)", Kind.Money, market.Nominal, at100.Nominal, T("È quanto lo Stato ti restituisce a scadenza.")),
+            L("Controvalore al prezzo secco", Kind.Money, market.CleanValue, at100.CleanValue),
+            L("Rateo pagato al venditore", Kind.Money, market.AccruedPaid, at100.AccruedPaid, T("Lo recuperi interamente con la prima cedola.")),
+            L("Commissioni", Kind.Money, market.Commission, at100.Commission),
+            L("Esborso totale", Kind.Money, market.TotalOutlay, at100.TotalOutlay, highlight: true),
+            L("Liquidità che avanza", Kind.Money, market.LeftoverCash, at100.LeftoverCash),
+            L("Cedola semestrale lorda", Kind.Money, market.SemiannualCoupon, at100.SemiannualCoupon),
+            L("Cedola annua lorda incassata", Kind.Money, market.AnnualCoupon, at100.AnnualCoupon, highlight: true),
+            L("Cedola annua netta (dopo {0})", Kind.Money, market.AnnualCouponNet, at100.AnnualCouponNet, args: new object[] { taxLabel }),
+            L("Rendimento cedolare lordo sul capitale investito", Kind.Percent, market.CouponYield, at100.CouponYield, T("Cedola annua / controvalore secco. A 100 coincide con il tasso nominale.")),
+            L("Totale cedole lorde fino a scadenza", Kind.Money, market.TotalCoupons, at100.TotalCoupons, T("Include la prima cedola intera (che restituisce anche il rateo pagato).")),
+            L("SURPLUS a scadenza (rimborso - prezzo secco)", Kind.Money, market.Surplus, at100.Surplus, T("Positivo = capital gain (titolo sotto la pari). Negativo = perdita in conto capitale (titolo sopra la pari)."), highlight: true),
+            L("Imposta sul surplus ({0} se positivo)", Kind.Money, market.SurplusTax, at100.SurplusTax, T("Se il surplus è negativo genera una minusvalenza compensabile (non calcolata qui)."), args: new object[] { taxLabel }),
+            L("Surplus netto a scadenza", Kind.Money, market.SurplusNet, at100.SurplusNet),
+            L("Surplus annualizzato sul capitale investito", Kind.Percent, market.SurplusAnnualized, at100.SurplusAnnualized, T("Quanto il recupero verso 100 aggiunge ogni anno al rendimento.")),
+            L("Guadagno totale lordo a scadenza", Kind.Money, market.GrossGain, at100.GrossGain, T("Cedole + rimborso - esborso (rateo e commissioni inclusi).")),
+            L("Guadagno totale netto a scadenza", Kind.Money, market.NetGain, at100.NetGain, T("Stima semplificata: tassazione al {0} su tutte le cedole e sul surplus.", taxLabel), highlight: true),
+            L("Rendimento effettivo a scadenza lordo (annuo)", Kind.Percent, ToDecimal(market.GrossYield), ToDecimal(at100.GrossYield), T("Tasso interno di rendimento (formula RENDIMENTO di Excel), cedole semestrali.")),
+            L("Rendimento effettivo a scadenza netto (annuo)", Kind.Percent, ToDecimal(market.NetYield), ToDecimal(at100.NetYield), T("Approssimazione: cedole nette e rimborso al netto dell'imposta sul capital gain.")),
+        };
+    }
+
+    /// <summary>Spiegazione della riga del calcolatore, riconosciuta dall'etichetta.</summary>
+    private static string? HelpKeyFor(string label) => label switch
+    {
+        var l when l.StartsWith("Prezzo secco") => "btp.row.price",
+        var l when l.StartsWith("Costo di un taglio") => "btp.row.lotcost",
+        var l when l.StartsWith("Numero di tagli") => "btp.row.lots",
+        var l when l.StartsWith("Valore nominale") => "btp.row.nominal",
+        var l when l.StartsWith("Controvalore") => "btp.row.clean",
+        var l when l.StartsWith("Rateo") => "btp.row.accrued",
+        var l when l.StartsWith("Commissioni") => "btp.commission",
+        var l when l.StartsWith("Esborso") => "btp.row.outlay",
+        var l when l.StartsWith("Liquidità") => "btp.row.leftover",
+        var l when l.StartsWith("Cedola annua netta") => "btp.row.couponnet",
+        var l when l.StartsWith("Cedola") => "btp.row.coupon",
+        var l when l.StartsWith("Rendimento cedolare") => "btp.row.couponyield",
+        var l when l.StartsWith("Totale cedole") => "btp.row.totalcoupons",
+        var l when l.StartsWith("SURPLUS") => "btp.row.surplus",
+        var l when l.StartsWith("Imposta sul surplus") => "btp.row.surplustax",
+        var l when l.StartsWith("Surplus netto") => "btp.row.surplus",
+        var l when l.StartsWith("Surplus annualizzato") => "btp.row.surplusann",
+        var l when l.StartsWith("Guadagno") => "btp.row.gain",
+        var l when l.StartsWith("Rendimento effettivo") => "btp.row.yield",
+        _ => null,
+    };
+
+    private static decimal? ToDecimal(double? value) => value is null ? null : (decimal)value.Value;
+
+    private static Line L(string label, Kind kind, decimal? market, decimal? at100, string note = "", bool highlight = false, object[]? args = null)
+    {
+        var diff = market is { } m && at100 is { } c ? m - c : (decimal?)null;
+        return new Line(label, Format(kind, market), Format(kind, at100), FormatDiff(kind, diff), note, highlight, args ?? Array.Empty<object>());
+    }
+
+    private static string Format(Kind kind, decimal? value)
+    {
+        if (value is not { } v)
+        {
+            return T("n/d");
+        }
+
+        return kind switch
+        {
+            Kind.Price => v.ToString("0.00#", Fmt.It),
+            Kind.Money => v.ToString("#,##0.00 €", Fmt.It),
+            Kind.Count => v.ToString("N0", Fmt.It),
+            _ => v.ToString("P2", Fmt.It),
+        };
+    }
+
+    private static string FormatDiff(Kind kind, decimal? value)
+    {
+        if (value is not { } v)
+        {
+            return T("n/d");
+        }
+
+        return kind switch
+        {
+            Kind.Price => v.ToString("+0.00#;-0.00#;0.00", Fmt.It),
+            Kind.Money => v.ToString("+#,##0.00 €;-#,##0.00 €;0.00 €", Fmt.It),
+            Kind.Count => v.ToString("+0;-0;0", Fmt.It),
+            _ => v.ToString("+0.00%;-0.00%;0.00%", Fmt.It),
+        };
+    }
+}

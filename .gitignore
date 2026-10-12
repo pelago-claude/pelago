@@ -1,0 +1,29 @@
+# Compilazione
+bin/
+obj/
+publish/
+TestResults/
+*.nupkg
+
+# Visual Studio e altri editor
+.vs/
+*.user
+*.suo
+*.userprefs
+.vscode/
+.idea/
+
+# Strumenti locali
+.claude/
+
+# Materiale di presentazione (video, PDF, schermate, dati di esempio, profilo del browser): resta in locale.
+# Nel repository ci sono solo samples/ e docs/img/.
+Presentazione/
+
+# Mai nel repository: i dati veri di chi usa o sviluppa l'app
+*.csv
+!samples/*.csv
+*.bak
+*.zip
+nomi-titoli.json
+nomi-emittenti.json

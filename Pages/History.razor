@@ -1,0 +1,37 @@
+@page "/history"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-history"></i>@T("Storia")</h1>
+    <p class="sub">@H("Com'è nata l'app e come è cresciuta, versione dopo versione. Siamo alla <b>{0}</b>: «{1}».", ChangeLog.Current.Version, T(ChangeLog.Current.Title))</p>
+
+    <div class="timeline">
+        @for (var i = 0; i < ChangeLog.Releases.Count; i++)
+        {
+            var release = ChangeLog.Releases[i];
+            <details class="release" open="@(i == 0)" data-help="@("release:" + release.Version)">
+                <summary>
+                    <span class="rel-version">@release.Version</span>
+                    <span class="rel-title">@T(release.Title)</span>
+                    <span class="rel-date">@release.Date.ToString("d MMMM yyyy", Fmt.It)</span>
+                </summary>
+                <div class="rel-body">
+                    <p class="rel-summary">@T(release.Summary)</p>
+                    @foreach (var paragraph in release.Story)
+                    {
+                        <p>@T(paragraph)</p>
+                    }
+                    <div class="rel-news-label">@T("Novità")</div>
+                    <ul class="credit-list">
+                        @foreach (var item in release.News)
+                        {
+                            <li>@T(item)</li>
+                        }
+                    </ul>
+                </div>
+            </details>
+        }
+    </div>
+
+    <p class="note" data-help="history.note">@T("Le versioni 0.x e 1.x sono state numerate a posteriori, ricostruendo l'ordine del lavoro. Questa pagina viene aggiornata a ogni nuova versione.")</p>
+</div>

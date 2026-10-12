@@ -1,0 +1,317 @@
+@inherits LayoutComponentBase
+@inject AppState State
+@inject AssistState Assist
+@inject NativeDialogs Dialogs
+@inject UiPrefs Prefs
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="shell">
+    <aside class="sidebar">
+        <div class="brand"><img src="img/pelago.png" alt="" /><span>@T("Pelago")</span></div>
+
+        <nav>
+            <button class="nav-group-head @(IsOpen(GToday) ? "open" : "")" aria-expanded="@IsOpen(GToday)" data-help="nav:group" @onclick="() => Toggle(GToday)"><i class="ti ti-chevron-right"></i>@T("Oggi")</button>
+            @if (IsOpen(GToday))
+            {
+                <NavLink class="nav-item" href="" Match="NavLinkMatch.All" data-help="nav:/"><i class="ti ti-layout-dashboard"></i>@T("Panoramica")</NavLink>
+                <NavLink class="nav-item" href="daily" data-help="nav:/daily"><i class="ti ti-calendar-stats"></i>@T("Andamento giornaliero")</NavLink>
+                <NavLink class="nav-item" href="returns" data-help="nav:/returns"><i class="ti ti-activity"></i>@T("Rendimenti")</NavLink>
+                <NavLink class="nav-item" href="charts" data-help="nav:/charts"><i class="ti ti-chart-area-line"></i>@T("Grafici")</NavLink>
+                <NavLink class="nav-item" href="heatmap" data-help="nav:/heatmap"><i class="ti ti-layout-grid"></i>@T("Mappa del portafoglio")</NavLink>
+                <NavLink class="nav-item" href="asof" data-help="nav:/asof"><i class="ti ti-calendar-search"></i>@T("Composizione a una data")</NavLink>
+            }
+
+            <button class="nav-group-head @(IsOpen(GTrading) ? "open" : "")" aria-expanded="@IsOpen(GTrading)" data-help="nav:group" @onclick="() => Toggle(GTrading)"><i class="ti ti-chevron-right"></i>@T("Operatività")</button>
+            @if (IsOpen(GTrading))
+            {
+                <NavLink class="nav-item" href="transfers" data-help="nav:/transfers"><i class="ti ti-arrows-exchange"></i>@T("Entrate / Uscite")</NavLink>
+                <NavLink class="nav-item" href="interest" data-help="nav:/interest"><i class="ti ti-percentage"></i>@T("Interessi")</NavLink>
+                <NavLink class="nav-item" href="securities" data-help="nav:/securities"><i class="ti ti-briefcase"></i>@T("Titoli")</NavLink>
+                <NavLink class="nav-item" href="gains" data-help="nav:/gains"><i class="ti ti-trending-up"></i>@T("Plusvalenze")</NavLink>
+                <NavLink class="nav-item" href="closed" data-help="nav:/closed"><i class="ti ti-circle-check"></i>@T("Posizioni chiuse")</NavLink>
+                <NavLink class="nav-item" href="stats" data-help="nav:/stats"><i class="ti ti-chart-dots"></i>@T("Statistiche")</NavLink>
+            }
+
+            <button class="nav-group-head @(IsOpen(GTax) ? "open" : "")" aria-expanded="@IsOpen(GTax)" data-help="nav:group" @onclick="() => Toggle(GTax)"><i class="ti ti-chevron-right"></i>@T("Fisco")</button>
+            @if (IsOpen(GTax))
+            {
+                <NavLink class="nav-item" href="tax" data-help="nav:/tax"><i class="ti ti-backpack"></i>@T("Zainetto fiscale")</NavLink>
+                <NavLink class="nav-item" href="costs" data-help="nav:/costs"><i class="ti ti-receipt-2"></i>@T("Costi e tasse")</NavLink>
+                <NavLink class="nav-item" href="coupons" data-help="nav:/coupons"><i class="ti ti-calendar-event"></i>@T("Cedole e scadenze")</NavLink>
+            }
+
+            <button class="nav-group-head @(IsOpen(GMarkets) ? "open" : "")" aria-expanded="@IsOpen(GMarkets)" data-help="nav:group" @onclick="() => Toggle(GMarkets)"><i class="ti ti-chevron-right"></i>@T("Mercati")</button>
+            @if (IsOpen(GMarkets))
+            {
+                <NavLink class="nav-item" href="quotes" data-help="nav:/quotes"><i class="ti ti-refresh @(State.IsUpdating ? "spin" : "")"></i>@T("Quotazioni")</NavLink>
+                <NavLink class="nav-item" href="currencies" data-help="nav:/currencies"><i class="ti ti-currency-euro"></i>@T("Valute")</NavLink>
+                <a class="nav-item @(GovActive ? "active" : "")" href="@GovHref" data-help="nav:/bonds"><i class="ti ti-building-bank"></i>@T("Titoli di Stato")</a>
+            }
+
+            <button class="nav-group-head @(IsOpen(GData) ? "open" : "")" aria-expanded="@IsOpen(GData)" data-help="nav:group" @onclick="() => Toggle(GData)">
+                <i class="ti ti-chevron-right"></i>@T("Dati")
+                @if (!IsOpen(GData) && State.WarningCount > 0)
+                {
+                    <span class="badge-count">@State.WarningCount</span>
+                }
+            </button>
+            @if (IsOpen(GData))
+            {
+                <NavLink class="nav-item" href="checks" data-help="nav:/checks">
+                    <i class="ti ti-shield-check"></i>@T("Controlli")
+                    @if (State.WarningCount > 0)
+                    {
+                        <span class="badge-count">@State.WarningCount</span>
+                    }
+                </NavLink>
+                <NavLink class="nav-item" href="files" data-help="nav:/files"><i class="ti ti-folder"></i>@T("Dati e file")</NavLink>
+                <NavLink class="nav-item" href="names" data-help="nav:/names"><i class="ti ti-tag"></i>@T("Nomi dei titoli")</NavLink>
+                <NavLink class="nav-item" href="history" data-help="nav:/history"><i class="ti ti-history"></i>@T("Storia")</NavLink>
+                <NavLink class="nav-item" href="credits" data-help="nav:/credits"><i class="ti ti-heart-handshake"></i>@T("Credits")</NavLink>
+            }
+        </nav>
+
+        <div class="side-foot">
+            <button class="side-btn" data-help="nav:search" @onclick="OpenPalette"><i class="ti ti-search"></i>@T("Cerca")<kbd>@T("Ctrl K")</kbd></button>
+            <button class="side-btn" data-help="nav:privacy" @onclick="TogglePrivacy"><i class="ti @(_privacy ? "ti-eye-off" : "ti-eye")"></i>@(_privacy ? T("Mostra gli importi") : T("Privacy"))<kbd>F2</kbd></button>
+            <button class="side-switch" data-help="nav:assist" @onclick="Assist.Toggle">
+                <span class="sw @(Assist.Enabled ? "on" : "")"></span>@T("Modalità assistita")<kbd>F1</kbd>
+            </button>
+            <button class="side-btn" data-help="nav:theme" @onclick="ToggleTheme"><i class="ti @(_dark ? "ti-sun" : "ti-moon")"></i>@(_dark ? T("Tema chiaro") : T("Tema scuro"))</button>
+            <label class="side-btn side-lang" data-help="nav:language">
+                <i class="ti ti-language"></i>
+                <select @onchange="OnLanguageChanged" aria-label="@T("Lingua")">
+                    @foreach (var language in Languages)
+                    {
+                        <option value="@language.Code" selected="@(language.Code == Lang)">@language.Name</option>
+                    }
+                </select>
+            </label>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <div class="file">
+                <i class="ti ti-file-spreadsheet"></i>
+                @if (State.LoadedFilePath is { } path)
+                {
+                    <span title="@path">@(State.IsArchive ? T("Storico delle operazioni") : System.IO.Path.GetFileName(path))</span>
+                    <span class="muted">@T("{0} operazioni", State.Operations!.Count)</span>
+                }
+                else
+                {
+                    <span class="muted">@T("Nessun file")</span>
+                }
+            </div>
+            <div class="grow"></div>
+            @if (State.IsUpdating)
+            {
+                <span class="muted"><i class="ti ti-loader-2 spin"></i> @T("Aggiorno i prezzi…")</span>
+            }
+            @if (State.QuotesLastUpdated is { } updated)
+            {
+                <span class="muted" data-help="top:quotes"><i class="ti ti-clock"></i> @T("Quotazioni al {0}", updated.ToString("dd/MM/yyyy HH:mm"))</span>
+            }
+            <button class="btn" data-help="top:add" @onclick="AddFile"><i class="ti ti-file-plus"></i> @T("Aggiungi movimenti…")</button>
+            <button class="btn" data-help="top:open" @onclick="OpenFile"><i class="ti ti-folder-open"></i> @T("Apri CSV…")</button>
+        </header>
+
+        @if (State.PendingFile is { } pending)
+        {
+            <div class="banner info top" data-help="banner.newfile">
+                <i class="ti ti-file-import"></i>
+                @if (State.PendingIsAddition)
+                {
+                    <span>@H("Nella cartella c'è un nuovo file: <b>{0}</b>. Vuoi aggiungere i suoi movimenti allo storico?", System.IO.Path.GetFileName(pending))</span>
+                }
+                else
+                {
+                    <span>@H("Nella cartella c'è un file più recente: <b>{0}</b>. Vuoi aprirlo al posto di quello attuale?", System.IO.Path.GetFileName(pending))</span>
+                }
+                <span class="grow"></span>
+                <button class="btn primary" @onclick="State.AcceptPendingFileAsync">@T("Apri")</button>
+                <button class="btn" @onclick="State.DismissPendingFile">@T("Ignora")</button>
+            </div>
+        }
+
+        @* @key: cambiando lingua le pagine si ricostruiscono da zero e rileggono tutti i testi *@
+        <main class="content" @key="Lang">
+            @Body
+        </main>
+    </div>
+</div>
+
+<AssistantPanel @key="@("assistant-" + Lang)" />
+<Toasts @key="@("toasts-" + Lang)" />
+<MergeDialog />
+<NameDialog />
+<CommandPalette @key="@("palette-" + Lang)" OnAddFile="AddFile" Open="_palette" OnClose="ClosePalette" OnToggleTheme="ToggleTheme" OnTogglePrivacy="TogglePrivacyAsync" OnOpenFile="OpenFile" />
+
+@code {
+    private bool _dark;
+    private bool _palette;
+    private bool _privacy;
+    private DotNetObjectReference<MainLayout>? _self;
+
+    // i gruppi del menu: se ne apre uno alla volta (aprirne uno chiude gli altri); quello della pagina in cui sei si apre da solo
+    private const string GToday = "today";
+    private const string GTrading = "trading";
+    private const string GTax = "tax";
+    private const string GMarkets = "markets";
+    private const string GData = "data";
+    private readonly HashSet<string> _open = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        State.Changed += OnChanged;
+        Assist.Changed += OnChanged;
+        Loc.Changed += OnChanged;
+        Nav.LocationChanged += OnLocationChanged;
+        Assist.SetPage(Nav.ToBaseRelativePath(Nav.Uri));
+        _dark = Prefs.Get("theme") == "dark";
+        _open.Add(GroupOf(Nav.ToBaseRelativePath(Nav.Uri)));
+        await State.InitializeAsync();
+    }
+
+    /// <summary>A quale gruppo del menu appartiene una pagina (dal primo pezzo del percorso).</summary>
+    internal static string GroupOf(string path)
+    {
+        var first = path.Split('?', '#')[0].Split('/')[0].ToLowerInvariant();
+        return first switch
+        {
+            "transfers" or "interest" or "securities" or "security" or "gains" or "closed" or "stats" => GTrading,
+            "tax" or "costs" or "coupons" => GTax,
+            "quotes" or "quote" or "currencies" or "bonds" or "btp" => GMarkets,
+            "checks" or "files" or "names" or "history" or "credits" => GData,
+            _ => GToday,
+        };
+    }
+
+    private bool IsOpen(string group) => _open.Contains(group);
+
+    /// <summary>Apre un gruppo chiudendo quelli già aperti; se era aperto lo chiude.</summary>
+    private void Toggle(string group)
+    {
+        var wasOpen = _open.Contains(group);
+        _open.Clear();
+        if (!wasOpen)
+        {
+            _open.Add(group);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _self = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("DPCharts.setTheme", _dark ? "dark" : "light");
+            await JS.InvokeVoidAsync("DPUi.setLanguage", Culture.Name, ChartStrings());
+            await JS.InvokeVoidAsync("DPUi.init", _self);
+        }
+    }
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        var path = Nav.ToBaseRelativePath(e.Location);
+        Assist.SetPage(path);
+        _open.Clear();
+        _open.Add(GroupOf(path));
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>«Titoli di Stato» porta all'ultimo Stato scelto (l'Italia, cioè i BTP, la prima volta).</summary>
+    private string GovHref => BondCountryBar.HrefFor(Prefs.Get("bonds.country") ?? "");
+
+    private bool GovActive
+    {
+        get
+        {
+            var path = Nav.ToBaseRelativePath(Nav.Uri);
+            return path.StartsWith("btp", StringComparison.OrdinalIgnoreCase) || path.StartsWith("bonds", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    [JSInvokable]
+    public Task OpenPalette() => InvokeAsync(() => { _palette = true; StateHasChanged(); });
+
+    [JSInvokable]
+    public Task TogglePrivacy() => TogglePrivacyAsync();
+
+    private Task ClosePalette()
+    {
+        _palette = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task TogglePrivacyAsync()
+    {
+        _privacy = !_privacy;
+        await JS.InvokeVoidAsync("DPUi.setPrivacy", _privacy);
+        StateHasChanged();
+    }
+
+    private async Task OnLanguageChanged(ChangeEventArgs e)
+    {
+        if (e.Value?.ToString() is not { Length: > 0 } code)
+        {
+            return;
+        }
+
+        Prefs.Set("lang", code);
+        SetLanguage(code);                                  // avvisa tutti (Loc.Changed): le pagine si ricostruiscono
+        await JS.InvokeVoidAsync("DPUi.setLanguage", Culture.Name, ChartStrings());
+    }
+
+    /// <summary>Le parole fisse che scrive il JavaScript dei grafici (legende e tooltip), nella lingua corrente.</summary>
+    private static object ChartStrings() => new
+    {
+        goal = T("Obiettivo"),
+        gap = T("Scostamento"),
+        net = T("Versamenti netti"),
+        total = T("Totale"),
+        above = T("Sopra i versamenti"),
+        below = T("Sotto i versamenti"),
+        @base = T("Totale (fino ai versamenti)"),
+    };
+
+    private async Task ToggleTheme()
+    {
+        _dark = !_dark;
+        Prefs.Set("theme", _dark ? "dark" : "light");
+        await JS.InvokeVoidAsync("DPCharts.setTheme", _dark ? "dark" : "light");
+    }
+
+    /// <summary>Aggiunge allo storico i movimenti di un altro CSV (di solito l'ultimo mese): le operazioni già presenti si riconoscono e si scartano.</summary>
+    private async Task AddFile()
+    {
+        var path = Dialogs.PickCsvFile(null, Prefs.Get("import.folder"), T("Seleziona il CSV con i movimenti da aggiungere"));
+        if (path is not null)
+        {
+            await State.AddMovementsAsync(path);
+        }
+    }
+
+    private async Task OpenFile()
+    {
+        var path = Dialogs.PickCsvFile(State.LoadedFilePath);
+        if (path is not null)
+        {
+            await State.LoadFileAsync(path);
+        }
+    }
+
+    public void Dispose()
+    {
+        State.Changed -= OnChanged;
+        Assist.Changed -= OnChanged;
+        Loc.Changed -= OnChanged;
+        Nav.LocationChanged -= OnLocationChanged;
+        _self?.Dispose();
+    }
+}

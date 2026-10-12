@@ -1,0 +1,239 @@
+@page "/files"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-folder"></i>@T("Dati e file")</h1>
+    <p class="sub">@T("Dove l'app tiene i suoi file sul tuo PC. Il tuo CSV non viene mai modificato.")</p>
+
+    <div class="panel" style="margin-bottom:16px" data-help="files.folder">
+        <h2>@T("Cartella dati")</h2>
+        <div class="pathbox">@DataLocations.Root</div>
+        <div class="row" style="margin-top:12px">
+            <button class="btn" data-help="files.open" @onclick="() => OpenFolder(DataLocations.Root)"><i class="ti ti-folder-open"></i> @T("Apri cartella")</button>
+            <button class="btn" data-help="files.copy" @onclick="CopyPath"><i class="ti ti-copy"></i> @(_copied ? T("Copiato ✓") : T("Copia percorso"))</button>
+            <button class="btn" data-help="files.backup" @onclick="Backup"><i class="ti ti-archive"></i> @T("Esporta backup (.zip)")</button>
+            @if (_backupMessage is not null)
+            {
+                <span class="muted">@_backupMessage</span>
+            }
+        </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px" data-help="files.autobackup">
+        <h2>@T("Backup automatico")</h2>
+        <label class="chip @(State.AutoBackupEnabled ? "on" : "")">
+            <input type="checkbox" checked="@State.AutoBackupEnabled" @onchange="e => State.AutoBackupEnabled = e.Value is true" />
+            @T("Una copia dei dati ogni {0} giorni (si tengono le ultime {1})", BackupService.EveryDays, BackupService.KeepLast)
+        </label>
+        <div class="pathbox" style="margin-top:10px">@State.BackupFolder</div>
+        <div class="row" style="margin-top:12px">
+            <button class="btn" @onclick="ChooseBackupFolder"><i class="ti ti-folder-cog"></i> @T("Cambia cartella…")</button>
+            <button class="btn" @onclick="() => OpenFolder(State.BackupFolder)"><i class="ti ti-folder-open"></i> @T("Apri cartella")</button>
+            <button class="btn" @onclick="BackupNow"><i class="ti ti-player-play"></i> @T("Fai un backup ora")</button>
+        </div>
+        <div class="note" style="padding-left:0">@T("Il backup contiene quotazioni, catalogo, BTP e preferenze, non il tuo file CSV.")</div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px" data-help="files.archive">
+        <h2>@T("Storico delle operazioni")</h2>
+        <p class="muted" style="margin:0 0 10px">@T("Invece di scaricare ogni volta tutti i movimenti, puoi aggiungere solo i più recenti (anche l'ultimo mese): l'app riconosce le operazioni che ha già e aggiunge solo quelle nuove, e li tiene insieme in uno storico.")</p>
+        @if (_archiveRows is { } rows)
+        {
+            <div class="pathbox">@OperationArchive.ArchivePath</div>
+            <div class="kv" style="margin-top:10px">
+                <span class="k">@T("Operazioni nello storico")</span><span>@rows.ToString("N0", Fmt.It)</span>
+                <span class="k">@T("In uso")</span><span>@(State.IsArchive ? T("sì") : T("no: stai usando un singolo file CSV"))</span>
+            </div>
+        }
+        else
+        {
+            <div class="muted">@T("Lo storico non c'è ancora: si crea la prima volta che aggiungi movimenti.")</div>
+        }
+        <div class="row" style="margin-top:12px">
+            <button class="btn primary" @onclick="AddMovements"><i class="ti ti-file-plus"></i> @T("Aggiungi movimenti da CSV…")</button>
+            @if (_archiveRows is not null && !State.IsArchive)
+            {
+                <button class="btn" @onclick="UseArchive"><i class="ti ti-database"></i> @T("Usa lo storico")</button>
+            }
+            @if (_archiveRows is not null)
+            {
+                <button class="btn" @onclick="ExportArchive"><i class="ti ti-download"></i> @T("Esporta lo storico in CSV…")</button>
+            }
+        </div>
+        <div class="note" style="padding-left:0">@T("I file CSV scaricati non vengono mai modificati. Prima di ogni aggiornamento dello storico se ne tiene una copia (operazioni.prev.bak).")</div>
+    </div>
+
+    @if (State.LoadedFilePath is { } csv && !State.IsArchive)
+    {
+        <div class="panel" style="margin-bottom:16px" data-help="files.csv">
+            <h2>@T("Il tuo CSV")</h2>
+            <div class="pathbox">@csv</div>
+            <div class="kv" style="margin-top:10px">
+                <span class="k">@T("Dimensione")</span><span>@(File.Exists(csv) ? DataLocations.FormatSize(new FileInfo(csv).Length) : "—")</span>
+                <span class="k">@T("Ultima modifica")</span><span>@(File.Exists(csv) ? new FileInfo(csv).LastWriteTime.ToString("dd/MM/yyyy HH:mm") : "—")</span>
+            </div>
+            <div class="row" style="margin-top:12px">
+                <button class="btn" @onclick="() => ShowInExplorer(csv)"><i class="ti ti-folder-search"></i> @T("Mostra in Esplora file")</button>
+            </div>
+        </div>
+    }
+
+    <h2 data-help="files.quotes">@T("File di quotazione") <span class="muted" style="font-weight:400">— @DataLocations.QuotesFolder</span></h2>
+    <div class="tbl-box">
+        <DataTable TableId="filesq" Items="_quoteFiles" Columns="_quoteColumns" ExportName="file-quotazioni"
+                   DefaultSortTitle="Asset" OnRowClick="r => ShowInExplorer(r.Path)" />
+    </div>
+
+    <h2>@T("Tutti i file dell'app")</h2>
+    <div class="tbl-box" style="height:300px">
+        <DataTable TableId="files" Items="_files" Columns="_fileColumns" ExportName="file-app"
+                   OnRowClick="r => ShowInExplorer(r.Path)" />
+    </div>
+</div>
+
+@code {
+    private sealed record QuoteFileRow(string File, string Asset, int Count, long Size, DateTime? Modified, string Path);
+
+    private List<QuoteFileRow> _quoteFiles = new();
+    private List<DataLocations.FileRow> _files = new();
+    private bool _copied;
+    private string? _backupMessage;
+    private int? _archiveRows;
+
+    private static readonly List<Column<QuoteFileRow>> _quoteColumns = new()
+    {
+        Col.Text<QuoteFileRow>("File", r => r.File),
+        Col.Text<QuoteFileRow>("Asset", r => r.Asset),
+        Col.Num<QuoteFileRow>("Quotazioni", r => r.Count, 0),
+        Col.Text<QuoteFileRow>("Dimensione", r => DataLocations.FormatSize(r.Size)),
+        Col.Date<QuoteFileRow>("Modificato", r => r.Modified, "dd/MM/yyyy HH:mm"),
+    };
+
+    private static readonly List<Column<DataLocations.FileRow>> _fileColumns = new()
+    {
+        Col.Text<DataLocations.FileRow>("File", r => r.Name),
+        Col.Text<DataLocations.FileRow>("Contenuto", r => r.Description),
+        Col.Text<DataLocations.FileRow>("Dimensione", r => DataLocations.FormatSize(r.Size)),
+        Col.Date<DataLocations.FileRow>("Modificato", r => r.Modified, "dd/MM/yyyy HH:mm"),
+    };
+
+    protected override void OnInitialized()
+    {
+        Load();
+        base.OnInitialized();
+    }
+
+    protected override void Rebuild() => Load();
+
+    private void Load()
+    {
+        _files = DataLocations.TopLevel();
+        _archiveRows = File.Exists(OperationArchive.ArchivePath) ? Math.Max(0, File.ReadLines(OperationArchive.ArchivePath).Count() - 1) : null;
+
+        var catalog = AssetCatalogStore.Load().ToDictionary(e => e.FileName, e => e.Name);
+        _quoteFiles = Directory.Exists(DataLocations.QuotesFolder)
+            ? new DirectoryInfo(DataLocations.QuotesFolder).GetFiles("*.json").Select(f => new QuoteFileRow(
+                f.Name,
+                catalog.GetValueOrDefault(f.Name, T("(non nel catalogo)")),
+                CountQuotes(f.FullName),
+                f.Length,
+                f.LastWriteTime,
+                f.FullName)).ToList()
+            : new();
+    }
+
+    private static int CountQuotes(string path)
+    {
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+            return doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array ? doc.RootElement.GetArrayLength() : 0;
+        }
+        catch (Exception ex) when (ex is IOException or System.Text.Json.JsonException)
+        {
+            return 0;
+        }
+    }
+
+    private static void OpenFolder(string path)
+    {
+        Directory.CreateDirectory(path);
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"\"{path}\"") { UseShellExecute = true });
+    }
+
+    private static void ShowInExplorer(string path)
+    {
+        var argument = File.Exists(path) ? $"/select,\"{path}\"" : $"\"{path}\"";
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", argument) { UseShellExecute = true });
+    }
+
+    private async Task AddMovements()
+    {
+        var path = Dialogs.PickCsvFile(null, Prefs.Get("import.folder"), T("Seleziona il CSV con i movimenti da aggiungere"));
+        if (path is not null)
+        {
+            await State.AddMovementsAsync(path);
+        }
+    }
+
+    private async Task UseArchive() => await State.UseArchiveAsync();
+
+    private void ExportArchive()
+    {
+        if (File.Exists(OperationArchive.ArchivePath))
+        {
+            Dialogs.SaveCsv("storico-operazioni.csv", File.ReadAllText(OperationArchive.ArchivePath));
+        }
+    }
+
+    private void ChooseBackupFolder()
+    {
+        if (Dialogs.PickFolder(State.BackupFolder, T("Dove salvare i backup automatici")) is { } folder)
+        {
+            State.BackupFolder = folder;
+        }
+    }
+
+    private void BackupNow()
+    {
+        try
+        {
+            Directory.CreateDirectory(State.BackupFolder);
+            var target = Path.Combine(State.BackupFolder, $"pelago-backup-{DateTime.Now:yyyyMMdd-HHmm}.zip");
+            var count = DataLocations.CreateBackup(target);
+            _backupMessage = T("Backup creato: {0} file in {1}.", count, Path.GetFileName(target));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _backupMessage = T("Backup non riuscito: {0}", ex.Message);
+        }
+    }
+
+    private async Task CopyPath()
+    {
+        Clipboard.SetText(DataLocations.Root);
+        _copied = true;
+        StateHasChanged();
+        await Task.Delay(1800);
+        _copied = false;
+    }
+
+    private void Backup()
+    {
+        var target = Dialogs.PickBackupFile();
+        if (target is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var count = DataLocations.CreateBackup(target);
+            _backupMessage = T("Backup creato: {0} file in {1}.", count, Path.GetFileName(target));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _backupMessage = T("Backup non riuscito: {0}", ex.Message);
+        }
+    }
+}

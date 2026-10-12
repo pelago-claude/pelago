@@ -1,0 +1,49 @@
+name: Build e test
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Test automatici
+        run: dotnet test Tests/Pelago.Tests.csproj --nologo
+
+  release:
+    # Solo quando si pubblica un tag come v2.12.0: compila pelago.exe, calcola lo SHA-256 e crea la release.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Pubblica pelago.exe
+        run: >
+          dotnet publish DPOper.csproj -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
+          -o out
+      - name: Impronta SHA-256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash out/pelago.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  pelago.exe" | Out-File -Encoding ascii out/pelago.exe.sha256
+          Get-Content out/pelago.exe.sha256
+      - name: Crea la release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" out/pelago.exe out/pelago.exe.sha256 --title "Pelago ${{ github.ref_name }}" --generate-notes

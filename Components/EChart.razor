@@ -1,0 +1,55 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="chart-wrap" data-help="@Help"><div @ref="_el" class="chart" style="height:@Height"></div></div>
+
+@code {
+    [Parameter, EditorRequired] public string Kind { get; set; } = "";
+    [Parameter, EditorRequired] public object? Data { get; set; }
+    [Parameter] public string Height { get; set; } = "360px";
+    [Parameter] public string? Help { get; set; }
+
+    /// <summary>Chiamato quando si clicca un elemento del grafico (per esempio una fetta della ciambella), con il suo nome.</summary>
+    [Parameter] public Action<string>? OnItemClick { get; set; }
+
+    private ElementReference _el;
+    private DotNetObjectReference<EChart>? _self;
+    private object? _lastData;
+    private string? _lastKind;
+    private bool _rendered;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _rendered = true;
+        if (!ReferenceEquals(_lastData, Data) || _lastKind != Kind)
+        {
+            _lastData = Data;
+            _lastKind = Kind;
+            if (Data is not null)
+            {
+                _self ??= OnItemClick is null ? null : DotNetObjectReference.Create(this);
+                await JS.InvokeVoidAsync("DPCharts.render", _el, Kind, Data, _self);
+            }
+        }
+    }
+
+    [JSInvokable]
+    public Task ItemClicked(string name) => InvokeAsync(() => OnItemClick?.Invoke(name));
+
+    public async ValueTask DisposeAsync()
+    {
+        _self?.Dispose();
+        if (!_rendered)
+        {
+            return;
+        }
+        try
+        {
+            await JS.InvokeVoidAsync("DPCharts.dispose", _el);
+        }
+        catch (Exception ex) when (ex is JSDisconnectedException or TaskCanceledException or InvalidOperationException)
+        {
+            // La finestra si sta chiudendo: niente da liberare.
+        }
+    }
+}

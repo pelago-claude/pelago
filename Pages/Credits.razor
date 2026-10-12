@@ -1,0 +1,74 @@
+@page "/credits"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-heart-handshake"></i>@T("Credits")</h1>
+    <p class="sub">@T("Pelago {0} — il tuo conto sotto controllo.", _version)</p>
+
+    <div class="panel" style="margin-bottom:16px">
+        <h2>@T("Realizzazione")</h2>
+        <p style="margin:0">@H("Ideata e voluta da <b>David</b>, scritta insieme a <b>Claude</b> (Anthropic).")</p>
+        <p class="muted" style="margin:6px 0 0">@T("I tuoi dati restano sul tuo PC: l'app contatta internet solo per scaricare prezzi, cambi, rendimenti e l'elenco dei BTP, e non invia a nessuno il tuo CSV.")</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px" data-help="name.pelago">
+        <h2>@T("Perché si chiama Pelago")</h2>
+        <p style="margin:0">@T("«Pelago», in italiano, è il mare aperto: una parola che rende bene l'idea di navigare tra i propri soldi, con la bussola in mano. Per questo l'icona è una barca a vela sulle onde.")</p>
+        <p class="muted" style="margin:6px 0 0">@T("All'inizio si chiamava DPOper, dove «Oper» sta per operazioni. Tra Pelago, Quota, Bussola e Fiorino abbiamo scelto Pelago l'8 ottobre 2026. Il racconto completo è nella pagina Storia.")</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px" data-help="credits.sources">
+        <h2>@T("Fonti dei dati")</h2>
+        <table class="grid">
+            <thead><tr><th>@T("Fonte")</th><th>@T("Cosa fornisce")</th><th>@T("Sito")</th></tr></thead>
+            <tbody>
+                <tr><td>@T("CoinGecko")</td><td class="badge-cell">@T("Prezzi delle crypto")</td><td>@T("coingecko.com")</td></tr>
+                <tr><td>@T("Yahoo Finance")</td><td class="badge-cell">@T("Prezzi di azioni e fondi, cambi in tempo quasi reale")</td><td>@T("finance.yahoo.com")</td></tr>
+                <tr><td>@T("Frankfurter (dati BCE)")</td><td class="badge-cell">@T("Cambi di riferimento BCE e storico dei cambi")</td><td>@T("frankfurter.app")</td></tr>
+                <tr><td>@T("Borsa Italiana (MOT)")</td><td class="badge-cell">@T("Elenco e prezzi dei BTP")</td><td>borsaitaliana.it</td></tr>
+                <tr><td>@T("BCE (Banca Centrale Europea)")</td><td class="badge-cell">@T("Rendimenti dei titoli di Stato dei paesi UE e curva dei titoli AAA")</td><td>data.ecb.europa.eu</td></tr>
+                <tr><td>Bundesbank</td><td class="badge-cell">@T("Curva dei rendimenti dei Bund tedeschi")</td><td>bundesbank.de</td></tr>
+                <tr><td>@T("Tesoro USA")</td><td class="badge-cell">@T("Curva dei rendimenti e aste dei titoli del Tesoro USA")</td><td>home.treasury.gov, treasurydirect.gov</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px">
+        <h2>@T("Licenza e codice sorgente")</h2>
+        <p style="margin:0">@T("Pelago è software libero: puoi usarlo, studiarlo, modificarlo e ridistribuirlo secondo i termini della GNU General Public License, versione 3 (GPL-3.0), pubblicata dalla Free Software Foundation.")</p>
+        <p class="muted" style="margin:6px 0 0">@T("Pelago è distribuito nella speranza che sia utile, ma SENZA ALCUNA GARANZIA, nemmeno quella implicita di commerciabilità o di idoneità a uno scopo particolare. Il testo completo della licenza è su gnu.org/licenses/gpl-3.0.html.")</p>
+        <p class="muted" style="margin:6px 0 0">@ProjectInfo.Copyright</p>
+        @if (!string.IsNullOrEmpty(ProjectInfo.RepositoryUrl))
+        {
+            <p style="margin:6px 0 0">@T("Codice sorgente e segnalazioni: {0}", ProjectInfo.RepositoryUrl)</p>
+        }
+    </div>
+
+    <div class="panel" style="margin-bottom:16px" data-help="credits.components">
+        <h2>@T("Componenti open source")</h2>
+        <table class="grid">
+            <thead><tr><th>@T("Componente")</th><th>@T("Uso")</th><th>@T("Licenza")</th></tr></thead>
+            <tbody>
+                <tr><td>@T("Apache ECharts 5.5")</td><td class="badge-cell">@T("Tutti i grafici")</td><td>@T("Apache License 2.0")</td></tr>
+                <tr><td>flag-icons</td><td class="badge-cell">@T("Le bandiere dei Paesi")</td><td>MIT</td></tr>
+                <tr><td>@T("Tabler Icons")</td><td class="badge-cell">@T("Le icone dell'interfaccia")</td><td>MIT</td></tr>
+                <tr><td>Instrument Sans</td><td class="badge-cell">@T("Il carattere dei testi")</td><td>SIL Open Font License 1.1</td></tr>
+                <tr><td>@T(".NET 8 e Blazor")</td><td class="badge-cell">@T("Il motore dell'app e dell'interfaccia")</td><td>@T("MIT (Microsoft)")</td></tr>
+                <tr><td>@T("Microsoft Edge WebView2")</td><td class="badge-cell">@T("Il browser incorporato che mostra le pagine")</td><td>@T("Licenza Microsoft")</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel" data-help="credits.disclaimer">
+        <h2>@T("Avvertenze")</h2>
+        <ul class="credit-list">
+            <li>@T("I prezzi vengono da servizi pubblici e sono indicativi: possono essere in ritardo o mancare.")</li>
+            <li>@T("Il valore degli asset è una stima (quantità × ultimo prezzo noto), non un saldo ufficiale del broker.")</li>
+            <li>@T("Plusvalenze e rendimenti sono calcoli semplificati: non sono consulenza finanziaria né una dichiarazione fiscale.")</li>
+        </ul>
+    </div>
+</div>
+
+@code {
+    private readonly string _version = ChangeLog.Current.Version;
+}

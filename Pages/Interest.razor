@@ -1,0 +1,39 @@
+@page "/interest"
+@inherits StatePage
+
+<div class="page fill">
+    <h1><i class="ti ti-percentage"></i>@T("Interessi")</h1>
+    <p class="sub">@T("Interessi pagati sulla liquidità.")</p>
+
+    <NeedData>
+        <div class="cards">
+            <div class="card" data-help="interest.gross"><div class="label">@T("Lordo")</div><div class="value">@Fmt.Money(_rows.Sum(r => r.Gross))</div></div>
+            <div class="card" data-help="interest.tax"><div class="label">@T("Tasse trattenute")</div><div class="value neg">@Fmt.Money(_rows.Sum(r => r.Tax))</div></div>
+            <div class="card" data-help="interest.net"><div class="label">@T("Netto incassato")</div><div class="value pos">@Fmt.Money(_rows.Sum(r => r.Net))</div></div>
+            <div class="card" data-help="count"><div class="label">@T("Pagamenti")</div><div class="value">@_rows.Count</div></div>
+        </div>
+        <DataTable TableId="interest" Items="_rows" Columns="_columns" ExportName="interessi"
+                   DefaultSortTitle="Data" DefaultDescending="true" />
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(DateTime Date, decimal Gross, decimal Tax, decimal Net, string Description);
+
+    private List<Row> _rows = new();
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Date<Row>("Data", r => r.Date),
+        Col.Money<Row>("Lordo", r => r.Gross, total: rows => rows.Sum(r => r.Gross)),
+        Col.Money<Row>("Tassa", r => r.Tax, total: rows => rows.Sum(r => r.Tax)),
+        Col.Money<Row>("Netto", r => r.Net, total: rows => rows.Sum(r => r.Net)),
+        Col.Text<Row>("Descrizione", r => r.Description),
+    };
+
+    protected override void Rebuild() => _rows = State.Operations!
+        .Where(o => o.Type == "INTEREST_PAYMENT")
+        .OrderByDescending(o => o.DateTime)
+        .Select(o => new Row(o.DateTime, o.Amount ?? 0m, o.Tax ?? 0m, o.NetCashImpact, o.Description))
+        .ToList();
+}

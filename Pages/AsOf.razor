@@ -1,0 +1,162 @@
+@page "/asof"
+@inherits StatePage
+
+<div class="page fill">
+    <h1><i class="ti ti-calendar-search"></i>@T("Composizione a una data")</h1>
+    <p class="sub">@T("Scegli un giorno con lo slider (le frecce della tastiera spostano di un giorno) e spunta le categorie da vedere: le righe si sommano, ciascuna col colore della sua categoria.")</p>
+
+    <NeedData>
+        @if (_current is not null)
+        {
+            <div class="row" style="margin-bottom:16px">
+                <DateSlider Min="@State.MinDate" Max="@State.MaxDate" Value="@_date" ValueChanged="OnSlide" />
+                <span class="muted" style="white-space:nowrap">@H("Totale conto: <b>{0}</b>", Fmt.Money(_current.Total))</span>
+            </div>
+
+            <div class="split">
+                <div class="cat-list">
+                    @foreach (var (key, label, color) in AssetClassPalette.Categories)
+                    {
+                        var k = key;
+                        var hex = Fmt.Hex(color);
+                        <label class="cat @(_checked.Contains(k) ? "on" : "")" style="border-left-color:@hex" data-help="@("asof.cat." + k)">
+                            <input type="checkbox" checked="@_checked.Contains(k)" @onchange="e => Toggle(k, e.Value is true)" style="accent-color:@hex" />
+                            <div>
+                                <div class="t" style="color:@hex">@T(label)</div>
+                                <div class="s">@Summary(k)</div>
+                            </div>
+                        </label>
+                    }
+                </div>
+
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                    <DataTable TableId="asof" Items="_rows" Columns="_columns" ExportName="composizione"
+                               OnRowClick="Open" RowStyle="RowStyle" FooterLabel="Totale selezione" />
+                </div>
+            </div>
+        }
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(string Category, string CategoryKey, string Name, string Symbol, decimal? Shares, decimal? Price, decimal Value, string Key);
+
+    private DateOnly _date;
+    private PortfolioAsOf? _current;
+    private readonly HashSet<string> _checked = new();
+    private List<Row> _rows = new();
+    private List<Operation> _interest = new();
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Badge<Row>("Categoria", r => r.Category),
+        Col.Name<Row>("Nome", r => r.Name, r => r.Key),
+        Col.Isin<Row>("Simbolo", r => r.Symbol),
+        Col.Issuer<Row>(r => r.Symbol, r => r.CategoryKey),
+        Col.Num<Row>("Quantità", r => r.Shares),
+        Col.Money4<Row>("Prezzo", r => r.Price),
+        Col.Money<Row>("Valore", r => r.Value, total: rows => rows.Sum(r => r.Value)),
+    };
+
+    protected override void OnInitialized()
+    {
+        foreach (var key in (Prefs.Get("asof.checked") ?? "CASH").Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            _checked.Add(key);
+        }
+        base.OnInitialized();
+    }
+
+    protected override void Rebuild()
+    {
+        if (_date == default || _date > State.MaxDate)
+        {
+            _date = State.ViewDate;
+        }
+        Recompute();
+    }
+
+    private static string Iso(DateOnly d) => d.ToString("yyyy-MM-dd");
+
+    private void Recompute()
+    {
+        _current = PortfolioCalculator.ComputeAsOf(State.Operations!, _date, State.Quotes);
+        var end = _date.ToDateTime(TimeOnly.MaxValue);
+        _interest = State.Operations!.Where(o => o.Type == "INTEREST_PAYMENT" && o.DateTime <= end)
+            .OrderByDescending(o => o.DateTime).ToList();
+
+        var rows = new List<Row>();
+        foreach (var (key, label, _) in AssetClassPalette.Categories)
+        {
+            if (!_checked.Contains(key))
+            {
+                continue;
+            }
+
+            switch (key)
+            {
+                case "CASH":
+                    rows.Add(new Row(T(label), key, T("Saldo disponibile"), "", null, null, _current.Cash, ""));
+                    break;
+                case "INTEREST":
+                    rows.AddRange(_interest.Select(o => new Row(T(label), key,
+                        T("Interesse del {0:dd/MM/yyyy}", o.DateTime.ToLocalTime()), "", null, null, o.NetCashImpact, "")));
+                    break;
+                default:
+                    rows.AddRange(_current.Assets.Where(a => a.AssetClass == key)
+                        .Select(a => new Row(T(label), key, State.ChosenNameOf(a.Key) ?? a.Name, a.Symbol, a.Shares, a.Price, a.Value, a.Key)));
+                    break;
+            }
+        }
+        _rows = rows;
+    }
+
+    private string Summary(string key)
+    {
+        if (_current is null)
+        {
+            return "";
+        }
+        return key switch
+        {
+            "CASH" => Fmt.Money(_current.Cash),
+            "INTEREST" => $"{_interest.Count} · {Fmt.Money(_interest.Sum(o => o.NetCashImpact))}",
+            _ => $"{_current.Assets.Count(a => a.AssetClass == key)} · {Fmt.Money(_current.Assets.Where(a => a.AssetClass == key).Sum(a => a.Value))}",
+        };
+    }
+
+    private string? RowStyle(Row row)
+    {
+        var color = AssetClassPalette.Categories.First(c => c.Key == row.CategoryKey).Color;
+        return $"background:rgba({color.R},{color.G},{color.B},.14)";
+    }
+
+    private void Toggle(string key, bool on)
+    {
+        if (on)
+        {
+            _checked.Add(key);
+        }
+        else
+        {
+            _checked.Remove(key);
+        }
+        Prefs.Set("asof.checked", string.Join(',', _checked));
+        Recompute();
+    }
+
+    private void OnSlide(DateOnly date)
+    {
+        _date = date < State.MinDate ? State.MinDate : date > State.MaxDate ? State.MaxDate : date;
+        State.ViewDate = _date;                 // lo stesso giorno vale per la Mappa del portafoglio
+        Recompute();
+    }
+
+    private void Open(Row row)
+    {
+        if (!string.IsNullOrEmpty(row.Key))
+        {
+            Nav.NavigateTo($"security?key={Uri.EscapeDataString(row.Key)}&asof={Iso(_date)}");
+        }
+    }
+}

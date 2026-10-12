@@ -1,0 +1,382 @@
+@page "/currencies"
+@inherits StatePage
+@using System.Globalization
+
+<div class="page">
+    <h1><i class="ti ti-currency-euro"></i>@T("Valute")</h1>
+    <p class="sub">@T("I cambi principali contro l'euro, quasi in tempo reale. Clicca una valuta per vedere come si è mossa.")</p>
+
+    <div class="row" style="margin-bottom:12px">
+        <button class="btn primary" data-help="fx.refresh" disabled="@_busy" @onclick="() => RefreshAsync()">
+            <i class="ti ti-refresh @(_busy ? "spin" : "")"></i> @T("Aggiorna")
+        </button>
+        <label class="chip @(_auto ? "on" : "")" data-help="fx.auto">
+            <input type="checkbox" checked="@_auto" @onchange="OnAutoChanged" />
+            @T("Aggiorna ogni minuto")
+        </label>
+        <span class="muted" data-help="fx.status">@Status()</span>
+    </div>
+
+    @if (_error is not null)
+    {
+        <div class="err">@_error</div>
+    }
+
+    @if (_snapshot is null)
+    {
+        <div class="panel"><span class="muted">@(_busy ? T("Scarico i cambi…") : T("Nessun cambio disponibile: premi «Aggiorna»."))</span></div>
+    }
+    else
+    {
+        <div class="cards" data-help="fx.cards">
+            @foreach (var code in _headline)
+            {
+                if (_snapshot.Rows.FirstOrDefault(r => r.Code == code) is not { } r)
+                {
+                    continue;
+                }
+                <div class="card link" @onclick="() => Select(r.Code)">
+                    <div class="label"><Flag Code="eu" /><Flag Code="@FxBoard.FlagOf(r.Code)" /> EUR / @r.Code</div>
+                    <div class="value">@Rate(r.Rate)</div>
+                    <div class="delta muted">@T("{0} oggi", Change(r.Change1d))</div>
+                </div>
+            }
+        </div>
+
+        <div class="panel" style="margin-bottom:16px" data-help="fx.table">
+            <table class="grid">
+                <thead><tr>
+                    <th>@T("Valuta")</th>
+                    <th class="r" data-help="fx.col.rate"><span>@T("1 € vale")</span></th>
+                    <th class="r" data-help="fx.col.inverse"><span>@T("1 unità vale")</span></th>
+                    <th class="r" data-help="fx.col.change1d"><span>@T("Oggi")</span></th>
+                    <th class="r" data-help="fx.col.change30d"><span>@T("30 giorni")</span></th>
+                    <th data-help="fx.col.spark"><span>@T("Ultimi 30 giorni")</span></th>
+                    <th data-help="fx.col.source"><span>@T("Fonte")</span></th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var r in _snapshot.Rows)
+                    {
+                        <tr class="clickable @(_selected == r.Code ? "selected" : "")" @onclick="() => Select(r.Code)">
+                            <td><Flag Code="@FxBoard.FlagOf(r.Code)" /><b>@r.Code</b> <span class="muted">@T(r.Name)</span></td>
+                            <td class="r strong">@Rate(r.Rate)</td>
+                            <td class="r">@Inverse(r.Inverse)</td>
+                            <td class="r">@Change(r.Change1d)</td>
+                            <td class="r">@Change(r.Change30d)</td>
+                            <td>@if (SparkPoints(r.Spark) is { Length: > 0 } points)
+                                {
+                                    <svg class="spark" viewBox="0 0 108 28" width="108" height="28" aria-hidden="true"><polyline points="@points" /></svg>
+                                }</td>
+                            <td title="@(r.AsOfUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss", FxCulture))"><span class="live-dot @(r.IsLive ? "on" : "")"></span>@T(r.Source)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel" style="margin-bottom:16px" data-help="fx.chart">
+            <div class="row" style="margin-bottom:8px">
+                <h2 style="margin:0"><Flag Code="eu" /><Flag Code="@FxBoard.FlagOf(_selected)" /> EUR / @_selected</h2>
+                <span class="muted">@T("quante {0} valgono 1 €", _selected)</span>
+                <div class="chips" style="margin-left:auto">
+                    @foreach (var (label, days) in Ranges)
+                    {
+                        <button class="chip @(_rangeDays == days ? "on" : "")" @onclick="() => SetRange(days)">@T(label)</button>
+                    }
+                </div>
+            </div>
+            @if (_historyError is not null)
+            {
+                <div class="warn">@_historyError</div>
+            }
+            else if (_chart is null)
+            {
+                <div class="muted" style="padding:40px 0;text-align:center">@T("Carico lo storico…")</div>
+            }
+            else
+            {
+                <EChart Kind="lines" Data="_chart" Height="320px" />
+            }
+            <div class="note" style="padding-left:0">@T("Storico: cambi di riferimento giornalieri della BCE (Frankfurter).")</div>
+        </div>
+
+        <div class="panel" style="margin-bottom:16px" data-help="fx.convert">
+            <h2>@T("Convertitore")</h2>
+            <div class="row">
+                <div class="field">@T("Importo")<input type="number" step="any" @bind="_amount" @bind:after="Convert" @bind:event="oninput" /></div>
+                <div class="field">@T("Da")
+                    <CurrencyPicker Value="@_from" ValueChanged="OnFromChanged" Options="CurrencyOptions()" />
+                </div>
+                <button class="btn" style="align-self:flex-end" @onclick="Swap" title="@T("Inverti")"><i class="ti ti-arrows-exchange"></i></button>
+                <div class="field">@T("In")
+                    <CurrencyPicker Value="@_to" ValueChanged="OnToChanged" Options="CurrencyOptions()" />
+                </div>
+            </div>
+            <div class="fx-result">
+                @if (_toText.Length > 0)
+                {
+                    <Flag Code="@FxBoard.FlagOf(_resultFrom)" />@_fromText <span class="muted">=</span> <Flag Code="@FxBoard.FlagOf(_resultTo)" />@_toText
+                }
+                else
+                {
+                    @_converted
+                }
+            </div>
+        </div>
+    }
+
+    @if (State.HasData)
+    {
+        <div class="panel" data-help="fx.exposure">
+            <h2>@T("Il tuo conto per valuta")</h2>
+            @if (_exposure.Count == 0)
+            {
+                <span class="muted">@T("Nessuna posizione aperta con un valore.")</span>
+            }
+            else
+            {
+                <p class="muted" style="margin:0 0 10px">@H("Titoli, obbligazioni e crypto per <b>valuta di quotazione</b> (non quella dei sottostanti: un ETF quotato in euro che investe in dollari risulta in euro).")</p>
+                <table class="grid">
+                    <thead><tr><th>@T("Valuta")</th><th class="r">@T("Valore")</th><th class="r">@T("Peso")</th><th class="r" data-help="fx.shock"><span>@T("Se si muove del")</span></th></tr></thead>
+                    <tbody>
+                        @foreach (var e in _exposure)
+                        {
+                            <tr>
+                                <td><Flag Code="@FxBoard.FlagOf(e.Currency)" /><b>@e.Currency</b></td>
+                                <td class="r">@Fmt.Money(e.Value)</td>
+                                <td class="r">@Fmt.Pct(e.Share, 1)</td>
+                                <td class="r @(e.Currency == "EUR" ? "muted" : ShockClass())">@(e.Currency == "EUR" ? "—" : Fmt.Money(e.Value * _shock / 100m))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="row" style="margin-top:12px">
+                    <div class="field" data-help="fx.shock">@T("Ipotesi: le valute diverse dall'euro si muovono del (%)")
+                        <input type="number" step="1" @bind="_shock" @bind:event="oninput" />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private static CultureInfo FxCulture => Culture;
+    private static readonly string[] _headline = { "USD", "GBP", "CHF", "JPY" };
+    private static readonly (string Label, int Days)[] Ranges = { ("1 mese", 31), ("3 mesi", 93), ("1 anno", 366), ("5 anni", 1830) };
+
+    private FxSnapshot? _snapshot;
+    private bool _busy;
+    private bool _auto = true;
+    private string? _error;
+    private string _selected = "USD";
+    private int _rangeDays = 93;
+    private object? _chart;
+    private string? _historyError;
+    private readonly Dictionary<(string, int), List<(DateOnly Date, decimal Rate)>> _histories = new();
+    private decimal _amount = 100m;
+    private string _from = "EUR";
+    private string _to = "USD";
+    private string _converted = "";
+    private string _fromText = "", _toText = "", _resultFrom = "", _resultTo = "";
+    private List<FxExposureRow> _exposure = new();
+    private decimal _shock = -5m;
+    private System.Threading.Timer? _timer;
+    private readonly CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _snapshot = FxBoard.LoadSaved();
+        Convert();
+        _ = LoadChartAsync();
+
+        var stale = _snapshot is null || DateTime.UtcNow - _snapshot.FetchedUtc > TimeSpan.FromSeconds(60);
+        if (stale)
+        {
+            await RefreshAsync();
+        }
+
+        _timer = new System.Threading.Timer(_ => _ = InvokeAsync(async () =>
+        {
+            if (_auto && !_busy)
+            {
+                await RefreshAsync();
+            }
+        }), null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
+    }
+
+    protected override void Rebuild()
+    {
+        var open = State.Holdings.Where(h => h.Shares > 0m && h.Value > 0m).ToList();
+        var currencies = FxExposure.LastQuoteCurrencies(open.Select(h => h.Key));
+        _exposure = FxExposure.Compute(open.Select(h => (h.Value, (string?)currencies.GetValueOrDefault(h.Key))));
+    }
+
+    private async Task RefreshAsync()
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        _error = null;
+        StateHasChanged();
+        try
+        {
+            var snapshot = await FxBoard.FetchAsync(_cts.Token);
+            _snapshot = snapshot;
+            FxBoard.Save(snapshot);
+            Convert();
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            _error = _snapshot is null ? T("Aggiornamento non riuscito ({0}).", ex.Message) : T("Aggiornamento non riuscito ({0}): mostro gli ultimi cambi salvati.", ex.Message);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void OnAutoChanged(ChangeEventArgs e) => _auto = e.Value is true;
+
+    private void Select(string code)
+    {
+        _selected = code;
+        _ = LoadChartAsync();
+    }
+
+    private void SetRange(int days)
+    {
+        _rangeDays = days;
+        _ = LoadChartAsync();
+    }
+
+    private async Task LoadChartAsync()
+    {
+        var key = (_selected, _rangeDays);
+        _historyError = null;
+        if (!_histories.TryGetValue(key, out var history))
+        {
+            _chart = null;
+            await InvokeAsync(StateHasChanged);
+            try
+            {
+                history = await FxBoard.HistoryAsync(_selected, DateOnly.FromDateTime(DateTime.Today.AddDays(-_rangeDays)), _cts.Token);
+                _histories[key] = history;
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                _historyError = T("Storico non disponibile ({0}).", ex.Message);
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+        }
+
+        if (key != (_selected, _rangeDays))
+        {
+            return; // nel frattempo l'utente ha scelto altro
+        }
+
+        var decimals = history.Count > 0 && history[^1].Rate >= 100m ? 2 : history.Count > 0 && history[^1].Rate >= 10m ? 3 : 4;
+        _chart = ChartData.RateLine(T("1 € in {0}", _selected), history.Select(p => (p.Date, p.Rate)), decimals);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private IEnumerable<string> CurrencyOptions() => new[] { "EUR" }.Concat(_snapshot?.Rows.Select(r => r.Code) ?? Enumerable.Empty<string>());
+
+    private void OnFromChanged(string code)
+    {
+        _from = code;
+        Convert();
+    }
+
+    private void OnToChanged(string code)
+    {
+        _to = code;
+        Convert();
+    }
+
+    private void Swap()
+    {
+        (_from, _to) = (_to, _from);
+        Convert();
+    }
+
+    private void Convert()
+    {
+        _fromText = _toText = _converted = "";
+        if (_snapshot is null)
+        {
+            return;
+        }
+
+        var result = FxBoard.Convert(_amount, _from, _to, _snapshot);
+        if (result is { } v)
+        {
+            _resultFrom = _from;
+            _resultTo = _to;
+            _fromText = $"{_amount.ToString("N2", FxCulture)} {_from}";
+            _toText = $"{v.ToString(v >= 100m ? "N2" : "N4", FxCulture)} {_to}";
+        }
+        else
+        {
+            _converted = T("Cambio non disponibile");
+        }
+    }
+
+    private string Status()
+    {
+        if (_snapshot is null)
+        {
+            return "";
+        }
+
+        var live = _snapshot.Rows.Count(r => r.IsLive);
+        var source = live == 0 ? T("cambi di riferimento BCE (Yahoo Finance non ha risposto)")
+            : live == _snapshot.Rows.Count ? "Yahoo Finance" : T("Yahoo Finance, per alcune valute BCE");
+        return T("Aggiornato alle {0:HH:mm:ss} · fonte: {1}", _snapshot.FetchedUtc.ToLocalTime(), source);
+    }
+
+    private static string Rate(decimal v) => v.ToString(v >= 100m ? "N2" : v >= 10m ? "N3" : "N4", FxCulture);
+    private static string Inverse(decimal v) => v.ToString(v < 0.01m ? "N6" : "N4", FxCulture);
+
+    private static string Change(decimal? v) =>
+        v is { } c ? (c * 100m).ToString("+0.00;−0.00;0.00", FxCulture) + "%" : "—";
+
+    private string ShockClass() => _shock switch { > 0m => "pos", < 0m => "neg", _ => "" };
+
+    private static string SparkPoints(List<decimal> values)
+    {
+        if (values.Count < 2)
+        {
+            return "";
+        }
+
+        var min = values.Min();
+        var span = values.Max() - min;
+        if (span == 0m)
+        {
+            span = 1m;
+        }
+
+        return string.Join(' ', values.Select((v, i) =>
+            FormattableString.Invariant($"{i * 108m / (values.Count - 1):0.#},{26m - (v - min) / span * 24m:0.#}")));
+    }
+
+    public override void Dispose()
+    {
+        _cts.Cancel();
+        _timer?.Dispose();
+        base.Dispose();
+    }
+}

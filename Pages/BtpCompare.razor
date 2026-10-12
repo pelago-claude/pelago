@@ -1,0 +1,135 @@
+@page "/btp/compare"
+@inherits StatePage
+
+<div class="page">
+    <a class="back" @onclick='() => Nav.NavigateTo("btp")'><i class="ti ti-arrow-left"></i> @T("Elenco BTP")</a>
+    <h1><i class="ti ti-building-bank"></i>@T("Confronto BTP")</h1>
+    <p class="sub">@T("Gli stessi soldi investiti in titoli diversi, al prezzo di mercato di oggi. In verde il valore migliore di ogni riga.")</p>
+
+    @if (_bonds.Count < 2)
+    {
+        <div class="empty"><i class="ti ti-search-off"></i><h2>@T("Servono almeno due BTP")</h2><p>@T("Torna all'elenco, attiva «Confronta BTP» e scegline due o tre.")</p></div>
+    }
+    else
+    {
+        <div class="panel" style="margin-bottom:14px">
+            <div class="row">
+                <div class="field" data-help="btp.capital">@T("Capitale da investire (€)")<input type="number" step="1000" @bind="_capital" @bind:after="Recalculate" /></div>
+                <div class="field" data-help="btp.commission">@T("Commissioni (€)")<input type="number" step="1" @bind="_commission" @bind:after="Recalculate" /></div>
+                <div class="field" data-help="btp.tax">@T("Aliquota (%)")<input type="number" step="0.5" @bind="_taxPercent" @bind:after="Recalculate" /></div>
+                <div class="field" data-help="btp.lot">@T("Taglio minimo (€)")<input type="number" step="1000" @bind="_lot" @bind:after="Recalculate" /></div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-wrap">
+                <table class="grid">
+                    <thead>
+                        <tr>
+                            <th>@T("Voce")</th>
+                            @foreach (var c in _columns)
+                            {
+                                <th class="r">@c.Bond.Description</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in _rows)
+                        {
+                            <tr data-help="@row.Help">
+                                <td>@T(row.Label)</td>
+                                @for (var i = 0; i < _columns.Count; i++)
+                                {
+                                    <td class="r @(row.BestIndex == i ? "best" : "")">@row.Cells[i]</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="note">@T("Il «valore migliore» è il più alto per cedole, guadagni e rendimenti; il più basso per l'esborso. Regolamento: {0} (T+2).", _settlement.ToString("dd/MM/yyyy"))</p>
+    }
+</div>
+
+@code {
+    private sealed record Column(BtpBond Bond, BtpScenario Scenario, BtpContext Context);
+    private sealed record CompareRow(string Label, string Help, string[] Cells, int BestIndex);
+
+    [SupplyParameterFromQuery(Name = "isins")] public string? Isins { get; set; }
+
+    private readonly List<Column> _columns = new();
+    private readonly List<BtpBond> _bonds = new();
+    private List<CompareRow> _rows = new();
+    private BtpData _data = new();
+    private decimal _capital, _commission, _taxPercent, _lot;
+    private DateOnly _settlement;
+
+    protected override void OnParametersSet()
+    {
+        _data = BtpStore.Load();
+        var wanted = (Isins ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        _bonds.Clear();
+        _bonds.AddRange(wanted.Select(i => _data.Bonds.FirstOrDefault(b => b.Isin == i)).OfType<BtpBond>().Take(3));
+        _capital = _data.Inputs.Capital;
+        _commission = _data.Inputs.Commission;
+        _taxPercent = _data.Inputs.TaxRate * 100m;
+        _lot = _data.Inputs.Lot;
+        _settlement = BondMath.AddWorkdays(DateOnly.FromDateTime(DateTime.Today), 2);
+        Recalculate();
+    }
+
+    private void Recalculate()
+    {
+        _columns.Clear();
+        var parameters = new BtpParams(_capital, _commission, _taxPercent / 100m, _lot, _settlement);
+        foreach (var bond in _bonds)
+        {
+            if (BtpCalculator.CreateContext(bond, parameters) is { } context)
+            {
+                _columns.Add(new Column(bond, BtpCalculator.Compute(context, bond.Price), context));
+            }
+        }
+
+        var it = Fmt.It;
+        string Money(decimal v) => v.ToString("#,##0.00 €", it);
+
+        CompareRow Row(string label, string help, Func<Column, string> text, Func<Column, double>? value = null, bool higherIsBetter = true)
+        {
+            var cells = _columns.Select(text).ToArray();
+            var best = -1;
+            if (value is not null && _columns.Count > 1)
+            {
+                var values = _columns.Select(value).ToList();
+                var target = higherIsBetter ? values.Max() : values.Min();
+                if (values.Count(v => Math.Abs(v - target) < 1e-9) == 1)
+                {
+                    best = values.IndexOf(target);
+                }
+            }
+            return new CompareRow(label, help, cells, best);
+        }
+
+        _rows = new List<CompareRow>
+        {
+            Row("ISIN", "btp/ISIN", c => c.Bond.Isin),
+            Row("Scadenza", "btp/Scadenza", c => c.Bond.Maturity.ToString("dd/MM/yyyy", it)),
+            Row("Anni residui", "btp/Anni residui", c => c.Context.YearsRemaining.ToString("0.00", it)),
+            Row("Cedola annua", "btp/Cedola annua", c => c.Bond.Coupon.ToString("0.0##%", it), c => (double)c.Bond.Coupon),
+            Row("Prezzo (corso secco)", "btp/Prezzo", c => c.Bond.Price.ToString("0.00#", it), c => (double)c.Bond.Price, higherIsBetter: false),
+            Row("Rateo per 100", "btp/Rateo per 100", c => c.Context.AccruedPer100.ToString("0.0000", it)),
+            Row("Tagli acquistabili", "btp.row.lots", c => c.Scenario.Lots.ToString("N0", it)),
+            Row("Valore nominale", "btp.row.nominal", c => Money(c.Scenario.Nominal), c => (double)c.Scenario.Nominal),
+            Row("Esborso totale", "btp.row.outlay", c => Money(c.Scenario.TotalOutlay), c => (double)c.Scenario.TotalOutlay, higherIsBetter: false),
+            Row("Cedola annua lorda", "btp.row.coupon", c => Money(c.Scenario.AnnualCoupon), c => (double)c.Scenario.AnnualCoupon),
+            Row("Cedola annua netta", "btp.row.couponnet", c => Money(c.Scenario.AnnualCouponNet), c => (double)c.Scenario.AnnualCouponNet),
+            Row("Totale cedole fino a scadenza", "btp.row.totalcoupons", c => Money(c.Scenario.TotalCoupons), c => (double)c.Scenario.TotalCoupons),
+            Row("Surplus a scadenza", "btp.row.surplus", c => Money(c.Scenario.Surplus), c => (double)c.Scenario.Surplus),
+            Row("Guadagno totale lordo", "btp.row.gain", c => Money(c.Scenario.GrossGain), c => (double)c.Scenario.GrossGain),
+            Row("Guadagno totale netto", "btp.row.gain", c => Money(c.Scenario.NetGain), c => (double)c.Scenario.NetGain),
+            Row("Rendimento cedolare lordo", "btp.row.couponyield", c => c.Scenario.CouponYield.ToString("P2", it), c => (double)c.Scenario.CouponYield),
+            Row("Rendimento effettivo lordo (annuo)", "btp.row.yield", c => Fmt.Pct(c.Scenario.GrossYield, 2), c => c.Scenario.GrossYield ?? double.NegativeInfinity),
+            Row("Rendimento effettivo netto (annuo)", "btp.row.yield", c => Fmt.Pct(c.Scenario.NetYield, 2), c => c.Scenario.NetYield ?? double.NegativeInfinity),
+        };
+    }
+}

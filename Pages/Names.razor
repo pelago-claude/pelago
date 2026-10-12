@@ -1,0 +1,125 @@
+@page "/names"
+@inherits StatePage
+@inject NameEditor Editor
+
+<div class="page">
+    <h1><i class="ti ti-tag"></i>@T("Nomi dei titoli")</h1>
+    <p class="sub">@T("I nomi dei titoli: quelli che hai scelto tu e, per i derivati, quelli letti dal sito dell'emittente. Cliccando un codice, in qualsiasi pagina, puoi cambiare il nome: da quel momento quel codice si chiama così in tutto il programma.")</p>
+
+    <NeedData>
+        <div class="chips" style="margin-bottom:12px">
+            <label class="chip @(_showAll ? "on" : "")" data-help="names.all">
+                <input type="checkbox" checked="@_showAll" @onchange="OnShowAll" />
+                @T("Mostra tutti i titoli")
+            </label>
+            <span class="muted">@Plural(State.Names.Count, "{0} nome scelto da te", "{0} nomi scelti da te")@if (State.IssuerNames.Count > 0) { <text> · </text>@Plural(State.IssuerNames.Count, "{0} nome dell'emittente", "{0} nomi dell'emittente") }</span>
+            <div class="grow"></div>
+            <button class="btn" data-help="names.export" @onclick="Export"><i class="ti ti-download"></i> @T("Esporta i nomi")</button>
+            <button class="btn" data-help="names.import" @onclick="Import"><i class="ti ti-upload"></i> @T("Importa i nomi")</button>
+        </div>
+
+        @if (_rows.Count == 0)
+        {
+            <div class="empty">
+                <i class="ti ti-tag"></i>
+                <h2>@T("Nessun nome cambiato")</h2>
+                <p class="muted">@T("Clicca un codice in qualsiasi pagina per dare un nome a un titolo, oppure scegli «Mostra tutti i titoli» per sceglierlo da qui.")</p>
+            </div>
+        }
+        else
+        {
+            <DataTable TableId="names" Items="_rows" Columns="_columns" ExportName="nomi-titoli" DefaultSortTitle="Codice" OnRowClick="Open" />
+        }
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(string Code, string Issuer, string Original, string? FromIssuer, string? Custom, string Class, DateTime? Changed, string Owned);
+
+    private bool _showAll;
+    private List<Row> _rows = new();
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Isin<Row>("Codice", r => r.Code),
+        Col.Text<Row>("Emittente", r => r.Issuer),
+        Col.Text<Row>("Nome nel file", r => r.Original),
+        Col.Text<Row>("Nome dell'emittente", r => r.FromIssuer),
+        Col.Text<Row>("Il tuo nome", r => r.Custom, cellCss: "strong"),
+        Col.Badge<Row>("Tipo", r => r.Class),
+        Col.Date<Row>("Modificato il", r => r.Changed),
+        Col.Text<Row>("In portafoglio", r => r.Owned),
+    };
+
+    protected override void OnInitialized()
+    {
+        _showAll = Prefs.Get("names.all") == "1";
+        base.OnInitialized();
+    }
+
+    protected override void Rebuild()
+    {
+        var holdings = State.Holdings.ToDictionary(h => InstrumentNames.Normalize(h.Key), h => h);
+        var codes = State.Names.All().Select(e => e.Code).ToHashSet(StringComparer.Ordinal);
+        codes.UnionWith(State.IssuerNames.All().Select(e => e.Code));
+        if (_showAll)
+        {
+            codes.UnionWith(holdings.Keys);
+        }
+
+        _rows = codes.Select(code =>
+        {
+            holdings.TryGetValue(code, out var holding);
+            var entry = State.Names.Entry(code);
+            var key = holding?.Key ?? code;
+            return new Row(
+                key,
+                Issuers.ShortName(key, holding?.AssetClass),
+                State.OriginalNameOf(key, ""),
+                State.IssuerNameOf(key),
+                entry?.Name,
+                holding is null ? "" : Fmt.ClassLabel(holding.AssetClass),
+                entry?.ChangedUtc.ToLocalTime(),
+                holding is null ? "" : holding.Shares > 0m ? T("Sì: {0} quote", Fmt.Num(holding.Shares, 4)) : T("No"));
+        }).OrderBy(r => r.Code, StringComparer.Ordinal).ToList();
+    }
+
+    private void OnShowAll(ChangeEventArgs e)
+    {
+        _showAll = e.Value is true;
+        Prefs.Set("names.all", _showAll ? "1" : "0");
+        Rebuild();
+    }
+
+    private void Open(Row row) => Editor.Open(row.Code);
+
+    private void Export()
+    {
+        var path = Dialogs.SaveCsv("nomi-titoli.csv", State.Names.ExportCsv());
+        if (path is not null)
+        {
+            State.Notify(T("Nomi esportati: {0}", System.IO.Path.GetFileName(path)));
+        }
+    }
+
+    private void Import()
+    {
+        var path = Dialogs.PickCsvFile(null, Prefs.Get("import.folder"), T("Seleziona il CSV con i nomi da importare"));
+        if (path is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var (imported, skipped) = State.Names.ImportCsv(System.IO.File.ReadAllText(path));
+            State.Notify(skipped == 0
+                ? T("Importati {0} nomi.", imported)
+                : T("Importati {0} nomi ({1} righe ignorate perché senza codice o senza nome).", imported, skipped));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            State.Notify(T("Impossibile importare i nomi: {0}", ex.Message));
+        }
+    }
+}

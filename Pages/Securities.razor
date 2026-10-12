@@ -1,0 +1,171 @@
+@page "/securities"
+@inherits StatePage
+
+<div class="page fill">
+    <h1><i class="ti ti-briefcase"></i>@T("Titoli")</h1>
+    <p class="sub">@T("Tutti gli asset movimentati, con quantità, costo medio e valore all'ultimo prezzo noto. Clicca una riga per vederne i movimenti.")</p>
+
+    <NeedData>
+        <div class="chips">
+            <button class="chip @(_selected.Count == 0 ? "on" : "")" data-help="securities.class" @onclick="ClearSelection">@T("Tutti") <span class="muted">@CountFor(null)</span></button>
+            @foreach (var (key, label) in _filters)
+            {
+                var k = key;
+                <button class="chip @(_selected.Contains(k) ? "on" : "")" data-help="securities.class" @onclick="() => Toggle(k)">@T(label) <span class="muted">@CountFor(k)</span></button>
+            }
+            <label class="chip @(_onlyOpen ? "on" : "")" style="margin-left:auto" data-help="securities.open">
+                <input type="checkbox" checked="@_onlyOpen" @onchange="ToggleOpen" /> @T("Solo posizioni aperte")
+            </label>
+        </div>
+
+        <DataTable TableId="securities2" Items="Visible" Columns="_columns" ExportName="titoli"
+                   DefaultSortTitle="Nome" OnRowClick="Open" FooterLabel="SALDO" />
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(string Key, string Name, string Symbol, string AssetClass, string ClassLabel,
+        decimal Shares, decimal? LastPrice, DateTime? Timestamp, bool Stale, decimal Value, double Weight,
+        decimal? AverageCost, decimal? Cost, decimal? Unrealized, double? UnrealizedPct, decimal? ClosedBalance);
+
+    private static readonly (string Key, string Label)[] _filters =
+    {
+        ("STOCK", "Azioni"), ("FUND", "Fondi"), ("BOND", "Obbligazioni"), ("CRYPTO", "Crypto"), ("DERIVATIVE", "Derivati"),
+    };
+
+    [SupplyParameterFromQuery(Name = "class")] public string? ClassParam { get; set; }
+    [SupplyParameterFromQuery(Name = "open")] public string? OpenParam { get; set; }
+
+    private List<Row> _all = new();
+    private readonly HashSet<string> _selected = new();
+    private bool _onlyOpen;
+
+    private IEnumerable<Row> Visible => _all
+        .Where(r => _selected.Count == 0 || _selected.Contains(r.AssetClass))
+        .Where(r => !_onlyOpen || r.Shares != 0m);
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Name<Row>("Nome", r => r.Name, r => r.Key),
+        Col.Isin<Row>("Simbolo", r => r.Symbol),
+        Col.Issuer<Row>(r => r.Symbol, r => r.AssetClass),
+        Col.Badge<Row>("Categoria", r => r.ClassLabel),
+        Col.Num<Row>("Quantità", r => r.Shares),
+        Col.Money4<Row>("Ultimo prezzo", r => r.LastPrice),
+        new Column<Row>
+        {
+            Title = "Quotazione del",
+            SortValue = r => r.Timestamp,
+            Text = r => Fmt.Date(r.Timestamp, "dd/MM/yyyy HH:mm"),
+            Kind = ColumnKind.Date,
+            Css = r => r.Stale ? "stale" : null,
+        },
+        Col.Money<Row>("Valore stimato", r => r.Value, total: rows => rows.Sum(r => r.Value)),
+        Col.Pct<Row>("Peso", r => r.Weight),
+        Col.Money4<Row>("Costo medio", r => r.AverageCost),
+        Col.Money<Row>("Costo totale", r => r.Cost, total: rows => rows.Sum(r => r.Cost ?? 0m)),
+        Col.Money<Row>("Plus/minus latente", r => r.Unrealized, signColor: true, total: rows => rows.Sum(r => r.Unrealized ?? 0m)),
+        Col.Pct<Row>("Plus/minus latente %", r => r.UnrealizedPct, signColor: true),
+        Col.Money<Row>("Saldo (posizione chiusa)", r => r.ClosedBalance, signColor: true,
+            total: rows => rows.Sum(r => r.ClosedBalance ?? 0m)),
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (ClassParam is null && OpenParam is not null)
+        {
+            _selected.Clear();
+            SaveSelection();
+        }
+
+        if (ClassParam is not null)
+        {
+            _selected.Clear();
+            foreach (var c in ClassParam.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                         .Where(c => _filters.Any(f => f.Key == c)))
+            {
+                _selected.Add(c);
+            }
+            SaveSelection();
+        }
+        else if (_selected.Count == 0 && Prefs.Get("securities.classes") is { Length: > 0 } saved)
+        {
+            foreach (var c in saved.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                _selected.Add(c);
+            }
+        }
+
+        if (OpenParam is not null)
+        {
+            _onlyOpen = OpenParam == "1";
+            Prefs.Set("securities.onlyOpen", _onlyOpen ? "1" : "0");
+        }
+        else if (!_prefsLoaded)
+        {
+            _onlyOpen = Prefs.Get("securities.onlyOpen") == "1";
+        }
+        _prefsLoaded = true;
+    }
+
+    private bool _prefsLoaded;
+
+    protected override void Rebuild()
+    {
+        var ops = State.Operations!;
+        var byKey = ops.Where(o => !string.IsNullOrWhiteSpace(o.PositionKey)).ToLookup(o => o.PositionKey);
+        var total = State.Latest?.Total ?? 0m;
+        var now = DateTime.UtcNow;
+
+        _all = State.Holdings.Select(h =>
+        {
+            var history = byKey[h.Key].ToList();
+            var name = State.ChosenNameOf(h.Key) ?? AssetNameResolver.ResolveDisplayName(h.Name, h.AssetClass, history.Select(o => o.Description));
+            decimal? closed = h.Shares == 0m ? history.Sum(o => o.NetCashImpact) : null;
+
+            decimal? avg = null, cost = null, unrealized = null;
+            double? pct = null;
+            if (h.Shares > 0m && State.OpenPositions.TryGetValue(h.Key, out var position))
+            {
+                avg = position.AverageCost;
+                cost = position.Cost;
+                unrealized = h.Value - position.Cost;
+                pct = position.Cost > 0m ? (double)(unrealized.Value / position.Cost) : null;
+            }
+
+            var hasQuote = State.Quotes.ContainsKey(h.Key);
+            var stale = h.Shares > 0m && hasQuote && h.LastPriceTimestamp is { } t && (now - t.ToUniversalTime()).TotalDays > ConsistencyChecker.StaleQuoteDays;
+
+            return new Row(h.Key, name, h.Symbol, h.AssetClass, Fmt.ClassLabel(h.AssetClass), h.Shares,
+                h.LastPrice ?? 0m, h.LastPriceTimestamp?.ToLocalTime(), stale, h.Value,
+                total > 0m && h.Shares > 0m ? (double)(h.Value / total) : 0.0, avg, cost, unrealized, pct, closed);
+        }).OrderBy(r => r.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+    }
+
+    private int CountFor(string? key) => _all.Count(r => (key is null || r.AssetClass == key) && (!_onlyOpen || r.Shares != 0m));
+
+    private void Toggle(string key)
+    {
+        if (!_selected.Remove(key))
+        {
+            _selected.Add(key);
+        }
+        SaveSelection();
+    }
+
+    private void ClearSelection()
+    {
+        _selected.Clear();
+        SaveSelection();
+    }
+
+    private void SaveSelection() => Prefs.Set("securities.classes", string.Join(',', _selected));
+
+    private void ToggleOpen(ChangeEventArgs e)
+    {
+        _onlyOpen = e.Value is true;
+        Prefs.Set("securities.onlyOpen", _onlyOpen ? "1" : "0");
+    }
+
+    private void Open(Row row) => Nav.NavigateTo($"security?key={Uri.EscapeDataString(row.Key)}");
+}

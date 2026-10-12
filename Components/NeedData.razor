@@ -1,0 +1,44 @@
+@inject AppState State
+@inject NativeDialogs Dialogs
+@implements IDisposable
+
+@if (State.HasData)
+{
+    @ChildContent
+}
+else if (State.IsLoading)
+{
+    <div class="empty"><i class="ti ti-loader-2 spin"></i><h2>@T("Caricamento del file…")</h2></div>
+}
+else
+{
+    <div class="empty">
+        <i class="ti ti-file-spreadsheet"></i>
+        <h2>@T("Nessun file caricato")</h2>
+        <p>@T("Apri il file CSV delle operazioni esportato dal broker.")</p>
+        @if (State.LoadError is not null)
+        {
+            <p class="neg">@State.LoadError</p>
+        }
+        <button class="btn primary" @onclick="Open"><i class="ti ti-folder-open"></i> @T("Apri CSV…")</button>
+    </div>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized() => State.Changed += OnChanged;
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    private async Task Open()
+    {
+        var path = Dialogs.PickCsvFile(State.LoadedFilePath);
+        if (path is not null)
+        {
+            await State.LoadFileAsync(path);
+        }
+    }
+
+    public void Dispose() => State.Changed -= OnChanged;
+}

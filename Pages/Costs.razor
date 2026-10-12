@@ -1,0 +1,109 @@
+@page "/costs"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-receipt-2"></i>@T("Costi e tasse")</h1>
+    <p class="sub">@H("Quanto hai pagato in commissioni e imposte. Gli importi sono quelli <b>pagati</b>: un rimborso compare in negativo.")</p>
+
+    <NeedData>
+        <div class="cards">
+            <div class="card" data-help="costs.total">
+                <div class="label"><i class="ti ti-receipt-2"></i> @T("Costi e tasse in tutto")</div>
+                <div class="value">@Fmt.Money(_total.Total)</div>
+                @if (_contrib > 0m)
+                {
+                    <div class="delta muted">@T("{0} dei versamenti netti", Fmt.Pct(_total.Total / _contrib, 1))</div>
+                }
+            </div>
+            <div class="card" data-help="costs.fees">
+                <div class="label"><i class="ti ti-cash"></i> @T("Commissioni")</div>
+                <div class="value">@Fmt.Money(_total.Fees)</div>
+                <div class="delta muted">@T("{0} operazioni di compravendita", _trades)</div>
+            </div>
+            <div class="card" data-help="costs.tax">
+                <div class="label"><i class="ti ti-building-bank"></i> @T("Imposte nette")</div>
+                <div class="value">@Fmt.Money(_total.NetTax)</div>
+                <div class="delta muted">@T("pagate meno rimborsate")</div>
+            </div>
+            <div class="card" data-help="costs.perTrade">
+                <div class="label"><i class="ti ti-calculator"></i> @T("Commissione media")</div>
+                <div class="value">@Fmt.Money(_trades == 0 ? 0m : _total.Fees / _trades)</div>
+                <div class="delta muted">@T("per operazione")</div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:16px">
+            <h2>@T("Mese per mese")</h2>
+            <EChart Kind="bars" Data="_chart" Height="300px" Help="chart:costs" />
+        </div>
+
+        <div class="panel" style="margin-bottom:16px" data-help="costs.years">
+            <h2>@T("Anno per anno")</h2>
+            <table class="grid">
+                <thead><tr>
+                    <th>@T("Anno")</th><th class="r">@T("Commissioni")</th><th class="r" data-help="*/Imposte su compravendite">@T("Imposte su compravendite")</th>
+                    <th class="r" data-help="*/Imposte sugli interessi">@T("Imposte sugli interessi")</th><th class="r" data-help="*/Bollo e ricalcoli">@T("Bollo e ricalcoli")</th>
+                    <th class="r" data-help="*/Ottimizzazione fiscale">@T("Ottimizzazione fiscale")</th><th class="r">@T("Altre imposte")</th>
+                    <th class="r">@T("Imposte nette")</th><th class="r">@T("Totale")</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var r in _years)
+                    {
+                        <tr>
+                            <td>@r.Period</td>
+                            <td class="r">@Fmt.Money(r.Fees)</td>
+                            <td class="r">@Fmt.Money(r.TradeTax)</td>
+                            <td class="r">@Fmt.Money(r.InterestTax)</td>
+                            <td class="r">@Fmt.Money(r.StampAndRecalculation)</td>
+                            <td class="r">@Fmt.Money(r.TaxOptimization)</td>
+                            <td class="r">@Fmt.Money(r.OtherTax)</td>
+                            <td class="r">@Fmt.Money(r.NetTax)</td>
+                            <td class="r strong">@Fmt.Money(r.Total)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>@T("Totale")</td>
+                        <td class="r">@Fmt.Money(_total.Fees)</td><td class="r">@Fmt.Money(_total.TradeTax)</td><td class="r">@Fmt.Money(_total.InterestTax)</td>
+                        <td class="r">@Fmt.Money(_total.StampAndRecalculation)</td><td class="r">@Fmt.Money(_total.TaxOptimization)</td><td class="r">@Fmt.Money(_total.OtherTax)</td>
+                        <td class="r">@Fmt.Money(_total.NetTax)</td><td class="r">@Fmt.Money(_total.Total)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="panel" data-help="costs.howto">
+            <h2>@T("Cosa c'è dentro")</h2>
+            <ul class="credit-list">
+                <li>@H("<b>Commissioni</b>: il costo di ogni operazione, come lo scrive il broker.")</li>
+                <li>@H("<b>Imposte su compravendite e interessi</b>: trattenute subito dal broker sulle vendite e sugli interessi della liquidità.")</li>
+                <li>@H("<b>Bollo e ricalcoli</b>: l'imposta di bollo e i ricalcoli fiscali (righe «TAX» del file).")</li>
+                <li>@H("<b>Ottimizzazione fiscale</b>: rimborsi o compensazioni (righe «TAX_OPTIMIZATION»): per questo possono essere negativi.")</li>
+                <li>@T("Non sono un calcolo fiscale: sono le somme delle colonne «fee» e «tax» del tuo file.")</li>
+            </ul>
+        </div>
+    </NeedData>
+</div>
+
+@code {
+    private CostRow _total = new("Totale", 0, 0, 0, 0, 0, 0);
+    private List<CostRow> _years = new();
+    private object? _chart;
+    private decimal _contrib;
+    private int _trades;
+
+    protected override void Rebuild()
+    {
+        var ops = State.Operations!;
+        _total = CostCalculator.Total(ops);
+        _years = CostCalculator.ByYear(ops);
+        _contrib = State.Latest?.Contributions ?? 0m;
+        _trades = ops.Count(o => o.Category == "TRADING");
+
+        var months = CostCalculator.ByMonth(ops);
+        _chart = ChartData.Bars(months.Select(m => $"{m.Period[5..]}/{m.Period[..4]}"), stacked: true,
+            (T("Commissioni"), "#3b6ef5", months.Select(m => m.Fees).ToArray()),
+            (T("Imposte nette"), "#e0a100", months.Select(m => m.NetTax).ToArray()));
+    }
+}

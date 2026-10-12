@@ -1,0 +1,61 @@
+@page "/heatmap"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-layout-grid"></i>@T("Mappa del portafoglio")</h1>
+    <p class="sub">@T("Ogni riquadro è un titolo: più è grande, più vale. Il colore dice quanto stai guadagnando o perdendo rispetto a quanto l'hai pagato. Sposta lo slider per vedere il portafoglio in un giorno del passato, o premi «Riproduci» per vederlo cambiare nel tempo.")</p>
+
+    <NeedData>
+        @if (_map is not null)
+        {
+            <div class="row" style="margin-bottom:14px">
+                <DateSlider Min="@State.MinDate" Max="@State.MaxDate" Value="@_date" ValueChanged="OnDate" />
+            </div>
+
+            <div class="cards">
+                <div class="card" data-help="heatmap.value">
+                    <div class="label"><i class="ti ti-briefcase"></i> @T("Valore dei titoli")</div>
+                    <div class="value">@Fmt.Money(_map.ItemsValue)</div>
+                    <div class="delta muted">@T("il {0:dd/MM/yyyy}", _date)</div>
+                </div>
+                <div class="card" data-help="heatmap.pnl">
+                    <div class="label"><i class="ti ti-chart-line"></i> @T("Plus/minus latente")</div>
+                    <div class="value @Fmt.Sign(_map.Pnl)">@Fmt.Money(_map.Pnl)</div>
+                    @if (_map.KnownCost > 0m)
+                    {
+                        <div class="delta @Fmt.Sign(_map.Pnl)">@Fmt.Pct(_map.Pnl / _map.KnownCost, 1)</div>
+                    }
+                </div>
+                <div class="card" data-help="heatmap.count">
+                    <div class="label"><i class="ti ti-layout-grid"></i> @T("Titoli in portafoglio")</div>
+                    <div class="value">@_map.Items.Count</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <HeatMapView Map="@_map" Height="max(420px, calc(100vh - 430px))" />
+            </div>
+            <div class="hm-note">@T("Per le date passate il valore usa l'ultimo prezzo noto fino a quel giorno (una quotazione registrata o il prezzo di un tuo scambio): dove mancano, è approssimato.")</div>
+        }
+    </NeedData>
+</div>
+
+@code {
+    private HeatMap? _map;
+    private DateOnly _date;
+
+    protected override void Rebuild()
+    {
+        _date = State.ViewDate;
+        Compute();
+    }
+
+    private void OnDate(DateOnly date)
+    {
+        _date = date;
+        State.ViewDate = date;
+        Compute();
+    }
+
+    private void Compute() => _map = HeatMapCalculator.Compute(State.Operations!, _date, State.Quotes);
+}

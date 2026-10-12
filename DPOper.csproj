@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>2.12.0</Version>
+    <!-- Il file si chiama pelago.exe (minuscolo); il progetto e i namespace restano DPOper. -->
+    <AssemblyName>pelago</AssemblyName>
+    <RootNamespace>DPOper</RootNamespace>
+    <Product>Pelago</Product>
+    <Description>Pelago - il conto sotto controllo</Description>
+    <ApplicationIcon>Assets\pelago.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Materiale di presentazione (video, PDF, dati di esempio): non fa parte dell'app. -->
+    <Compile Remove="Presentazione\**" />
+    <Content Remove="Presentazione\**" />
+    <None Remove="Presentazione\**" />
+    <EmbeddedResource Remove="Presentazione\**" />
+    <!-- Test automatici: progetto a parte (Tests\Pelago.Tests.csproj), non entrano nell'app. -->
+    <Compile Remove="Tests\**" />
+    <Content Remove="Tests\**" />
+    <None Remove="Tests\**" />
+    <EmbeddedResource Remove="Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pelago.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- L'interfaccia web viaggia dentro l'exe (vedi Services/WebAssets.cs). -->
+    <EmbeddedResource Include="wwwroot\**\*" LogicalName="www/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Traduzioni (en, fr, de, es): «testo italiano» -> «traduzione», lette da Services/Loc.cs. -->
+    <EmbeddedResource Include="i18n\??.json" LogicalName="i18n/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="8.0.*" />
+  </ItemGroup>
+
+</Project>

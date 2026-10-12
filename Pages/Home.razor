@@ -1,0 +1,195 @@
+@page "/"
+@inherits StatePage
+@inject PageExporter Exporter
+
+<div class="page">
+    <div class="page-head">
+        <div>
+            <h1><i class="ti ti-layout-dashboard"></i>@T("Panoramica")</h1>
+            <p class="sub">@T("Il conto di oggi in un colpo d'occhio. Clicca un riquadro per vederne i dettagli.")</p>
+        </div>
+        <button class="btn no-print" data-help="export.pdf" @onclick="ExportPdf"><i class="ti ti-file-type-pdf"></i> @T("Esporta PDF")</button>
+    </div>
+
+    <NeedData>
+        @if (_latest is { } latest)
+        {
+            @if (State.WarningCount > 0)
+            {
+                <a class="banner warn" href="checks" data-help="banner.checks">
+                    <i class="ti ti-alert-triangle"></i>
+                    <span>@H("<b>{0}</b> nei controlli dei dati: {1}", Plural(State.WarningCount, "{0} segnalazione", "{0} segnalazioni"), FirstWarning)</span>
+                    <span class="grow"></span><span class="link">@T("Vedi i controlli") <i class="ti ti-arrow-right"></i></span>
+                </a>
+            }
+
+            <div class="cards">
+                <a class="card hero link" href="charts" data-help="total">
+                    <div class="label"><i class="ti ti-wallet"></i> @T("Totale conto")</div>
+                    <div class="value">@Fmt.Money(latest.Total)</div>
+                    @if (_prev is not null)
+                    {
+                        var d = latest.Total - _prev.Total;
+                        <div class="delta">@T("{0} {1} rispetto al {2}", d >= 0 ? "▲" : "▼", Fmt.Money(Math.Abs(d)), _prev.Date.ToString("dd/MM"))</div>
+                    }
+                </a>
+                <a class="card link" href="daily" data-help="cash">
+                    <div class="label"><span class="dot" style="background:#4682B4"></span> @T("Disponibilità")</div>
+                    <div class="value">@Fmt.Money(latest.Cash)</div>
+                </a>
+                <a class="card link" href="securities?class=STOCK,FUND,DERIVATIVE&open=1" data-help="securities">
+                    <div class="label"><span class="dot" style="background:#FF8C00"></span> @T("Titoli")</div>
+                    <div class="value">@Fmt.Money(latest.Securities)</div>
+                </a>
+                <a class="card link" href="securities?class=BOND&open=1" data-help="bonds">
+                    <div class="label"><span class="dot" style="background:#3CB371"></span> @T("Obbligazioni")</div>
+                    <div class="value">@Fmt.Money(latest.Bonds)</div>
+                </a>
+                <a class="card link" href="securities?class=CRYPTO&open=1" data-help="crypto">
+                    <div class="label"><span class="dot" style="background:#9370DB"></span> @T("Crypto")</div>
+                    <div class="value">@Fmt.Money(latest.Crypto)</div>
+                </a>
+            </div>
+
+            <div class="cards">
+                <a class="card link" href="transfers" data-help="contributions">
+                    <div class="label"><i class="ti ti-arrows-exchange"></i> @T("Versamenti netti")</div>
+                    <div class="value">@Fmt.Money(latest.Contributions)</div>
+                </a>
+                <a class="card link" href="charts?tab=gap" data-help="gap">
+                    <div class="label"><i class="ti ti-scale"></i> @T("Sopra / sotto i versamenti")</div>
+                    <div class="value @Fmt.Sign(latest.Gap)">@Fmt.Money(latest.Gap)</div>
+                    @if (latest.Contributions != 0m)
+                    {
+                        <div class="delta @Fmt.Sign(latest.Gap)">@Fmt.Pct(latest.Gap / latest.Contributions, 1)</div>
+                    }
+                </a>
+                <a class="card link" href="securities?open=1" data-help="unrealized.card">
+                    <div class="label"><i class="ti ti-chart-line"></i> @T("Plus/minus latente")</div>
+                    <div class="value @Fmt.Sign(_unrealized)">@Fmt.Money(_unrealized)</div>
+                    <div class="delta muted">@T("sulle posizioni aperte")</div>
+                </a>
+                <a class="card link" href="gains" data-help="realized.card">
+                    <div class="label"><i class="ti ti-trending-up"></i> @T("Plus/minus realizzate")</div>
+                    <div class="value @Fmt.Sign(_gains)">@Fmt.Money(_gains)</div>
+                </a>
+                <a class="card link" href="interest" data-help="interest.card">
+                    <div class="label"><i class="ti ti-percentage"></i> @T("Interessi netti incassati")</div>
+                    <div class="value">@Fmt.Money(_interest)</div>
+                </a>
+            </div>
+
+            <div class="cards">
+                <a class="card link" href="returns" data-help="twr.card">
+                    <div class="label"><i class="ti ti-activity"></i> @T("Rendimento (TWR)")</div>
+                    <div class="value @(_total?.Twr is { } t ? (t >= 0 ? "pos" : "neg") : "")">@(_total?.Twr is { } tw ? Fmt.Pct(tw, 1) : "n/d")</div>
+                    <div class="delta muted">@T("dall'inizio, ponderato nel tempo")</div>
+                </a>
+                <a class="card link" href="returns" data-help="xirr.card">
+                    <div class="label"><i class="ti ti-calendar-dollar"></i> @T("Rendimento annuo (XIRR)")</div>
+                    <div class="value @(_total?.Xirr is { } x ? (x >= 0 ? "pos" : "neg") : "")">@(_total?.Xirr is { } xi ? Fmt.Pct(xi, 1) : "n/d")</div>
+                    <div class="delta muted">@T("sui tuoi versamenti, annualizzato")</div>
+                </a>
+                <a class="card link" href="costs" data-help="costs.card">
+                    <div class="label"><i class="ti ti-receipt-2"></i> @T("Costi e tasse pagati")</div>
+                    <div class="value">@Fmt.Money(_costs.Total)</div>
+                    <div class="delta muted">@T("commissioni {0}", Fmt.Money(_costs.Fees))</div>
+                </a>
+                <a class="card link" href="securities" data-help="concentration.card">
+                    <div class="label"><i class="ti ti-chart-pie"></i> @T("Concentrazione")</div>
+                    <div class="value">@Fmt.Pct(_top5Weight, 1)</div>
+                    <div class="delta muted">@T("del conto nelle prime 5 posizioni")</div>
+                </a>
+                <GoalCard Total="latest.Total" />
+            </div>
+
+            <div class="grid2">
+                <div class="panel">
+                    <h2>@T("Composizione attuale") <span class="muted" style="font-weight:400;font-size:12px">@T("· clicca una fetta")</span></h2>
+                    <EChart Kind="donut" Data="_donut" Height="320px" Help="chart:donut" OnItemClick="SliceClicked" />
+                </div>
+                <div class="panel">
+                    <h2>@T("Totale e versamenti netti nel tempo")</h2>
+                    <EChart Kind="lines" Data="_trend" Height="320px" Help="chart:total" />
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="row" style="margin-bottom:8px">
+                    <h2 style="margin:0" data-help="home.heatmap">@T("Mappa del portafoglio") <span class="muted" style="font-weight:400;font-size:12px">@T("· grandezza = valore, colore = guadagno sul costo")</span></h2>
+                    <div class="grow"></div>
+                    <a class="link-btn" href="heatmap">@T("Apri la mappa") <i class="ti ti-arrow-right"></i></a>
+                </div>
+                <HeatMapView Map="@_heat" Height="380px" />
+            </div>
+        }
+    </NeedData>
+</div>
+
+@code {
+    private DailySnapshot? _latest;
+    private DailySnapshot? _prev;
+    private object? _donut;
+    private object? _trend;
+    private decimal _interest;
+    private decimal _gains;
+    private decimal _unrealized;
+    private double _top5Weight;
+    private ReturnPeriod? _total;
+    private CostRow _costs = new("Totale", 0, 0, 0, 0, 0, 0);
+    private HeatMap? _heat;
+
+    private string FirstWarning => State.Findings.FirstOrDefault(f => f.Level == FindingLevel.Warning)?.Title ?? "";
+
+
+
+    protected override void Rebuild()
+    {
+        var ordered = State.Snapshots.OrderBy(s => s.Date).ToList();
+        _latest = ordered.LastOrDefault();
+        _prev = ordered.Count > 1 ? ordered[^2] : null;
+        if (_latest is null)
+        {
+            return;
+        }
+
+        var ops = State.Operations!;
+        _donut = ChartData.Donut(_latest);
+        _trend = ChartData.TotalVsContributions(ordered, State.Goal);
+        _interest = ops.Where(o => o.Type == "INTEREST_PAYMENT").Sum(o => o.NetCashImpact);
+        _gains = RealizedGainsCalculator.Compute(ops).Sum(e => e.Gain);
+        _costs = CostCalculator.Total(ops);
+        _total = ReturnCalculator.Period(T("Dall'inizio"), ordered, ops, ordered[0].Date.AddDays(-1), ordered[^1].Date);
+
+        var open = State.Holdings.Where(h => h.Shares > 0m && h.Value > 0m).OrderByDescending(h => h.Value).ToList();
+        _unrealized = open.Where(h => State.OpenPositions.ContainsKey(h.Key)).Sum(h => h.Value - State.OpenPositions[h.Key].Cost);
+        _top5Weight = _latest.Total > 0m ? (double)(open.Take(5).Sum(h => h.Value) / _latest.Total) : 0.0;
+        _heat = HeatMapCalculator.Compute(ops, State.MaxDate, State.Quotes);
+    }
+
+    private void SliceClicked(string name)
+    {
+        // il nome della fetta arriva dal grafico, già tradotto nella lingua corrente
+        string? target = null;
+        if (name == T("Disponibilità")) target = "daily";
+        else if (name == T("Titoli")) target = "securities?class=STOCK,FUND,DERIVATIVE&open=1";
+        else if (name == T("Obbligazioni")) target = "securities?class=BOND&open=1";
+        else if (name == T("Crypto")) target = "securities?class=CRYPTO&open=1";
+        if (target is not null)
+        {
+            Nav.NavigateTo(target);
+        }
+    }
+
+    private async Task ExportPdf()
+    {
+        var path = Dialogs.PickPdfFile("pelago-panoramica.pdf");
+        if (path is null)
+        {
+            return;
+        }
+        var ok = await Exporter.PrintToPdfAsync(path);
+        State.Notify(ok ? T("PDF salvato: {0}", System.IO.Path.GetFileName(path)) : T("Non sono riuscito a creare il PDF."));
+    }
+
+}

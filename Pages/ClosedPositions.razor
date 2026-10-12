@@ -1,0 +1,251 @@
+@page "/closed"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-circle-check"></i>@T("Posizioni chiuse")</h1>
+    <p class="sub">@T("I titoli su cui hai venduto tutta la quantità: quanto hai fatto su ciascuno, dal primo acquisto all'ultima vendita. Se ne hai ricomprato qualcuno, qui vedi solo i cicli già chiusi. Gli importi sono netti di commissioni e imposte già trattenute dal broker.")</p>
+
+    <NeedData>
+        @if (_all.Count == 0)
+        {
+            <div class="empty"><i class="ti ti-circle-check"></i><h2>@T("Nessuna posizione chiusa")</h2><p class="muted">@T("Compare qui ogni titolo su cui hai venduto tutta la quantità.")</p></div>
+        }
+        else
+        {
+            <div class="chips" style="margin-bottom:12px" data-help="closed.filters">
+                <button class="chip @(_selected.Count == 0 ? "on" : "")" @onclick="ClearClasses">@T("Tutte") <span class="muted">@_all.Count</span></button>
+                @foreach (var (key, label) in Classes)
+                {
+                    var k = key;
+                    if (_all.Any(p => p.AssetClass == k))
+                    {
+                        <button class="chip @(_selected.Contains(k) ? "on" : "")" @onclick="() => ToggleClass(k)">@T(label) <span class="muted">@_all.Count(p => p.AssetClass == k)</span></button>
+                    }
+                }
+                <select class="field-input" style="margin-left:12px" @onchange="OnYear" data-help="closed.year" aria-label="@T("Anno di chiusura")">
+                    <option value="" selected="@(_year is null)">@T("Tutti gli anni")</option>
+                    @foreach (var y in _years)
+                    {
+                        <option value="@y" selected="@(_year == y)">@y</option>
+                    }
+                </select>
+                <label class="chip @(_byUnderlying ? "on" : "")" style="margin-left:auto" data-help="closed.group">
+                    <input type="checkbox" checked="@_byUnderlying" @onchange="OnGroup" />
+                    @T("Raggruppa per sottostante")
+                </label>
+            </div>
+
+            <div class="cards">
+                <div class="card" data-help="closed.count">
+                    <div class="label"><i class="ti ti-circle-check"></i> @T("Posizioni chiuse")</div>
+                    <div class="value">@_count</div>
+                    <div class="delta muted">@T("{0} operazioni in tutto", _rows.Sum(r => r.Trades))</div>
+                </div>
+                <div class="card" data-help="closed.result">
+                    <div class="label"><i class="ti ti-scale"></i> @T("Risultato totale")</div>
+                    <div class="value @Fmt.Sign(_total)">@Fmt.Money(_total)</div>
+                    <div class="delta muted">@T("al netto di commissioni e imposte")</div>
+                </div>
+                <div class="card" data-help="closed.winners">
+                    <div class="label"><i class="ti ti-trending-up"></i> @T("In guadagno")</div>
+                    <div class="value pos">@_winners</div>
+                    <div class="delta muted">@(_count == 0 ? "" : Fmt.Pct((decimal)_winners / _count, 0)) · @T("media {0}", Fmt.Money(_avgWin))</div>
+                </div>
+                <div class="card" data-help="closed.losers">
+                    <div class="label"><i class="ti ti-trending-down"></i> @T("In perdita")</div>
+                    <div class="value neg">@_losers</div>
+                    <div class="delta muted">@(_count == 0 ? "" : Fmt.Pct((decimal)_losers / _count, 0)) · @T("media {0}", Fmt.Money(_avgLoss))</div>
+                </div>
+                <div class="card" data-help="closed.paid">
+                    <div class="label"><i class="ti ti-receipt-2"></i> @T("Costi e imposte pagati")</div>
+                    <div class="value">@Fmt.Money(_fees + _taxes)</div>
+                    <div class="delta muted">@T("commissioni {0} · imposte {1}", Fmt.Money(_fees), Fmt.Money(_taxes))</div>
+                </div>
+                @if (_best is not null && _worst is not null)
+                {
+                    <div class="card" data-help="closed.extremes">
+                        <div class="label"><i class="ti ti-arrows-up-down"></i> @T("Migliore e peggiore")</div>
+                        <div class="delta pos" style="font-size:13px">▲ @Short(_best.Name) · <b>@Fmt.Money(_best.Result)</b></div>
+                        <div class="delta neg" style="font-size:13px">▼ @Short(_worst.Name) · <b>@Fmt.Money(_worst.Result)</b></div>
+                    </div>
+                }
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="closed.chart">
+                <h2>@T("Risultato per anno di chiusura")</h2>
+                <EChart Kind="bars" Data="_chart" Height="260px" />
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="closed.years">
+                <h2>@T("Anno per anno")</h2>
+                <table class="grid">
+                    <thead><tr>
+                        <th>@T("Anno")</th><th class="r">@T("Posizioni chiuse")</th><th class="r">@T("In guadagno")</th><th class="r">@T("In perdita")</th>
+                        <th class="r">@T("Risultato")</th><th class="r">@T("Commissioni")</th><th class="r" data-help="closed.taxes"><span>@T("Imposte già pagate")</span></th>
+                    </tr></thead>
+                    <tbody>
+                        @foreach (var y in _yearRows)
+                        {
+                            <tr>
+                                <td>@y.Year</td><td class="r">@y.Count</td><td class="r">@y.Winners</td><td class="r">@y.Losers</td>
+                                <td class="r strong @Fmt.Sign(y.Result)">@Fmt.Money(y.Result)</td><td class="r">@Fmt.Money(y.Fees)</td><td class="r">@Fmt.Money(y.Taxes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <DataTable TableId="closed" Items="_rows" Columns="_columns" ExportName="posizioni-chiuse" DefaultSortTitle="Chiusa il" DefaultDescending="true"
+                       OnRowClick="Open" FooterLabel="Totale" />
+        }
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(string Key, string Name, string Class, string Issuer, DateTime Opened, DateTime Closed, int Days, int Trades, int Cycles,
+        decimal Invested, decimal Proceeds, decimal Fees, decimal Taxes, decimal Result, double? ReturnPct, string Status);
+
+    private sealed record YearRow(int Year, int Count, int Winners, int Losers, decimal Result, decimal Fees, decimal Taxes);
+
+    private static readonly (string Key, string Label)[] Classes =
+    {
+        ("STOCK", "Azioni"), ("FUND", "Fondi"), ("BOND", "Obbligazioni"), ("CRYPTO", "Crypto"), ("DERIVATIVE", "Derivati"),
+    };
+
+    private List<ClosedPosition> _all = new();
+    private readonly HashSet<string> _selected = new();
+    private int? _year;
+    private bool _byUnderlying;
+    private List<int> _years = new();
+    private List<Row> _rows = new();
+    private List<YearRow> _yearRows = new();
+    private object? _chart;
+    private decimal _total, _fees, _taxes, _avgWin, _avgLoss;
+    private int _winners, _losers, _count;
+    private Row? _best, _worst;
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Name<Row>("Titolo", r => r.Name, r => r.Key),
+        Col.Isin<Row>("Codice", r => r.Key),
+        Col.Text<Row>("Emittente", r => r.Issuer),
+        Col.Badge<Row>("Categoria", r => r.Class),
+        Col.Date<Row>("Chiusa il", r => r.Closed),
+        Col.Money<Row>("Risultato", r => r.Result, signColor: true, total: rows => rows.Sum(r => r.Result), bar: true),
+        Col.Pct<Row>("Rendimento", r => r.ReturnPct, signColor: true),
+        Col.Money<Row>("Investito", r => r.Invested),
+        Col.Money<Row>("Incassato", r => r.Proceeds),
+        Col.Money<Row>("Commissioni", r => r.Fees),
+        Col.Money<Row>("Imposte pagate", r => r.Taxes),
+        Col.Date<Row>("Aperta il", r => r.Opened),
+        Col.Num<Row>("Giorni", r => r.Days, 0),
+        Col.Num<Row>("Operazioni", r => r.Trades, 0),
+        Col.Num<Row>("Cicli", r => r.Cycles, 0),
+        Col.Text<Row>("Stato", r => r.Status),
+    };
+
+    protected override void OnInitialized()
+    {
+        foreach (var c in (Prefs.Get("closed.classes") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            _selected.Add(c);
+        }
+        _byUnderlying = Prefs.Get("closed.group") == "1";
+        base.OnInitialized();
+    }
+
+    protected override void Rebuild()
+    {
+        var prices = State.Holdings.ToDictionary(h => h.Key, h => h.LastPrice);
+        _all = ClosedPositionCalculator.Compute(State.Operations!, key => prices.GetValueOrDefault(key))
+            .Select(p => p with { Name = State.FullNameOf(p.Key, p.Name) })
+            .ToList();
+        _years = _all.Select(p => p.Closed.Year).Distinct().OrderByDescending(y => y).ToList();
+        Recompute();
+    }
+
+    private void Recompute()
+    {
+        var shown = _all.Where(p => (_selected.Count == 0 || _selected.Contains(p.AssetClass)) && (_year is null || p.Closed.Year == _year)).ToList();
+
+        string StatusOf(IEnumerable<ClosedPosition> items)
+        {
+            var list = items.ToList();
+            return list.Any(p => p.KnockedOut) ? T("Knock-out / scaduto")
+                : list.Any(p => !p.IsClosed) ? T("Riaperta")
+                : list.Sum(p => p.Cycles.Count) > 1 ? T("Più cicli") : T("Chiusa");
+        }
+
+        _rows = _byUnderlying
+            ? shown.GroupBy(p => (p.AssetClass, Name: ClosedPositionCalculator.Underlying(p.Name))).Select(g =>
+                new Row("", g.Key.Name, Fmt.ClassLabel(g.Key.AssetClass), IssuersOf(g), g.Min(p => p.Opened), g.Max(p => p.Closed),
+                    (int)(g.Max(p => p.Closed).Date - g.Min(p => p.Opened).Date).TotalDays, g.Sum(p => p.Trades), g.Sum(p => p.Cycles.Count),
+                    g.Sum(p => p.Invested), g.Sum(p => p.Proceeds), g.Sum(p => p.Fees), g.Sum(p => p.TaxesPaid), g.Sum(p => p.Result),
+                    g.Sum(p => p.Invested) > 0m ? (double)(g.Sum(p => p.Result) / g.Sum(p => p.Invested)) : null, StatusOf(g))).ToList()
+            : shown.Select(p => new Row(p.Key, p.Name, Fmt.ClassLabel(p.AssetClass), Issuers.ShortName(p.Key, p.AssetClass), p.Opened, p.Closed, (int)(p.Closed.Date - p.Opened.Date).TotalDays,
+                p.Trades, p.Cycles.Count, p.Invested, p.Proceeds, p.Fees, p.TaxesPaid, p.Result, p.ReturnPct, StatusOf(new[] { p }))).ToList();
+
+        _count = shown.Count;
+        _total = shown.Sum(p => p.Result);
+        _fees = shown.Sum(p => p.Fees);
+        _taxes = shown.Sum(p => p.TaxesPaid);
+        _winners = shown.Count(p => p.Result > 0m);
+        _losers = shown.Count(p => p.Result < 0m);
+        _avgWin = _winners == 0 ? 0m : shown.Where(p => p.Result > 0m).Average(p => p.Result);
+        _avgLoss = _losers == 0 ? 0m : shown.Where(p => p.Result < 0m).Average(p => p.Result);
+        _best = _rows.Count == 0 ? null : _rows.MaxBy(r => r.Result);
+        _worst = _rows.Count == 0 ? null : _rows.MinBy(r => r.Result);
+
+        _yearRows = shown.GroupBy(p => p.Closed.Year).OrderByDescending(g => g.Key)
+            .Select(g => new YearRow(g.Key, g.Count(), g.Count(p => p.Result > 0m), g.Count(p => p.Result < 0m), g.Sum(p => p.Result), g.Sum(p => p.Fees), g.Sum(p => p.TaxesPaid))).ToList();
+
+        var chartYears = _yearRows.OrderBy(y => y.Year).ToList();
+        _chart = ChartData.Bars(chartYears.Select(y => y.Year.ToString()), stacked: true,
+            (T("Guadagni"), "#2eaa64", chartYears.Select(y => shown.Where(p => p.Closed.Year == y.Year && p.Result > 0m).Sum(p => p.Result)).ToArray()),
+            (T("Perdite"), "#dc3c32", chartYears.Select(y => shown.Where(p => p.Closed.Year == y.Year && p.Result < 0m).Sum(p => p.Result)).ToArray()));
+    }
+
+    /// <summary>Gli emittenti dei prodotti di un gruppo (raggruppando per sottostante possono essere più di uno).</summary>
+    private static string IssuersOf(IEnumerable<ClosedPosition> positions) =>
+        string.Join(", ", positions.Select(p => Issuers.ShortName(p.Key, p.AssetClass)).Where(s => s.Length > 0).Distinct().Order());
+
+    private void ToggleClass(string key)
+    {
+        if (!_selected.Remove(key))
+        {
+            _selected.Add(key);
+        }
+        Prefs.Set("closed.classes", string.Join(',', _selected));
+        Recompute();
+    }
+
+    private void ClearClasses()
+    {
+        _selected.Clear();
+        Prefs.Set("closed.classes", "");
+        Recompute();
+    }
+
+    private void OnYear(ChangeEventArgs e)
+    {
+        _year = int.TryParse(e.Value?.ToString(), out var y) ? y : null;
+        Recompute();
+    }
+
+    private void OnGroup(ChangeEventArgs e)
+    {
+        _byUnderlying = e.Value is true;
+        Prefs.Set("closed.group", _byUnderlying ? "1" : "0");
+        Recompute();
+    }
+
+    private void Open(Row row)
+    {
+        if (row.Key.Length > 0)
+        {
+            Nav.NavigateTo($"security?key={Uri.EscapeDataString(row.Key)}");
+        }
+    }
+
+    private static string Short(string name) => name.Length > 38 ? name[..37] + "…" : name;
+}

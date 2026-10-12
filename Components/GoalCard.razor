@@ -1,0 +1,64 @@
+@inject AppState State
+@implements IDisposable
+
+<div class="card" data-help="goal.card">
+    <div class="label">
+        <i class="ti ti-target"></i> @T("Obiettivo")
+        <span class="grow"></span>
+        @if (!_editing)
+        {
+            <button class="icon-btn" title="@(State.Goal is null ? T("Imposta un obiettivo") : T("Cambia obiettivo"))" @onclick="StartEdit"><i class="ti ti-pencil"></i></button>
+        }
+    </div>
+
+    @if (_editing)
+    {
+        <form class="goal-form" @onsubmit="SaveAsync" @onsubmit:preventDefault>
+            <input type="number" min="0" step="1000" placeholder="@T("es. 300000")" @bind="_input" @bind:event="oninput" />
+            <button type="submit" class="btn primary" title="@T("Salva")"><i class="ti ti-check"></i></button>
+            <button type="button" class="btn" title="@T("Annulla")" @onclick="() => _editing = false"><i class="ti ti-x"></i></button>
+        </form>
+        <div class="delta muted">@T("Lascia vuoto per toglierlo.")</div>
+    }
+    else if (State.Goal is { } goal)
+    {
+        var ratio = goal == 0m ? 0m : Total / goal;
+        <div class="value">@Fmt.Pct(ratio, 1)</div>
+        <div class="progress"><div style="width:@(Math.Clamp((double)ratio * 100, 0, 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div></div>
+        <div class="delta muted">
+            @if (Total >= goal) { <text>@T("Raggiunto: {0}", Fmt.Money(goal))</text> }
+            else { <text>@T("mancano {0} a {1}", Fmt.Money(goal - Total), Fmt.Money(goal))</text> }
+        </div>
+    }
+    else
+    {
+        <div class="value muted">—</div>
+        <div class="delta muted">@T("Imposta una cifra da raggiungere: comparirà anche sul grafico.")</div>
+    }
+</div>
+
+@code {
+    [Parameter] public decimal Total { get; set; }
+
+    private bool _editing;
+    private decimal? _input;
+
+    protected override void OnInitialized() => State.Changed += OnChanged;
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    private void StartEdit()
+    {
+        _input = State.Goal;
+        _editing = true;
+    }
+
+    private Task SaveAsync()
+    {
+        State.SetGoal(_input is > 0m ? _input : null);
+        _editing = false;
+        return Task.CompletedTask;
+    }
+
+    public void Dispose() => State.Changed -= OnChanged;
+}

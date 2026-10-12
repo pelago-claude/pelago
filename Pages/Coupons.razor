@@ -1,0 +1,101 @@
+@page "/coupons"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-calendar-event"></i>@T("Cedole e scadenze")</h1>
+    <p class="sub">@T("Quando incassi cedole e rimborsi dei BTP che possiedi.")</p>
+
+    <NeedData>
+        @if (_held.Count == 0)
+        {
+            <div class="empty" style="padding:40px">
+                <i class="ti ti-building-bank"></i>
+                <h2>@T("Nessuna obbligazione in portafoglio")</h2>
+                <p>@T("Quando possiederai un BTP, qui comparirà il calendario degli incassi.")</p>
+            </div>
+        }
+        else
+        {
+            @if (_btp.Bonds.Count == 0)
+            {
+                <div class="warn">@H("Mancano i dati dei BTP (cedola e scadenza). Apri la pagina <a href=\"btp\">Titoli di Stato</a>: l'elenco dei BTP si scarica da Borsa Italiana e qui comparirà il calendario.")</div>
+            }
+            @if (_plan.Unknown.Count > 0 && _btp.Bonds.Count > 0)
+            {
+                <div class="warn" data-help="coupons.unknown">@T("Per {0} non ho i dati della cedola: l'obbligazione non è nell'elenco dei BTP a tasso fisso (potrebbe avere una cedola variabile o crescente), quindi non la inserisco nel calendario.", string.Join(", ", _plan.Unknown))</div>
+            }
+
+            @if (_plan.Events.Count > 0)
+            {
+                <div class="cards">
+                    <div class="card" data-help="coupons.next">
+                        <div class="label"><i class="ti ti-calendar-event"></i> @T("Prossimo incasso")</div>
+                        <div class="value">@Fmt.Money(_plan.Events[0].Net)</div>
+                        <div class="delta muted">@_plan.Events[0].Date.ToString("dd/MM/yyyy") · @T(_plan.Events[0].Kind).ToLowerInvariant() · @_plan.Events[0].Name</div>
+                    </div>
+                    <div class="card" data-help="coupons.year">
+                        <div class="label"><i class="ti ti-coin"></i> @T("Cedole nei prossimi 12 mesi")</div>
+                        <div class="value">@Fmt.Money(_next12Net)</div>
+                        <div class="delta muted">@T("lordo {0}", Fmt.Money(_next12Gross))</div>
+                    </div>
+                    <div class="card" data-help="coupons.redemption">
+                        <div class="label"><i class="ti ti-flag"></i> @T("Rimborsi a scadenza")</div>
+                        <div class="value">@Fmt.Money(_redemptions)</div>
+                        <div class="delta muted">@T("valore nominale")</div>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-bottom:16px">
+                    <h2>@T("Incassi mese per mese (prossimi 24 mesi)")</h2>
+                    <EChart Kind="bars" Data="_chart" Height="300px" Help="chart:coupons" />
+                </div>
+
+                <div class="tbl-box" style="height:380px">
+                    <DataTable TableId="coupons" Items="_plan.Events" Columns="_columns" ExportName="cedole" DefaultSortTitle="Data" />
+                </div>
+            }
+        }
+
+        <p class="note">@T("Il netto toglie l'imposta del {0} sulle cedole. Il rimborso è al valore nominale. Di turbo e derivati l'esportazione non indica la scadenza: non compaiono qui.", Fmt.Pct(_btp.Inputs.TaxRate, 1))</p>
+    </NeedData>
+</div>
+
+@code {
+    private BtpData _btp = new();
+    private List<(string Key, string Name, decimal Nominal)> _held = new();
+    private CouponPlan _plan = new(new(), new());
+    private object? _chart;
+    private decimal _next12Gross, _next12Net, _redemptions;
+
+    private static readonly List<Column<CouponEvent>> _columns = new()
+    {
+        Col.Date<CouponEvent>("Data", e => e.Date.ToDateTime(TimeOnly.MinValue)),
+        Col.Text<CouponEvent>("Obbligazione", e => e.Name),
+        Col.Badge<CouponEvent>("Tipo", e => T(e.Kind)),
+        Col.Money<CouponEvent>("Lordo", e => e.Gross, total: rows => rows.Sum(e => e.Gross)),
+        Col.Money<CouponEvent>("Netto", e => e.Net, total: rows => rows.Sum(e => e.Net)),
+    };
+
+    protected override void Rebuild()
+    {
+        _btp = BtpStore.Load();
+        _held = State.Holdings.Where(h => h.AssetClass == "BOND" && h.Shares > 0m)
+            .Select(h => (h.Key, State.FullNameOf(h.Key, h.Name), h.Shares)).ToList();
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        _plan = CouponSchedule.Build(_held, _btp.Bonds, _btp.Inputs.TaxRate, today);
+
+        var limit = today.AddMonths(12);
+        var coupons = _plan.Events.Where(e => e.Kind == "Cedola" && e.Date <= limit).ToList();
+        _next12Gross = coupons.Sum(e => e.Gross);
+        _next12Net = coupons.Sum(e => e.Net);
+        _redemptions = _plan.Events.Where(e => e.Kind == "Rimborso").Sum(e => e.Gross);
+
+        var months = Enumerable.Range(0, 24).Select(i => today.AddMonths(i)).Select(d => $"{d.Year:0000}-{d.Month:00}").ToList();
+        var byMonth = _plan.Events.GroupBy(e => $"{e.Date.Year:0000}-{e.Date.Month:00}").ToDictionary(g => g.Key);
+        decimal Sum(string m, string kind) => byMonth.TryGetValue(m, out var g) ? g.Where(e => e.Kind == kind).Sum(e => e.Net) : 0m;
+        _chart = ChartData.Bars(months, stacked: true,
+            (T("Cedole (nette)"), "#3CB371", months.Select(m => Sum(m, "Cedola")).ToArray()),
+            (T("Rimborsi"), "#4682B4", months.Select(m => Sum(m, "Rimborso")).ToArray()));
+    }
+}

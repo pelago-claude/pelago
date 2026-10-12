@@ -1,0 +1,246 @@
+@typeparam TItem
+@using System.Text
+@inject NativeDialogs Dialogs
+@inject UiPrefs Prefs
+
+<div class="table-card @(_compact ? "compact" : "")">
+    <div class="table-toolbar">
+        <div class="search" data-help="filter">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="@T("Filtra…")" value="@_filter" @oninput="OnFilter" />
+        </div>
+        <span class="count" data-help="count.rows">@Plural(_view.Count, "{0} riga", "{0} righe")@(_view.Count != _total ? T(" su {0}", _total) : "")</span>
+        <div class="grow"></div>
+        @Toolbar
+        <button class="btn ghost @(_compact ? "on" : "")" data-help="table.compact" @onclick="ToggleCompact" title="@T("Righe compatte")" aria-pressed="@_compact"><i class="ti ti-list"></i></button>
+        <button class="btn ghost" data-help="export" @onclick="Export" title="@T("Esporta in CSV")"><i class="ti ti-download"></i> CSV</button>
+        <button class="btn ghost" data-help="export.xlsx" @onclick="ExportXlsx" title="@T("Esporta in Excel")"><i class="ti ti-file-spreadsheet"></i> @T("Excel")</button>
+    </div>
+    <div class="table-wrap">
+        <table class="grid">
+            <thead>
+                <tr>
+                    @foreach (var col in Columns)
+                    {
+                        var active = _sortKey == col.Key;
+                        <th class="@(col.Right ? "r" : "") @col.HeaderCss @(active ? "sorted" : "")" data-help="@HelpTexts.ColumnKey(TableId, col.Title)" @onclick="() => SortBy(col)">
+                            <span>@T(col.Title)</span>
+                            @if (active)
+                            {
+                                <i class="ti @(_desc ? "ti-arrow-down" : "ti-arrow-up")"></i>
+                            }
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in _shown)
+                {
+                    <tr class="@RowClass?.Invoke(item) @(OnRowClick is not null ? "clickable" : "")" style="@RowStyle?.Invoke(item)"
+                        @onclick="() => OnRowClick?.Invoke(item)">
+                        @foreach (var col in Columns)
+                        {
+                            <td class="@(col.Right ? "r" : "") @col.Css?.Invoke(item) @col.CellCss">
+                                @if (col.Render is { } render)
+                                {
+                                    @render(item)
+                                }
+                                else if (col.LinkIsins && col.Text(item) is { Length: >= 12 } text && IsinPattern.IsMatch(text))
+                                {
+                                    <IsinText Text="@text" />
+                                }
+                                else if (col.Bar && col.SortValue(item) is decimal amount)
+                                {
+                                    <span class="rbar"><span class="rbar-track" aria-hidden="true"><i class="rbar-fill @(amount >= 0m ? "pos" : "neg")" style="@BarStyle(col, amount)"></i></span><span>@col.Text(item)</span></span>
+                                }
+                                else
+                                {
+                                    @col.Text(item)
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+            @if (Columns.Any(c => c.Footer is not null) && _view.Count > 0)
+            {
+                <tfoot>
+                    <tr>
+                        @foreach (var col in Columns)
+                        {
+                            <td class="@(col.Right ? "r" : "")">@(col.Footer?.Invoke(_view) ?? (col == Columns[0] ? T(FooterLabel) : ""))</td>
+                        }
+                    </tr>
+                </tfoot>
+            }
+        </table>
+        @if (_view.Count > MaxRows)
+        {
+            <div class="note">@T("Mostrate le prime {0} righe su {1}: usa il filtro per restringere (l'esportazione CSV include tutte le righe).", MaxRows, _view.Count)</div>
+        }
+        @if (_view.Count == 0)
+        {
+            <div class="note">@T("Nessuna riga da mostrare.")</div>
+        }
+    </div>
+</div>
+
+@code {
+    private const int MaxRows = 2500;
+
+    // un ISIN dentro un testo qualunque (per esempio la descrizione di un'operazione) diventa un codice cliccabile
+    private static readonly System.Text.RegularExpressions.Regex IsinPattern = new(@"\b[A-Z]{2}[A-Z0-9]{9}\d\b", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    [Parameter, EditorRequired] public string TableId { get; set; } = "";
+    [Parameter, EditorRequired] public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+    [Parameter, EditorRequired] public List<Column<TItem>> Columns { get; set; } = new();
+    [Parameter] public string ExportName { get; set; } = "export";
+    [Parameter] public string FooterLabel { get; set; } = "Totale";
+    [Parameter] public string? DefaultSortTitle { get; set; }
+    [Parameter] public bool DefaultDescending { get; set; }
+    [Parameter] public Action<TItem>? OnRowClick { get; set; }
+    [Parameter] public Func<TItem, string?>? RowClass { get; set; }
+    [Parameter] public Func<TItem, string?>? RowStyle { get; set; }
+    [Parameter] public RenderFragment? Toolbar { get; set; }
+
+    private string _filter = "";
+    private string? _sortKey;
+    private bool _desc;
+    private bool _sortLoaded;
+    private int _total;
+    private List<TItem> _view = new();
+    private List<TItem> _shown = new();
+    private bool _compact;
+    private readonly Dictionary<string, decimal> _barMax = new();
+
+    protected override void OnInitialized() => _compact = Prefs.Get("table.compact") == "1";
+
+    private void ToggleCompact()
+    {
+        _compact = !_compact;
+        Prefs.Set("table.compact", _compact ? "1" : "0");
+    }
+
+    /// <summary>Barra del risultato: parte dal centro della traccia, verso destra se positivo e verso sinistra se negativo.</summary>
+    private string BarStyle(Column<TItem> col, decimal value)
+    {
+        var max = _barMax.GetValueOrDefault(col.Key);
+        var half = max == 0m ? 0d : Math.Min(1d, (double)(Math.Abs(value) / max)) * 50d;
+        var width = half.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        return value >= 0m ? $"left:50%;width:{width}%" : $"right:50%;width:{width}%";
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!_sortLoaded)
+        {
+            _sortLoaded = true;
+            var saved = Prefs.Get("sort." + TableId);
+            if (saved is not null && saved.Split('|') is [var key, var dir] && Columns.Any(c => c.Key == key))
+            {
+                _sortKey = key;
+                _desc = dir == "desc";
+            }
+            else if (DefaultSortTitle is not null)
+            {
+                _sortKey = DefaultSortTitle;
+                _desc = DefaultDescending;
+            }
+        }
+        Recompute();
+    }
+
+    private void OnFilter(ChangeEventArgs e)
+    {
+        _filter = e.Value?.ToString() ?? "";
+        Recompute();
+    }
+
+    private void SortBy(Column<TItem> col)
+    {
+        if (_sortKey == col.Key)
+        {
+            _desc = !_desc;
+        }
+        else
+        {
+            _sortKey = col.Key;
+            _desc = false;
+        }
+        Prefs.Set("sort." + TableId, $"{_sortKey}|{(_desc ? "desc" : "asc")}");
+        Recompute();
+    }
+
+    private void Recompute()
+    {
+        var all = Items.ToList();
+        _total = all.Count;
+
+        IEnumerable<TItem> rows = all;
+        if (!string.IsNullOrWhiteSpace(_filter))
+        {
+            var f = _filter.Trim();
+            rows = rows.Where(r => Columns.Any(c => c.Text(r).Contains(f, StringComparison.CurrentCultureIgnoreCase)));
+        }
+
+        var list = rows.ToList();
+        var sortCol = Columns.FirstOrDefault(c => c.Key == _sortKey);
+        if (sortCol is not null)
+        {
+            var comparer = Comparer<IComparable?>.Create(Compare);
+            // OrderBy è stabile: a parità di valore resta l'ordine originale.
+            list = (_desc
+                ? list.OrderByDescending(r => sortCol.SortValue(r), comparer)
+                : list.OrderBy(r => sortCol.SortValue(r), comparer)).ToList();
+        }
+
+        _view = list;
+        _shown = list.Count > MaxRows ? list.Take(MaxRows).ToList() : list;
+
+        // scala delle barre: il valore assoluto più grande della colonna tra le righe visibili
+        _barMax.Clear();
+        foreach (var col in Columns.Where(c => c.Bar))
+        {
+            _barMax[col.Key] = list.Select(r => col.SortValue(r) is decimal d ? Math.Abs(d) : 0m).DefaultIfEmpty(0m).Max();
+        }
+    }
+
+    private static int Compare(IComparable? a, IComparable? b)
+    {
+        if (a is null && b is null) return 0;
+        if (a is null) return -1;
+        if (b is null) return 1;
+        if (a is string sa && b is string sb) return string.Compare(sa, sb, StringComparison.CurrentCultureIgnoreCase);
+        return a.CompareTo(b);
+    }
+
+    private void Export()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine(string.Join(";", Columns.Select(c => Quote(T(c.Title)))));
+        foreach (var row in _view)
+        {
+            sb.AppendLine(string.Join(";", Columns.Select(c => Quote(c.Text(row)))));
+        }
+        Dialogs.SaveCsv($"{ExportName}.csv", sb.ToString());
+    }
+
+    /// <summary>Esporta in Excel con valori veri (numeri, importi, percentuali, date), nell'ordine e con il filtro attuali.</summary>
+    private void ExportXlsx()
+    {
+        var path = Dialogs.PickXlsxFile($"{ExportName}.xlsx");
+        if (path is null)
+        {
+            return;
+        }
+
+        var rows = _view.Select(row => Columns.Select(c => c.Kind == ColumnKind.Text ? c.Text(row) : (object?)c.SortValue(row)).ToArray());
+        XlsxWriter.Write(path, ExportName, Columns.Select(c => T(c.Title)).ToList(), Columns.Select(c => c.Kind).ToList(), rows);
+    }
+
+    private static string Quote(string value)
+    {
+        var needsQuotes = value.Contains(';') || value.Contains('"') || value.Contains('\n');
+        return needsQuotes ? "\"" + value.Replace("\"", "\"\"") + "\"" : value;
+    }
+}

@@ -1,0 +1,61 @@
+@* Selettore di valuta con bandiere: un pulsante che apre l'elenco (codice, nome, bandiera) con ricerca. Un menu a tendina nativo non può mostrare immagini. *@
+<div class="picker">
+    <button type="button" class="picker-btn" @onclick="Toggle">
+        <Flag Code="@FxBoard.FlagOf(Value)" /><b>@Value</b><span class="muted">@NameOf(Value)</span>
+        <i class="ti @(_open ? "ti-chevron-up" : "ti-chevron-down")"></i>
+    </button>
+    @if (_open)
+    {
+        <div class="picker-back" @onclick="Close"></div>
+        <div class="picker-panel">
+            <input type="text" class="field-input" placeholder="@T("Filtra…")" value="@_filter" @oninput="e => _filter = e.Value?.ToString() ?? string.Empty" autofocus />
+            <div class="picker-list">
+                @foreach (var cur in Visible())
+                {
+                    <button type="button" class="picker-item @(cur == Value ? "on" : "")" @onclick="() => Pick(cur)">
+                        <Flag Code="@FxBoard.FlagOf(cur)" /><b>@cur</b><span class="muted">@NameOf(cur)</span>
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Value { get; set; } = "EUR";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    /// <summary>I codici tra cui scegliere (l'euro compreso).</summary>
+    [Parameter, EditorRequired] public IEnumerable<string> Options { get; set; } = Array.Empty<string>();
+
+    private bool _open;
+    private string _filter = "";
+
+    private void Toggle()
+    {
+        _open = !_open;
+        _filter = "";
+    }
+
+    private void Close() => _open = false;
+
+    private async Task Pick(string code)
+    {
+        _open = false;
+        if (code != Value)
+        {
+            await ValueChanged.InvokeAsync(code);
+        }
+    }
+
+    private static string NameOf(string code) =>
+        code == "EUR" ? T("Euro") : T(FxBoard.Currencies.FirstOrDefault(c => c.Code == code)?.Name ?? "");
+
+    private IEnumerable<string> Visible()
+    {
+        var f = _filter.Trim();
+        return f.Length == 0
+            ? Options
+            : Options.Where(c => c.Contains(f, StringComparison.OrdinalIgnoreCase) || NameOf(c).Contains(f, StringComparison.CurrentCultureIgnoreCase));
+    }
+}

@@ -1,0 +1,70 @@
+# Pelago
+
+**[Versione italiana → README.md](README.md)**
+
+Pelago is a Windows app that turns the transactions CSV exported from Trade Republic into what the file alone doesn't tell you: **how your portfolio changed over time**. One tile per holding (bigger = worth more, green/red = gain/loss on cost), a slider to go back to any day in the past, and a "Play" button to watch it change.
+
+Free, ad-free, non-profit, free software (GPL-3.0). The interface is available in Italian, English, French, German and Spanish.
+
+> **Personal, unofficial project.** Pelago is not affiliated with or endorsed by Trade Republic and has no access to your account. It is not financial or tax advice: all values are estimates computed from the file.
+
+![The portfolio map](docs/img/mappa-portafoglio.png)
+
+## What it does
+
+- **Portfolio map** with a time slider and "Play": holdings appear, grow and disappear.
+- **Overview**, **daily trend**, **returns** (time-weighted and annualized on deposits), monthly composition **charts**.
+- **Composition on a date**, open and closed **positions**, **capital gains**, trade **statistics**, **tax backpack** (Italian tax logic), **BTP** calculator.
+- **Assisted mode**: hover a column or a number to see what it is and how it is computed.
+- Light and dark themes. Your CSV is **never modified**; one-click local backup.
+
+The screenshots use a sample account with **invented data** (see [samples/](samples/)). Some screens and texts in the screenshots are in Italian.
+
+## Privacy: what leaves your PC
+
+The CSV and your data stay on your PC (folder `%LOCALAPPDATA%\DPOper`). Pelago **never asks for a login or password** and never connects to your account.
+
+To get prices, the app calls public services and **sends only instrument codes and dates — never personal data, amounts or quantities**:
+
+| Service | Used for |
+|---|---|
+| `query1/query2.finance.yahoo.com` (Yahoo Finance) | stock and fund prices, FX rates |
+| `api.coingecko.com` (CoinGecko) | crypto prices |
+| `api.frankfurter.dev` (ECB data) | reference FX rates and history |
+| `borsaitaliana.it` | Italian government bond list and prices |
+| `data-api.ecb.europa.eu` (ECB), `api.statistiken.bundesbank.de` (Bundesbank), `home.treasury.gov` and `treasurydirect.gov` (US Treasury) | yield curves |
+| `markets.vontobel.com` | price and name of Vontobel derivatives — **off by default**, enabled from the Quotes page |
+| `prodotti.societegenerale.it` | price and name of Société Générale derivatives — **off by default**, enabled from the Quotes page with a banner quoting the site's legal notice |
+
+The code is public, so you can check there is nothing else (search for `http` in `Services/`).
+
+## How to use it
+
+1. Download the transactions CSV from your Trade Republic account.
+2. Download `pelago.exe` from the [**Releases**](https://github.com/pelago-claude/pelago/releases) page of this repository and run it (64-bit Windows 10/11; it needs the *WebView2 Runtime*, already included in Windows 11 and in most up-to-date Windows 10).
+3. Click **Open CSV** and choose the file. To try it without your own data: [samples/esempio-operazioni.csv](samples/esempio-operazioni.csv).
+
+Every release lists the **SHA-256** of `pelago.exe`: compare it with `Get-FileHash pelago.exe`. The executable is not code-signed, so Windows may show a SmartScreen warning the first time. If you prefer not to trust a downloaded file, build it yourself (below).
+
+> If something is wrong with your file, **never attach your real CSV** to a report: it contains all your transactions. Describe the problem, or start from `samples/esempio-operazioni.csv`.
+
+## Building from source
+
+You need Windows and the .NET 8 SDK.
+
+```bash
+dotnet test Tests/Pelago.Tests.csproj
+dotnet publish DPOper.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/win-x64
+```
+
+The result is `publish/win-x64/pelago.exe`. The app is written in C# (.NET 8, Windows Forms with a Blazor UI inside WebView2); charts use [Apache ECharts](https://echarts.apache.org). Source strings are in Italian, translations live in `i18n/`.
+
+## Feedback
+
+Bug reports and suggestions are welcome: open an [*Issue*](https://github.com/pelago-claude/pelago/issues/new/choose), or write to **pelago_claude@gmail.com** (without attaching your CSV). I'm especially interested in **what you need most, what is unclear, what is missing**. See also [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+Copyright © 2026 David. Pelago is free software, distributed under the terms of the **GNU General Public License version 3** ([LICENSE](LICENSE)), **without any warranty**. Bundled third-party libraries keep their own licenses: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+"Trade Republic" is a trademark of its respective owners, mentioned only to describe the file format Pelago reads.

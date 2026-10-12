@@ -1,0 +1,4 @@
+Instrument Sans
+Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)
+Licenza: SIL Open Font License, Version 1.1 — https://openfontlicense.org
+File scaricato da fonts.gstatic.com (Google Fonts), sottoinsieme «latin», l'11 ottobre 2026.

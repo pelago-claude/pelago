@@ -1,0 +1,152 @@
+@page "/security"
+@inherits StatePage
+
+<div class="page fill">
+    <a class="back" @onclick="Back"><i class="ti ti-arrow-left"></i> @T("Indietro")</a>
+
+    <NeedData>
+        @if (_history.Count == 0)
+        {
+            <div class="empty"><i class="ti ti-search-off"></i><h2>@T("Nessun movimento trovato")</h2></div>
+        }
+        else
+        {
+            <h1><NameCell Name="@_name" Code="@Key" /></h1>
+            <p class="sub">@if (!string.IsNullOrWhiteSpace(_symbol)) {<Isin Code="@_symbol" /> <text>· </text>}@_classLabel@(_issuer.Length > 0 ? " · " + _issuer : "")@(_asOf is { } d ? T(" · movimenti fino al {0:dd/MM/yyyy}", d) : "")</p>
+
+            <div class="cards">
+                <div class="card" data-help="sec.shares"><div class="label">@T("Quantità netta")</div><div class="value">@Fmt.Num(_shares)</div></div>
+                <div class="card" data-help="sec.value"><div class="label">@T("Valore stimato")</div><div class="value">@Fmt.Money(_value)</div>
+                    @if (_priceDate is { } pd) { <div class="delta muted">@T("prezzo del {0}", pd.ToString("dd/MM/yyyy HH:mm"))</div> }</div>
+                <div class="card" data-help="sec.net"><div class="label">@T("Netto in cassa")</div><div class="value @Fmt.Sign(_net)">@Fmt.Money(_net)</div></div>
+                <div class="card" data-help="count"><div class="label">@T("Movimenti")</div><div class="value">@_rows.Count</div></div>
+            </div>
+
+            @if (_cycles is { Count: > 0 } cycles)
+            {
+                <div class="panel" style="margin-bottom:16px" data-help="sec.cycles">
+                    <h2>@T("Cicli di questa posizione") <span class="muted" style="font-weight:400;font-size:12.5px">@T("dal primo acquisto a quando la quantità torna a zero")</span></h2>
+                    <table class="grid">
+                        <thead><tr>
+                            <th>#</th><th>@T("Aperto il")</th><th>@T("Chiuso il")</th><th class="r">@T("Giorni")</th><th class="r">@T("Operazioni")</th>
+                            <th class="r">@T("Investito")</th><th class="r">@T("Incassato")</th><th class="r">@T("Risultato")</th><th class="r">@T("Rendimento")</th><th>@T("Stato")</th>
+                        </tr></thead>
+                        <tbody>
+                            @foreach (var cycle in cycles)
+                            {
+                                <tr>
+                                    <td>@cycle.Number</td><td>@cycle.Opened.ToLocalTime().ToString("dd/MM/yyyy")</td><td>@cycle.Closed.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                                    <td class="r">@cycle.DaysHeld</td><td class="r">@cycle.Trades</td>
+                                    <td class="r">@Fmt.Money(cycle.Invested)</td><td class="r">@Fmt.Money(cycle.Proceeds)</td>
+                                    <td class="r strong @Fmt.Sign(cycle.Result)">@Fmt.Money(cycle.Result)</td><td class="r @Fmt.Sign((decimal?)cycle.ReturnPct)">@Fmt.Pct(cycle.ReturnPct, 1)</td>
+                                    <td>@(cycle.KnockedOut ? T("Knock-out / scaduto") : T("Chiuso"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                        @if (cycles.Count > 1)
+                        {
+                            <tfoot><tr>
+                                <td colspan="5">@T("Su questo titolo, in tutto")</td>
+                                <td class="r">@Fmt.Money(cycles.Sum(c => c.Invested))</td><td class="r">@Fmt.Money(cycles.Sum(c => c.Proceeds))</td>
+                                <td class="r @Fmt.Sign(cycles.Sum(c => c.Result))">@Fmt.Money(cycles.Sum(c => c.Result))</td><td colspan="2"></td>
+                            </tr></tfoot>
+                        }
+                    </table>
+                </div>
+            }
+
+            @if (_quoteChart is not null)
+            {
+                <div class="panel" style="margin-bottom:16px">
+                    <h2>@T("Quotazioni registrate")</h2>
+                    <EChart Kind="lines" Data="_quoteChart" Height="220px" Help="chart:quote" />
+                </div>
+            }
+
+            <DataTable TableId="secdetail" Items="_rows" Columns="_columns" ExportName="@_exportName"
+                       DefaultSortTitle="Data" DefaultDescending="true" FooterLabel="SALDO" />
+        }
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(DateTime Date, string Type, decimal? Shares, decimal? Price, decimal Amount, decimal Fee, decimal Tax, string Description);
+
+    [SupplyParameterFromQuery(Name = "key")] public string? Key { get; set; }
+    [SupplyParameterFromQuery(Name = "asof")] public string? AsOfText { get; set; }
+
+    private List<Operation> _history = new();
+    private List<Row> _rows = new();
+    private string _name = "";
+    private string _symbol = "";
+    private string _classLabel = "";
+    private string _issuer = "";
+    private string _exportName = "movimenti";
+    private decimal _shares;
+    private decimal _value;
+    private decimal _net;
+    private DateTime? _priceDate;
+    private DateOnly? _asOf;
+    private object? _quoteChart;
+    private List<PositionCycle>? _cycles;
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Date<Row>("Data", r => r.Date, "dd/MM/yyyy HH:mm"),
+        Col.Text<Row>("Tipo", r => r.Type),
+        Col.Num<Row>("Quantità", r => r.Shares, total: rows => rows.Sum(r => r.Shares ?? 0m)),
+        Col.Money4<Row>("Prezzo", r => r.Price),
+        Col.Money<Row>("Importo", r => r.Amount, signColor: true, total: rows => rows.Sum(r => r.Amount)),
+        Col.Money<Row>("Fee", r => r.Fee, total: rows => rows.Sum(r => r.Fee)),
+        Col.Money<Row>("Tax", r => r.Tax, total: rows => rows.Sum(r => r.Tax)),
+        Col.Text<Row>("Descrizione", r => r.Description),
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (State.HasData)
+        {
+            Rebuild();
+        }
+    }
+
+    protected override void Rebuild()
+    {
+        _asOf = DateOnly.TryParseExact(AsOfText, "yyyy-MM-dd", out var d) ? d : null;
+        var endOfDay = _asOf?.ToDateTime(TimeOnly.MaxValue);
+
+        _history = State.Operations!
+            .Where(o => o.PositionKey == Key && (endOfDay is null || o.DateTime <= endOfDay))
+            .ToList();
+        if (_history.Count == 0)
+        {
+            return;
+        }
+
+        var first = _history[0];
+        _symbol = first.Symbol;
+        _classLabel = Fmt.ClassLabel(first.AssetClass);
+        _issuer = Issuers.ShortName(first.Symbol, first.AssetClass);
+        _name = State.ChosenNameOf(first.PositionKey) ?? AssetNameResolver.ResolveDisplayName(first.Name, first.AssetClass, _history.Select(o => o.Description));
+        _exportName = "movimenti-" + string.Concat(_name.Where(char.IsLetterOrDigit)).ToLowerInvariant();
+
+        _rows = _history.OrderByDescending(o => o.DateTime)
+            .Select(o => new Row(o.DateTime, o.Type, o.Shares, o.Price, o.Amount ?? 0m, o.Fee ?? 0m, o.Tax ?? 0m, o.Description))
+            .ToList();
+        _shares = _history.Sum(o => o.Shares ?? 0m);
+        _net = _history.Sum(o => o.NetCashImpact);
+
+        var holding = PortfolioCalculator.ComputeHoldings(_history, State.Quotes).FirstOrDefault(h => h.Key == Key);
+        _value = holding is null ? 0m : _shares * (holding.LastPrice ?? 0m);
+        _priceDate = holding?.LastPriceTimestamp?.ToLocalTime();
+
+        var prices = State.Holdings.ToDictionary(h => h.Key, h => h.LastPrice);
+        _cycles = ClosedPositionCalculator.Compute(_history, key => prices.GetValueOrDefault(key)).FirstOrDefault()?.Cycles.ToList();
+
+        _quoteChart = Key is not null && State.Quotes.TryGetValue(Key, out var quotes) && quotes.Count > 1
+            ? ChartData.QuoteLine(_name, quotes)
+            : null;
+    }
+
+    private void Back() => Nav.NavigateTo("securities");
+}

@@ -1,0 +1,185 @@
+@implements IDisposable
+@inject NameEditor Editor
+@inject AppState State
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+@if (Editor.Code is { } current)
+{
+    <div class="modal-back" @onclick="Editor.Close">
+        <div class="modal names-dialog" @onclick:stopPropagation="true" @onkeydown="OnKey" data-help="names.dialog">
+            <h2><i class="ti ti-tag"></i> @T("Nome del titolo")</h2>
+            <div class="code-line">
+                <span class="pathbox">@current</span>
+                <button class="icon-btn" title="@T("Copia il codice")" aria-label="@T("Copia il codice")" @onclick="CopyAsync"><i class="ti ti-copy"></i></button>
+            </div>
+
+            <label class="field">
+                @T("Il tuo nome")
+                <input id="name-input" class="field-input" type="text" maxlength="@InstrumentNames.MaxLength" placeholder="@_default"
+                       value="@_name" @oninput="e => _name = e.Value?.ToString() ?? string.Empty" />
+            </label>
+
+            <div class="info" style="margin-top:10px">@T("Nome nel file: {0}", string.IsNullOrWhiteSpace(_original) ? "—" : _original)</div>
+            @if (_issuerName is not null)
+            {
+                <div class="info">@T("Nome dell'emittente: {0}", _issuerName)</div>
+            }
+            @if (_holding is { } holding)
+            {
+                <div class="info">@Fmt.ClassLabel(holding.AssetClass) · @(holding.Shares > 0m ? T("in portafoglio: {0} quote", Fmt.Num(holding.Shares, 4)) : T("non più in portafoglio"))</div>
+            }
+            @if (State.Names.OtherCodeWithName(current, _name) is { Length: > 0 } other)
+            {
+                <div class="warn" style="margin-top:10px">@T("Lo stesso nome è già usato per {0}: nelle statistiche per sottostante i due titoli verranno raggruppati.", other)</div>
+            }
+            @if (_error is not null)
+            {
+                <div class="err" style="margin-top:10px">@_error</div>
+            }
+
+            <div class="actions" style="justify-content:space-between">
+                <div class="row" style="gap:8px">
+                    @if (State.Names.Has(current))
+                    {
+                        <button class="btn ghost" @onclick="Restore"><i class="ti ti-arrow-back-up"></i> @T("Ripristina il nome originale")</button>
+                    }
+                    @if (_holding is not null)
+                    {
+                        <button class="btn ghost" @onclick="OpenDetail">@T("Apri il dettaglio") <i class="ti ti-arrow-right"></i></button>
+                    }
+                </div>
+                <div class="row" style="gap:8px">
+                    <button class="btn" @onclick="Editor.Close">@T("Annulla")</button>
+                    <button class="btn primary" @onclick="Save">@T("Salva")</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string? _loadedFor;
+    private string _name = "";
+    private string _original = "";
+    private string _default = "";
+    private string? _issuerName;
+    private string? _error;
+    private Holding? _holding;
+
+    protected override void OnInitialized()
+    {
+        Editor.Changed += OnEditorChanged;
+        State.Changed += OnStateChanged;
+    }
+
+    private bool _focusPending;
+
+    private void OnEditorChanged()
+    {
+        _ = InvokeAsync(() =>
+        {
+            Load();
+            StateHasChanged();
+        });
+    }
+
+    private void OnStateChanged() => _ = InvokeAsync(StateHasChanged);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusPending)
+        {
+            _focusPending = false;
+            try
+            {
+                await JS.InvokeVoidAsync("DPUi.focus", "name-input");
+            }
+            catch (JSException)
+            {
+            }
+        }
+    }
+
+    /// <summary>Quando si apre la finestra su un codice, si leggono il nome attuale, quello del file e la posizione.</summary>
+    private void Load()
+    {
+        if (Editor.Code is not { } code)
+        {
+            _loadedFor = null;
+            return;
+        }
+
+        _loadedFor = code;
+        _name = State.Names.Get(code) ?? "";
+        _original = State.OriginalNameOf(code, "");
+        _issuerName = State.IssuerNameOf(code);
+        _default = State.DefaultNameOf(code, "");
+        _holding = State.Holdings.FirstOrDefault(h => string.Equals(h.Key, code, StringComparison.OrdinalIgnoreCase));
+        _error = null;
+        _focusPending = true;
+    }
+
+    private void Save()
+    {
+        if (Editor.Code is not { } code)
+        {
+            return;
+        }
+
+        try
+        {
+            State.Names.Set(code, _name);
+            Editor.Close();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _error = T("Impossibile salvare i nomi: {0}", ex.Message);
+        }
+    }
+
+    private void Restore()
+    {
+        _name = "";
+        Save();
+    }
+
+    private void OpenDetail()
+    {
+        if (_holding is { } holding)
+        {
+            Editor.Close();
+            Nav.NavigateTo($"security?key={Uri.EscapeDataString(holding.Key)}");
+        }
+    }
+
+    private async Task CopyAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", Editor.Code);
+            State.Notify(T("Codice copiato"));
+        }
+        catch (JSException)
+        {
+        }
+    }
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Save();
+        }
+        else if (e.Key == "Escape")
+        {
+            Editor.Close();
+        }
+    }
+
+    public void Dispose()
+    {
+        Editor.Changed -= OnEditorChanged;
+        State.Changed -= OnStateChanged;
+    }
+}

@@ -1,0 +1,64 @@
+@page "/quote"
+@inherits StatePage
+
+<div class="page fill">
+    <a class="back" @onclick='() => Nav.NavigateTo("quotes")'><i class="ti ti-arrow-left"></i> @T("Indietro")</a>
+
+    @if (_entry is null)
+    {
+        <div class="empty"><i class="ti ti-search-off"></i><h2>@T("Asset non trovato")</h2></div>
+    }
+    else
+    {
+        <h1><NameCell Name="@State.FullNameOf(_entry.Key, _entry.Name)" Code="@_entry.Key" /></h1>
+        <p class="sub"><Isin Code="@_entry.Symbol" /> <text>@T("· {0} · {1} quotazioni registrate", Fmt.ClassLabel(_entry.AssetClass), _rows.Count)</text></p>
+
+        @if (_chart is not null)
+        {
+            <div class="panel" style="margin-bottom:16px">
+                <EChart Kind="lines" Data="_chart" Height="260px" Help="chart:quote" />
+            </div>
+        }
+
+        <DataTable TableId="quotedetail" Items="_rows" Columns="_columns" ExportName="@_exportName"
+                   DefaultSortTitle="Data" DefaultDescending="true" />
+    }
+</div>
+
+@code {
+    private sealed record Row(DateTime Timestamp, decimal Price, string Currency, string Source);
+
+    [SupplyParameterFromQuery(Name = "key")] public string? Key { get; set; }
+
+    private AssetCatalogEntry? _entry;
+    private List<Row> _rows = new();
+    private object? _chart;
+    private string _exportName = "quotazioni";
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Date<Row>("Data", r => r.Timestamp, "dd/MM/yyyy HH:mm:ss"),
+        Col.Num<Row>("Prezzo", r => r.Price),
+        Col.Text<Row>("Valuta", r => r.Currency),
+        Col.Text<Row>("Fonte", r => r.Source),
+    };
+
+    protected override void OnParametersSet() => Load();
+
+    protected override void Rebuild() => Load();
+
+    private void Load()
+    {
+        _entry = AssetCatalogStore.Load().FirstOrDefault(e => e.Key == Key);
+        if (_entry is null)
+        {
+            return;
+        }
+
+        var quotes = QuoteHistoryStore.Load(_entry);
+        _rows = quotes.OrderByDescending(q => q.Timestamp)
+            .Select(q => new Row(q.Timestamp.ToLocalTime(), q.Price, q.Currency, q.Source)).ToList();
+        _chart = quotes.Count > 1 ? ChartData.QuoteLine(_entry.Name, quotes.Select(q => (q.Timestamp, q.Price))) : null;
+        _exportName = "quotazioni-" + string.Concat(_entry.Name.Where(char.IsLetterOrDigit)).ToLowerInvariant();
+    }
+}

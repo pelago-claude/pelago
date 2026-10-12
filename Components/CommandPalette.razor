@@ -1,0 +1,222 @@
+@using System.Globalization
+@using System.Text
+@inject AppState State
+@inject AssistState Assist
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+@if (Open)
+{
+    <div class="palette-back" @onclick="Close">
+        <div class="palette" @onclick:stopPropagation="true">
+            <div class="palette-input">
+                <i class="ti ti-search"></i>
+                <input id="palette-input" type="text" autocomplete="off" placeholder="@T("Cerca una pagina, un titolo, un BTP o un comando…")"
+                       value="@_query" @oninput="OnInput" @onkeydown="OnKey" />
+                <kbd>@T("Esc")</kbd>
+            </div>
+            <div class="palette-results">
+                @if (_results.Count == 0)
+                {
+                    <div class="palette-empty">@T("Nessun risultato per «{0}».", _query)</div>
+                }
+                @for (var i = 0; i < _results.Count; i++)
+                {
+                    var index = i;
+                    var item = _results[i];
+                    <div class="palette-item @(index == _selected ? "sel" : "")" @onclick="() => RunAsync(item)" @onmouseover="() => _selected = index">
+                        <i class="ti @item.Icon"></i>
+                        <span class="pt">@item.Title</span>
+                        <span class="ps">@item.Sub</span>
+                    </div>
+                }
+            </div>
+            <div class="palette-hint">@T("↑ ↓ per scegliere · Invio per aprire · Esc per chiudere")</div>
+        </div>
+    </div>
+}
+
+@code {
+    private sealed record Item(string Icon, string Title, string Sub, string Keywords, string? Route, Func<Task>? Action);
+
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnToggleTheme { get; set; }
+    [Parameter] public EventCallback OnTogglePrivacy { get; set; }
+    [Parameter] public EventCallback OnOpenFile { get; set; }
+    [Parameter] public EventCallback OnAddFile { get; set; }
+
+    private string _query = "";
+    private int _selected;
+    private bool _wasOpen;
+    private List<Item> _index = new();
+    private List<Item> _results = new();
+
+    private bool _focusPending;
+
+    protected override void OnParametersSet()
+    {
+        if (Open && !_wasOpen)
+        {
+            _query = "";
+            _selected = 0;
+            BuildIndex();
+            Search();
+            _focusPending = true;
+        }
+        _wasOpen = Open;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Open && _focusPending)
+        {
+            _focusPending = false;
+            await JS.InvokeVoidAsync("DPUi.focus", "palette-input");
+        }
+    }
+
+    /// <summary>Parole chiave per la ricerca: nella lingua corrente e in italiano, così si trova una pagina in entrambe.</summary>
+    private static string K(string italian) => T(italian) is var translated && translated != italian ? $"{translated} {italian}" : italian;
+
+    private void BuildIndex()
+    {
+        var items = new List<Item>
+        {
+            new("ti-layout-dashboard", T("Panoramica"), T("pagina"), K("home riepilogo conto"), "", null),
+            new("ti-calendar-stats", T("Andamento giornaliero"), T("pagina"), K("saldo giorno tabella"), "daily", null),
+            new("ti-activity", T("Rendimenti"), T("pagina"), K("twr xirr rendimento guadagno"), "returns", null),
+            new("ti-chart-area-line", T("Grafici"), T("pagina"), K("andamento composizione scostamento"), "charts", null),
+            new("ti-layout-grid", T("Mappa del portafoglio"), T("pagina"), K("mappa heat map heatmap treemap titoli portafoglio colori guadagno perdita slider tempo"), "heatmap", null),
+            new("ti-calendar-search", T("Composizione a una data"), T("pagina"), K("data passato macchina del tempo"), "asof", null),
+            new("ti-arrows-exchange", T("Entrate / Uscite"), T("pagina"), K("bonifici versamenti prelievi"), "transfers", null),
+            new("ti-percentage", T("Interessi"), T("pagina"), K("interessi liquidita"), "interest", null),
+            new("ti-briefcase", T("Titoli"), T("pagina"), K("azioni fondi crypto derivati asset posizioni"), "securities", null),
+            new("ti-trending-up", T("Plusvalenze"), T("pagina"), K("plusvalenze minusvalenze utile perdita vendite"), "gains", null),
+            new("ti-circle-check", T("Posizioni chiuse"), T("pagina"), K("posizioni chiuse titoli venduti risultato ciclo knock out turbo"), "closed", null),
+            new("ti-tag", T("Nomi dei titoli"), T("pagina"), K("nomi titoli isin rinominare alias nome codice"), "names", null),
+            new("ti-chart-dots", T("Statistiche"), T("pagina"), K("statistiche trading percentuale vincenti guadagno medio fattore di profitto durata calendario giorni mesi sottostante"), "stats", null),
+            new("ti-backpack", T("Zainetto fiscale"), T("pagina"), K("zainetto fiscale tasse dichiarazione redditi diversi minusvalenze compensazione capital gain cripto"), "tax", null),
+            new("ti-receipt-2", T("Costi e tasse"), T("pagina"), K("commissioni imposte tasse bollo costi"), "costs", null),
+            new("ti-refresh", T("Quotazioni"), T("pagina"), K("prezzi aggiorna"), "quotes", null),
+            new("ti-currency-euro", T("Valute"), T("pagina"), K("valute cambi cambio dollaro sterlina franco yen convertitore forex"), "currencies", null),
+            new("ti-building-bank", T("Titoli di Stato"), T("pagina"), K("titoli di stato btp bund oat bonos treasury obbligazioni governative rendimenti spread"), "bonds", null),
+            new("ti-list-details", T("BTP: elenco e calcolatore"), T("pagina"), K("btp calcolatore elenco italia"), "btp", null),
+            new("ti-calendar-event", T("Cedole e scadenze"), T("pagina"), K("cedole rimborsi calendario scadenziario"), "coupons", null),
+            new("ti-shield-check", T("Controlli"), T("pagina"), K("controlli coerenza verifiche segnalazioni"), "checks", null),
+            new("ti-folder", T("Dati e file"), T("pagina"), K("file backup cartella dati"), "files", null),
+            new("ti-history", T("Storia"), T("pagina"), K("versioni novita cronologia"), "history", null),
+            new("ti-heart-handshake", T("Credits"), T("pagina"), K("autori licenze fonti"), "credits", null),
+
+            new("ti-refresh", T("Aggiorna tutte le quotazioni"), T("comando"), K("aggiorna prezzi scarica quotazioni"), null,
+                () => State.RunUpdateAsync(AppState.AllSupportedAssetClasses, "tutti gli asset supportati")),
+            new("ti-folder-open", T("Apri un file CSV…"), T("comando"), K("apri carica csv file"), null, () => OnOpenFile.InvokeAsync()),
+            new("ti-file-plus", T("Aggiungi movimenti da un CSV…"), T("comando"), K("aggiungi movimenti unisci importa csv storico nuovi"), null, () => OnAddFile.InvokeAsync()),
+            new("ti-moon", T("Cambia tema (chiaro / scuro)"), T("comando"), K("tema scuro chiaro"), null, () => OnToggleTheme.InvokeAsync()),
+            new("ti-eye-off", T("Modalità privacy (nascondi gli importi)"), T("comando"), K("privacy nascondi importi blur"), null, () => OnTogglePrivacy.InvokeAsync()),
+            new("ti-help-hexagon", T("Modalità assistita (accendi / spegni)"), T("comando"), K("assistente aiuto spiegazioni"), null, () => { Assist.Toggle(); return Task.CompletedTask; }),
+        };
+
+        foreach (var h in State.Holdings.OrderByDescending(h => h.Shares != 0m).ThenByDescending(h => h.Value))
+        {
+            var full = State.FullNameOf(h.Key, h.Name);
+            items.Add(new Item("ti-briefcase", full, $"{Fmt.ClassLabel(h.AssetClass)}{(h.Shares == 0m ? T(" · chiusa") : "")}",
+                $"{h.Name} {h.Symbol} {h.Key}", $"security?key={Uri.EscapeDataString(h.Key)}", null));
+        }
+
+        foreach (var country in GovBonds.Countries.Where(c => c.Code != "IT"))
+        {
+            items.Add(new Item("ti-building-bank", T("Titoli di Stato: {0}", T(country.Name)), T("pagina"), $"{T(country.Name)} {country.Name} {country.Code} {K("titoli di stato rendimenti")}",
+                $"bonds/{country.Code}", null));
+        }
+
+        foreach (var bond in BtpStore.Load().Bonds)
+        {
+            items.Add(new Item("ti-building-bank", bond.Description, T("BTP · scade {0:dd/MM/yyyy}", bond.Maturity), $"{bond.Isin} btp",
+                $"btp/calc?isin={Uri.EscapeDataString(bond.Isin)}", null));
+        }
+
+        _index = items;
+    }
+
+    private void Search()
+    {
+        var tokens = Normalize(_query).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (tokens.Length == 0)
+        {
+            // senza testo: pagine e comandi
+            _results = _index.Where(i => i.Sub is "pagina" or "comando").Take(14).ToList();
+        }
+        else
+        {
+            _results = _index
+                .Select(i => (Item: i, Hay: Normalize($"{i.Title} {i.Keywords} {i.Sub}")))
+                .Where(x => tokens.All(t => x.Hay.Contains(t)))
+                .OrderBy(x => Normalize(x.Item.Title).StartsWith(tokens[0]) ? 0 : 1)
+                .ThenBy(x => x.Item.Sub is "pagina" ? 0 : x.Item.Sub is "comando" ? 1 : 2)
+                .Select(x => x.Item)
+                .Take(12)
+                .ToList();
+        }
+        _selected = 0;
+    }
+
+    private static string Normalize(string text)
+    {
+        var decomposed = text.ToLowerInvariant().Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder(decomposed.Length);
+        foreach (var ch in decomposed)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)
+            {
+                sb.Append(ch);
+            }
+        }
+        return sb.ToString();
+    }
+
+    private void OnInput(ChangeEventArgs e)
+    {
+        _query = e.Value?.ToString() ?? "";
+        Search();
+    }
+
+    private async Task OnKey(KeyboardEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case "ArrowDown":
+                _selected = Math.Min(_results.Count - 1, _selected + 1);
+                await JS.InvokeVoidAsync("DPUi.keepVisible", ".palette-item.sel");
+                break;
+            case "ArrowUp":
+                _selected = Math.Max(0, _selected - 1);
+                await JS.InvokeVoidAsync("DPUi.keepVisible", ".palette-item.sel");
+                break;
+            case "Enter":
+                if (_results.Count > 0)
+                {
+                    await RunAsync(_results[_selected]);
+                }
+                break;
+            case "Escape":
+                await Close();
+                break;
+        }
+    }
+
+    private async Task RunAsync(Item item)
+    {
+        await Close();
+        if (item.Route is not null)
+        {
+            Nav.NavigateTo(item.Route);
+        }
+        else if (item.Action is not null)
+        {
+            await item.Action();
+        }
+    }
+
+    private Task Close() => OnClose.InvokeAsync();
+}

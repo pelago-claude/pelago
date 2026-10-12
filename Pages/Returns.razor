@@ -1,0 +1,119 @@
+@page "/returns"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-activity"></i>@T("Rendimenti")</h1>
+    <p class="sub">@H("Quanto ha reso il conto, tenendo conto di <b>quando</b> hai versato i soldi.")</p>
+
+    <NeedData>
+        @if (_total is { } total)
+        {
+            <div class="cards">
+                <div class="card" data-help="twr.card">
+                    <div class="label"><i class="ti ti-activity"></i> @T("Rendimento ponderato nel tempo (TWR)")</div>
+                    <div class="value @Sign(total.Twr)">@Fmt.Pct(total.Twr, 1)</div>
+                    <div class="delta muted">@T("dall'inizio, a prescindere dai versamenti")</div>
+                </div>
+                <div class="card" data-help="xirr.card">
+                    <div class="label"><i class="ti ti-calendar-dollar"></i> @T("Rendimento annuo dei tuoi soldi (XIRR)")</div>
+                    <div class="value @Sign(total.Xirr)">@Fmt.Pct(total.Xirr, 1)</div>
+                    <div class="delta muted">@T("tiene conto delle date dei versamenti")</div>
+                </div>
+                <div class="card" data-help="returns.gain">
+                    <div class="label"><i class="ti ti-coins"></i> @T("Guadagno in euro")</div>
+                    <div class="value @Fmt.Sign(total.Gain)">@Fmt.Money(total.Gain)</div>
+                    <div class="delta muted">@T("valore − versamenti netti")</div>
+                </div>
+                <div class="card" data-help="contributions">
+                    <div class="label"><i class="ti ti-arrows-exchange"></i> @T("Versamenti netti")</div>
+                    <div class="value">@Fmt.Money(total.NetDeposits)</div>
+                </div>
+            </div>
+        }
+
+        <div class="panel" style="margin-bottom:16px">
+            <h2>@T("Rendimento cumulato nel tempo")</h2>
+            <EChart Kind="lines" Data="_chart" Height="320px" Help="chart:twr" />
+        </div>
+
+        <div class="panel" style="margin-bottom:16px" data-help="returns.years">
+            <h2>@T("Anno per anno")</h2>
+            <table class="grid">
+                <thead><tr>
+                    <th>@T("Periodo")</th><th class="r">@T("Valore iniziale")</th><th class="r">@T("Versamenti netti")</th><th class="r">@T("Valore finale")</th>
+                    <th class="r">@T("Guadagno")</th><th class="r" data-help="*/TWR">TWR</th><th class="r" data-help="*/XIRR">@T("XIRR annuo")</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var p in _years)
+                    {
+                        <tr>
+                            <td>@p.Label</td>
+                            <td class="r">@Fmt.Money(p.StartValue)</td>
+                            <td class="r">@Fmt.Money(p.NetDeposits)</td>
+                            <td class="r">@Fmt.Money(p.EndValue)</td>
+                            <td class="r @Fmt.Sign(p.Gain)">@Fmt.Money(p.Gain)</td>
+                            <td class="r @Sign(p.Twr)">@Fmt.Pct(p.Twr, 1)</td>
+                            <td class="r @Sign(p.Xirr)" title="@(p.Short ? T("Periodo inferiore a un anno: il tasso annuo è poco significativo.") : "")">@Fmt.Pct(p.Xirr, 1)@(p.Short ? " *" : "")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="note">@T("* periodo inferiore a un anno: il tasso annualizzato (XIRR) amplifica anche pochi giorni di andamento, guarda piuttosto il TWR e il guadagno in euro.")</div>
+        </div>
+
+        <div class="panel" style="margin-bottom:16px" data-help="returns.categories">
+            <h2>@T("Per categoria (dall'inizio)")</h2>
+            <table class="grid">
+                <thead><tr><th>@T("Categoria")</th><th class="r">@T("Valore iniziale")</th><th class="r">@T("Acquisti netti")</th><th class="r">@T("Valore attuale")</th><th class="r">@T("Guadagno")</th><th class="r">TWR</th></tr></thead>
+                <tbody>
+                    @foreach (var c in _categories)
+                    {
+                        <tr>
+                            <td>@c.Label</td>
+                            <td class="r">@Fmt.Money(c.StartValue)</td>
+                            <td class="r">@Fmt.Money(c.NetFlows)</td>
+                            <td class="r">@Fmt.Money(c.EndValue)</td>
+                            <td class="r @Fmt.Sign(c.Gain)">@Fmt.Money(c.Gain)</td>
+                            <td class="r @Sign(c.Twr)">@Fmt.Pct(c.Twr, 1)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="note">@T("Per ogni categoria: acquisti e vendite sono flussi, il resto è rendimento. I derivati (turbo) rendono molto in più o in meno: guarda la categoria «Titoli» come un tutt'uno.")</div>
+        </div>
+
+        <div class="panel" data-help="returns.howto">
+            <h2>@T("Come leggerli")</h2>
+            <ul class="credit-list">
+                <li>@H("<b>TWR</b> risponde a «come è andata la gestione?». Toglie l'effetto dei versamenti: versare più soldi non lo fa salire.")</li>
+                <li>@H("<b>XIRR</b> risponde a «come sono andati i miei soldi?». Pesa ogni versamento per il tempo in cui è stato investito, come il tasso interno di rendimento di Excel.")</li>
+                <li>@H("<b>Guadagno</b> è il numero più semplice: quanto vale il conto meno quanto ci hai messo.")</li>
+                <li>@T("Il valore del conto è stimato all'ultimo prezzo noto di ogni asset: se i prezzi non sono aggiornati, i rendimenti non lo sono.")</li>
+            </ul>
+        </div>
+    </NeedData>
+</div>
+
+@code {
+    private ReturnPeriod? _total;
+    private List<ReturnPeriod> _years = new();
+    private List<CategoryReturn> _categories = new();
+    private object? _chart;
+
+    private static string Sign(double? v) => v is { } x ? (x >= 0 ? "pos" : "neg") : "";
+
+    protected override void Rebuild()
+    {
+        var snaps = State.Snapshots.OrderBy(s => s.Date).ToList();
+        var ops = State.Operations!;
+        if (snaps.Count == 0)
+        {
+            return;
+        }
+
+        _total = ReturnCalculator.Period(T("Dall'inizio"), snaps, ops, snaps[0].Date.AddDays(-1), snaps[^1].Date);
+        _years = ReturnCalculator.ByYear(snaps, ops);
+        _categories = ReturnCalculator.ByCategory(snaps, ops);
+        _chart = ChartData.CumulativeTwr(ReturnCalculator.CumulativeTwr(snaps));
+    }
+}

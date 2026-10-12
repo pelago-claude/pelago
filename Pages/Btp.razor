@@ -1,0 +1,244 @@
+@page "/btp"
+@inherits StatePage
+@implements IAsyncDisposable
+
+<div class="page fill">
+    <h1><i class="ti ti-building-bank"></i>@T("Titoli di Stato")</h1>
+    <p class="sub">@T("Scegli lo Stato. Per l'Italia ecco l'elenco dei BTP a tasso fisso da Borsa Italiana: clicca un titolo per calcolare quanti ne compri, le cedole e il surplus a scadenza.")</p>
+
+    <BondCountryBar Selected="IT" />
+
+    <div class="row" style="margin:14px 0 12px">
+        <a class="btn" href="bonds/IT" data-help="bonds.yields"><i class="ti ti-chart-line"></i> @T("Rendimenti e spread dell'Italia")</a>
+        <button class="btn primary" data-help="btp.refresh" disabled="@_refreshing" @onclick="() => RefreshAsync(true)">
+            <i class="ti ti-refresh @(_refreshing ? "spin" : "")"></i> @T("Aggiorna da Borsa Italiana")
+        </button>
+        <button class="btn @(_compare ? "primary" : "")" data-help="btp.compare" @onclick="ToggleCompare"><i class="ti ti-columns-3"></i> @(_compare ? T("Esci dal confronto") : T("Confronta BTP"))</button>
+        @if (_compare)
+        {
+            <button class="btn primary" disabled="@(_selected.Count < 2)" @onclick="OpenCompare"><i class="ti ti-arrows-diff"></i> @T("Confronta {0} selezionati", _selected.Count)</button>
+            <span class="muted">@T("Clicca da 2 a 3 titoli.")</span>
+        }
+        <span class="muted">@_info</span>
+    </div>
+
+    @if (_error is not null)
+    {
+        <div class="err">@_error</div>
+    }
+    @if (_unrecognized.Count > 0)
+    {
+        <div class="warn">@H("<b>Attenzione:</b> {0} titoli non riconosciuti ({1}): potrebbero essere BTP con un nuovo formato di nome.", _unrecognized.Count, string.Join(", ", _unrecognized.Take(3)) + (_unrecognized.Count > 3 ? ", …" : ""))</div>
+    }
+
+    <DataTable TableId="btp" Items="_rows" Columns="_columns" ExportName="btp" DefaultSortTitle="Scadenza" OnRowClick="Ask"
+               RowClass="RowCss" />
+</div>
+
+@if (_asking is { } bond)
+{
+    <div class="modal-back" @onclick="Cancel">
+        <div class="modal" @onclick:stopPropagation="true">
+            <h2>@T("Capitale da investire")</h2>
+            <p class="muted" style="margin:0 0 14px">@bond.Description</p>
+            <div class="field" data-help="btp.capital">
+                @T("Capitale (€)")
+                <input type="number" min="0" step="1000" @bind="_capital" @bind:event="oninput" @onkeydown="OnKey" autofocus />
+            </div>
+            <div class="actions">
+                <button class="btn" @onclick="Cancel">@T("Annulla")</button>
+                <button class="btn primary" @onclick="Confirm">@T("Calcola")</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private sealed record Row(string Isin, string Description, decimal Coupon, DateTime Maturity, decimal Price,
+        double Years, decimal Accrued, decimal CurrentYield, double? GrossYield, double? NetYield);
+
+    private readonly CancellationTokenSource _cts = new();
+    private BtpData _data = BtpStore.Load();
+    private List<Row> _rows = new();
+    private List<string> _unrecognized = new();
+    private int _skipped;
+    private bool _refreshing;
+    private string _info = "";
+    private string? _error;
+    private BtpBond? _asking;
+    private bool _compare;
+    private readonly HashSet<string> _selected = new();
+    private decimal _capital;
+
+    private static readonly TimeSpan StaleAfter = TimeSpan.FromMinutes(15);
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Text<Row>("ISIN", r => r.Isin),
+        Col.Text<Row>("Descrizione", r => r.Description),
+        Col.Pct<Row>("Cedola annua", r => (double)r.Coupon),
+        Col.Date<Row>("Scadenza", r => r.Maturity),
+        Col.Num<Row>("Prezzo", r => r.Price, 3),
+        Col.Num<Row>("Anni residui", r => (decimal)r.Years, 2),
+        Col.Num<Row>("Rateo per 100", r => r.Accrued, 4),
+        Col.Pct<Row>("Rendimento cedolare lordo sul capitale investito", r => (double)r.CurrentYield, "hl-blue", "hl-blue"),
+        Col.Pct<Row>("Rendimento effettivo a scadenza lordo (annuo)", r => r.GrossYield, "hl-green", "hl-green"),
+        Col.Pct<Row>("Rendimento effettivo a scadenza netto (annuo)", r => r.NetYield),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoadRows();
+        var stale = _data.UpdatedAt is not { } updated || DateTime.Now - updated > StaleAfter;
+        if (_data.Bonds.Count == 0 || stale)
+        {
+            await RefreshAsync(false);
+        }
+    }
+
+    private async Task RefreshAsync(bool userInitiated)
+    {
+        if (_refreshing)
+        {
+            return;
+        }
+
+        _refreshing = true;
+        _error = null;
+        _info = T("Aggiornamento da Borsa Italiana in corso…");
+        StateHasChanged();
+
+        try
+        {
+            var result = await BtpOnlineProvider.FetchAsync(_cts.Token);
+            _data.Bonds = result.Bonds;
+            _data.UpdatedAt = DateTime.Now;
+            _data.Source = BtpOnlineProvider.SourceName;
+            _skipped = result.SkippedNoPrice;
+            _unrecognized = result.Unrecognized;
+            BtpStore.Save(_data);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            _error = _data.Bonds.Count > 0
+                ? T("Aggiornamento non riuscito ({0}) — mostro gli ultimi dati salvati.", ex.Message)
+                : T("Aggiornamento non riuscito ({0}).", ex.Message);
+        }
+        finally
+        {
+            _refreshing = false;
+        }
+
+        LoadRows();
+    }
+
+    private void LoadRows()
+    {
+        var settlement = BondMath.AddWorkdays(DateOnly.FromDateTime(DateTime.Today), 2);
+        var tax = _data.Inputs.TaxRate;
+        var rows = new List<Row>();
+
+        foreach (var bond in _data.Bonds.Where(b => b.Maturity > settlement))
+        {
+            var context = BtpCalculator.CreateContext(bond,
+                new BtpParams(_data.Inputs.Capital, _data.Inputs.Commission, tax, _data.Inputs.Lot, settlement));
+            if (context is null)
+            {
+                continue;
+            }
+
+            double? gross = null;
+            double? net = null;
+            if (bond.Price > 0)
+            {
+                var rate = (double)bond.Coupon;
+                var price = (double)bond.Price;
+                var g = BondMath.Yield(settlement, bond.Maturity, rate, price, 100);
+                var n = BondMath.Yield(settlement, bond.Maturity, rate * (1 - (double)tax), price,
+                    100 - Math.Max(0, 100 - price) * (double)tax);
+                gross = double.IsNaN(g) ? null : g;
+                net = double.IsNaN(n) ? null : n;
+            }
+
+            rows.Add(new Row(bond.Isin, bond.Description, bond.Coupon, bond.Maturity.ToDateTime(TimeOnly.MinValue),
+                bond.Price, context.YearsRemaining, context.AccruedPer100,
+                bond.Price > 0 ? bond.Coupon * 100m / bond.Price : 0m, gross, net));
+        }
+
+        _rows = rows;
+        var skippedNote = _skipped > 0 ? T(" ({0} senza prezzo esclusi)", _skipped) : "";
+        _info = _data.UpdatedAt is { } u
+            ? T("{0} BTP a tasso fisso — {1} — aggiornati il {2:dd/MM/yyyy HH:mm}{3} · regolamento {4:dd/MM/yyyy} (T+2), imposta {5:P1}", rows.Count, T(_data.Source ?? ""), u, skippedNote, settlement, tax)
+            : T("Nessun dato scaricato.");
+    }
+
+    private string? RowCss(Row row) => _selected.Contains(row.Isin) ? "selected" : null;
+
+    private void ToggleCompare()
+    {
+        _compare = !_compare;
+        _selected.Clear();
+    }
+
+    private void OpenCompare()
+    {
+        if (_selected.Count >= 2)
+        {
+            Nav.NavigateTo($"btp/compare?isins={Uri.EscapeDataString(string.Join(',', _selected))}");
+        }
+    }
+
+    private void Ask(Row row)
+    {
+        if (_compare)
+        {
+            if (!_selected.Remove(row.Isin) && _selected.Count < 3)
+            {
+                _selected.Add(row.Isin);
+            }
+            StateHasChanged();
+            return;
+        }
+
+        _asking = _data.Bonds.FirstOrDefault(b => b.Isin == row.Isin);
+        _capital = _data.Inputs.Capital;
+        StateHasChanged();
+    }
+
+    private void Cancel() => _asking = null;
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Confirm();
+        }
+        else if (e.Key == "Escape")
+        {
+            Cancel();
+        }
+    }
+
+    private void Confirm()
+    {
+        if (_asking is not { } bond || _capital <= 0m)
+        {
+            return;
+        }
+        _data.Inputs.Capital = _capital;
+        BtpStore.Save(_data);
+        _asking = null;
+        Nav.NavigateTo($"btp/calc?isin={Uri.EscapeDataString(bond.Isin)}");
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _cts.Cancel();
+        base.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}

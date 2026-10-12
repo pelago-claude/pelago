@@ -1,0 +1,229 @@
+@page "/stats"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-chart-dots"></i>@T("Statistiche di trading")</h1>
+    <p class="sub">@T("Come stai andando davvero: quanto spesso guadagni, quanto vale in media un guadagno rispetto a una perdita, quanto durano le posizioni e quando rendi di più. Ogni operazione è un ciclo completo di acquisto e vendita.")</p>
+
+    <NeedData>
+        @if (_s.Trades == 0)
+        {
+            <div class="empty"><i class="ti ti-chart-dots"></i><h2>@T("Nessuna operazione chiusa")</h2><p class="muted">@T("Le statistiche compaiono appena chiudi la prima posizione.")</p></div>
+        }
+        else
+        {
+            <div class="chips" style="margin-bottom:12px" data-help="stats.year">
+                <select class="field-input" @onchange="OnYear" aria-label="@T("Anno di chiusura")">
+                    <option value="" selected="@(_year is null)">@T("Tutti gli anni")</option>
+                    @foreach (var y in _years)
+                    {
+                        <option value="@y" selected="@(_year == y)">@y</option>
+                    }
+                </select>
+            </div>
+
+            <div class="cards">
+                <div class="card" data-help="stats.trades">
+                    <div class="label"><i class="ti ti-arrows-exchange"></i> @T("Operazioni chiuse")</div>
+                    <div class="value">@_s.Trades</div>
+                    <div class="delta muted">@T("{0} aperte e chiuse nello stesso giorno", _s.IntradayTrades)</div>
+                </div>
+                <div class="card" data-help="stats.winrate">
+                    <div class="label"><i class="ti ti-target"></i> @T("Percentuale in guadagno")</div>
+                    <div class="value">@Fmt.Pct(_s.WinRate, 0)</div>
+                    <div class="delta muted">@T("{0} in guadagno · {1} in perdita", _s.Winners, _s.Losers)</div>
+                </div>
+                <div class="card" data-help="stats.average">
+                    <div class="label"><i class="ti ti-scale"></i> @T("Guadagno medio")</div>
+                    <div class="value pos">@Fmt.Money(_s.AverageWin)</div>
+                    <div class="delta muted">@T("perdita media {0}", Fmt.Money(_s.AverageLoss)) · @(_s.Payoff is { } p ? T("un guadagno vale {0} perdite", p.ToString("N2", Loc.Culture)) : "—")</div>
+                </div>
+                <div class="card" data-help="stats.expectancy">
+                    <div class="label"><i class="ti ti-calculator"></i> @T("Risultato medio per operazione")</div>
+                    <div class="value @Fmt.Sign(_s.Expectancy)">@Fmt.Money(_s.Expectancy)</div>
+                    <div class="delta muted">@T("{0} in tutto", Fmt.Money(_s.TotalResult))</div>
+                </div>
+                <div class="card" data-help="stats.profitfactor">
+                    <div class="label"><i class="ti ti-chart-arrows-vertical"></i> @T("Fattore di profitto")</div>
+                    <div class="value">@(_s.ProfitFactor is { } pf ? pf.ToString("N2", Loc.Culture) : "—")</div>
+                    <div class="delta muted">@T("guadagni diviso perdite: sopra 1 si guadagna")</div>
+                </div>
+                <div class="card" data-help="stats.fees">
+                    <div class="label"><i class="ti ti-receipt-2"></i> @T("Commissioni pagate")</div>
+                    <div class="value">@Fmt.Money(_s.Fees)</div>
+                    <div class="delta muted">@(_s.GrossResult > 0m ? T("{0} del risultato lordo", Fmt.Pct(_s.Fees / _s.GrossResult, 1)) : T("{0} a operazione", Fmt.Money(_s.Fees / _s.Trades)))</div>
+                </div>
+                <div class="card" data-help="stats.duration">
+                    <div class="label"><i class="ti ti-hourglass"></i> @T("Durata media")</div>
+                    <div class="value">@T("{0} giorni", _days.ToString("N1", Loc.Culture))</div>
+                    <div class="delta muted">@T("serie più lunga: {0} in guadagno, {1} in perdita", _s.LongestWinStreak, _s.LongestLossStreak)</div>
+                </div>
+                @if (_s.Best is not null && _s.Worst is not null)
+                {
+                    <div class="card" data-help="stats.extremes">
+                        <div class="label"><i class="ti ti-arrows-up-down"></i> @T("Migliore e peggiore")</div>
+                        <div class="delta pos" style="font-size:13px">▲ @Short(_s.Best.Name) · <b>@Fmt.Money(_s.Best.Result)</b></div>
+                        <div class="delta neg" style="font-size:13px">▼ @Short(_s.Worst.Name) · <b>@Fmt.Money(_s.Worst.Result)</b></div>
+                    </div>
+                }
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="stats.equity">
+                <h2>@T("Risultato cumulato")</h2>
+                <EChart Kind="lines" Data="_equity" Height="280px" />
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="stats.months">
+                <h2>@T("Risultato per mese")</h2>
+                <EChart Kind="bars" Data="_months" Height="260px" />
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="stats.calendar">
+                <h2>@T("Giorno per giorno")</h2>
+                <p class="muted" style="margin:0 0 10px">@T("Ogni quadratino è un giorno di chiusura: verde se hai guadagnato, rosso se hai perso, più intenso quanto più è grande l'importo.")</p>
+                <div class="heat-wrap">
+                    <div class="heat-months">
+                        @foreach (var label in _monthLabels)
+                        {
+                            <span>@label</span>
+                        }
+                    </div>
+                    <div class="heat-body">
+                        <div class="heat-days"><span>@T("Lun")</span><span></span><span>@T("Mer")</span><span></span><span>@T("Ven")</span><span></span><span></span></div>
+                        <div class="heat">
+                            @foreach (var cell in _cells)
+                            {
+                                <i class="@(cell.Off ? "off" : "")" style="@cell.Style" title="@cell.Title"></i>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="stats.weekday">
+                <h2>@T("Per giorno della settimana")</h2>
+                <table class="grid">
+                    <thead><tr><th>@T("Giorno")</th><th class="r">@T("Operazioni")</th><th class="r">@T("Percentuale in guadagno")</th><th class="r">@T("Risultato")</th></tr></thead>
+                    <tbody>
+                        @foreach (var d in _s.ByWeekday)
+                        {
+                            <tr><td>@T(d.Label)</td><td class="r">@d.Trades</td><td class="r">@Fmt.Pct(d.WinRate, 0)</td><td class="r strong @Fmt.Sign(d.Result)">@Fmt.Money(d.Result)</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel" data-help="stats.underlying">
+                <h2>@T("Per sottostante")</h2>
+                <p class="muted" style="margin:0 0 8px">@T("I prodotti sullo stesso titolo (per esempio tutti i turbo su una stessa azione) sono raggruppati in una riga.")</p>
+                <DataTable TableId="stats" Items="_s.ByUnderlying" Columns="_columns" ExportName="statistiche-sottostanti" DefaultSortTitle="Risultato" DefaultDescending="true" FooterLabel="Totale" />
+            </div>
+        }
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Cell(bool Off, string Style, string Title);
+
+    private List<ClosedPosition> _positions = new();
+    private List<int> _years = new();
+    private int? _year;
+    private TradingStats _s = TradingStatsCalculator.Compute(Array.Empty<ClosedPosition>());
+    private object? _equity, _months;
+    private double _days;
+    private List<Cell> _cells = new();
+    private List<string> _monthLabels = new();
+
+    private static readonly List<Column<UnderlyingStat>> _columns = new()
+    {
+        Col.Text<UnderlyingStat>("Sottostante", r => r.Name),
+        Col.Num<UnderlyingStat>("Operazioni", r => r.Trades, 0, total: rows => rows.Sum(r => r.Trades)),
+        Col.Pct<UnderlyingStat>("Percentuale in guadagno", r => r.WinRate),
+        Col.Money<UnderlyingStat>("Commissioni", r => r.Fees, total: rows => rows.Sum(r => r.Fees)),
+        Col.Money<UnderlyingStat>("Risultato", r => r.Result, signColor: true, total: rows => rows.Sum(r => r.Result), bar: true),
+    };
+
+    protected override void OnInitialized()
+    {
+        _year = int.TryParse(Prefs.Get("stats.year"), out var y) ? y : null;
+        base.OnInitialized();
+    }
+
+    protected override void Rebuild()
+    {
+        var prices = State.Holdings.ToDictionary(h => h.Key, h => h.LastPrice);
+        _positions = ClosedPositionCalculator.Compute(State.Operations!, key => prices.GetValueOrDefault(key))
+            .Select(p => p with { Name = State.FullNameOf(p.Key, p.Name) })
+            .ToList();
+        _years = TradingStatsCalculator.Trades(_positions).Select(t => t.ClosedOn.Year).Distinct().OrderByDescending(y => y).ToList();
+        if (_year is { } selected && !_years.Contains(selected))
+        {
+            _year = null;
+        }
+        Recompute();
+    }
+
+    private void Recompute()
+    {
+        _s = TradingStatsCalculator.Compute(_positions, _year);
+        _days = Math.Round(_s.AverageDaysHeld, 1);
+        _equity = ChartData.CumulativeResult(_s.Cumulative);
+        _months = ChartData.Bars(_s.ByMonth.Select(m => MonthLabel(m.Label)), stacked: true,
+            (T("Guadagni"), "#2eaa64", _s.ByMonth.Select(m => m.SumWins).ToArray()),
+            (T("Perdite"), "#dc3c32", _s.ByMonth.Select(m => m.SumLosses).ToArray()));
+        BuildCalendar();
+    }
+
+    private static string MonthLabel(string yearMonth) =>
+        new DateTime(int.Parse(yearMonth[..4]), int.Parse(yearMonth[5..]), 1).ToString("MM/yyyy");
+
+    /// <summary>La griglia giorno per giorno: colonne = settimane (da lunedì), righe = giorni della settimana; ultime 52 settimane o l'anno scelto.</summary>
+    private void BuildCalendar()
+    {
+        _cells = new();
+        _monthLabels = new();
+        if (_s.Daily.Count == 0)
+        {
+            return;
+        }
+
+        var results = _s.Daily.ToDictionary(d => d.Date, d => d.Result);
+        var end = _s.Daily[^1].Date;
+        var start = _year is { } y ? new DateOnly(y, 1, 1) : end.AddDays(-7 * 52 + 1);
+        var firstMonday = start.AddDays(-(((int)start.DayOfWeek + 6) % 7));
+        var max = Math.Max(1m, _s.Daily.Max(d => Math.Abs(d.Result)));
+
+        for (var weekStart = firstMonday; weekStart <= end; weekStart = weekStart.AddDays(7))
+        {
+            var monthStart = Enumerable.Range(0, 7).Select(i => weekStart.AddDays(i)).FirstOrDefault(d => d.Day == 1);
+            _monthLabels.Add(monthStart == default ? "" : monthStart.ToString("MMM", Loc.Culture));
+
+            for (var i = 0; i < 7; i++)
+            {
+                var day = weekStart.AddDays(i);
+                if (day < start || day > end)
+                {
+                    _cells.Add(new Cell(true, "", ""));
+                    continue;
+                }
+                if (!results.TryGetValue(day, out var r))
+                {
+                    _cells.Add(new Cell(false, "", day.ToString("dd/MM/yyyy")));
+                    continue;
+                }
+                var alpha = (0.2 + 0.8 * Math.Min(1.0, (double)(Math.Abs(r) / max))).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+                var color = r >= 0m ? "30,138,110" : "210,69,47";
+                _cells.Add(new Cell(false, $"background:rgba({color},{alpha})", $"{day:dd/MM/yyyy}: {Fmt.Money(r)}"));
+            }
+        }
+    }
+
+    private void OnYear(ChangeEventArgs e)
+    {
+        _year = int.TryParse(e.Value?.ToString(), out var y) ? y : null;
+        Prefs.Set("stats.year", _year?.ToString() ?? "");
+        Recompute();
+    }
+
+    private static string Short(string name) => name.Length > 38 ? name[..37] + "…" : name;
+}

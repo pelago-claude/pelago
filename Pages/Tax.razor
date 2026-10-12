@@ -1,0 +1,395 @@
+@page "/tax"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-backpack"></i>@T("Zainetto fiscale")</h1>
+    <p class="sub">@T("Anno per anno, cosa potresti dover dichiarare divisa per tipo di reddito, e lo zainetto delle minusvalenze da riportare negli anni successivi.")</p>
+
+    <div class="disclaimer" data-help="tax.disclaimer">
+        <i class="ti ti-alert-triangle"></i>
+        <div>
+            <b>@T("Solo a scopo informativo.")</b>
+            @T("Non è consulenza fiscale né un modello da riportare in dichiarazione: le regole cambiano e hanno eccezioni, e il file del broker non dice tutto (per esempio se un fondo è un ETF o un ETC). Fai sempre verificare i numeri da un commercialista.")
+        </div>
+    </div>
+
+    <NeedData>
+        @if (_report.Sales.Count == 0 && _report.Income.Count == 0)
+        {
+            <div class="empty"><i class="ti ti-backpack"></i><h2>@T("Nessuna vendita da mostrare")</h2><p class="muted">@T("Il prospetto parte dalle cessioni: compare appena hai venduto qualcosa.")</p></div>
+        }
+        else
+        {
+            <div class="panel" style="margin-bottom:16px" data-help="tax.years">
+                <h2>@T("Anno per anno")</h2>
+                <p class="muted" style="margin:0 0 8px">@T("Risultato delle cessioni (guadagni meno perdite, commissioni comprese) per tipo di strumento. Le imposte sono quelle già trattenute dal broker.")</p>
+                <div style="overflow-x:auto">
+                <table class="grid">
+                    <thead><tr>
+                        <th>@T("Anno")</th>
+                        @foreach (var c in Categories)
+                        {
+                            <th class="r">@T(TaxCategories.Label(c))</th>
+                        }
+                        <th class="r" data-help="tax.col.interest"><span>@T("Interessi e cedole (lordi)")</span></th>
+                        <th class="r taxpaid" data-help="tax.col.paid"><span>@T("Imposte già trattenute")</span></th>
+                        <th class="r" data-help="tax.col.value"><span>@T("Valore a fine anno")</span></th>
+                    </tr></thead>
+                    <tbody>
+                        @foreach (var y in _yearRows)
+                        {
+                            <tr class="clickable @(y.Year == _year ? "selected" : "")" @onclick="() => SelectYear(y.Year)">
+                                <td><b>@y.Year</b></td>
+                                @foreach (var c in Categories)
+                                {
+                                    <td class="r @Fmt.Sign(y.ByCategory[c])">@Cell(y.ByCategory[c])</td>
+                                }
+                                <td class="r">@Cell(y.Interest)</td>
+                                <td class="r taxpaid">@Cell(y.Taxes)</td>
+                                <td class="r">@(y.YearEndValue is { } v ? Fmt.Money(v) : "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="tax.checks">
+                <div class="row" style="margin-bottom:8px">
+                    <h2 style="margin:0">@T("Riscontri sui numeri")</h2>
+                    <span class="pill @(_recon.ToCheck == 0 ? "ok" : "warn")" style="margin-left:12px">
+                        <i class="ti @(_recon.ToCheck == 0 ? "ti-circle-check" : "ti-alert-triangle")"></i>
+                        @(_recon.ToCheck == 0 ? T("Tutto a posto") : T("{0} da controllare", _recon.ToCheck))
+                    </span>
+                </div>
+                <p class="muted" style="margin:0 0 10px">@T("Quanto fidarsi del prospetto: cosa torna con il file e cosa può renderlo meno preciso.")</p>
+                <div class="findings">
+                    @foreach (var check in _recon.Checks)
+                    {
+                        <div class="finding @check.Level.ToString().ToLowerInvariant()">
+                            <i class="ti @CheckIcon(check.Level)"></i>
+                            <div class="body">
+                                <div class="t">@check.Title</div>
+                                <div class="d">@check.Detail</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <h3 style="margin:16px 0 6px">@T("Imposte trattenute per anno")</h3>
+                <div style="overflow-x:auto">
+                <table class="grid">
+                    <thead><tr>
+                        <th>@T("Anno")</th><th class="r">@T("Sulle vendite")</th><th class="r">@T("Sugli interessi")</th><th class="r">@T("Bollo e ricalcoli")</th>
+                        <th class="r">@T("Rimborsi")</th><th class="r">@T("Altre imposte")</th><th class="r taxpaid">@T("Totale trattenuto")</th><th class="r">@T("Differenza sulle vendite")</th>
+                    </tr></thead>
+                    <tbody>
+                        @foreach (var row in _recon.Years)
+                        {
+                            <tr>
+                                <td><b>@row.Year</b></td><td class="r">@Cell(row.OnSales)</td><td class="r">@Cell(row.OnInterest)</td><td class="r">@Cell(row.StampAndRecalculation)</td>
+                                <td class="r">@Cell(row.Refunds)</td><td class="r">@Cell(row.Other)</td><td class="r taxpaid strong">@Cell(row.Total)</td>
+                                <td class="r @(Math.Abs(row.Difference) > 0.01m ? "neg" : "")">@Cell(row.Difference)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="tax.backpack">
+                <h2>@T("Zainetto delle minusvalenze") <span class="muted" style="font-weight:400;font-size:12.5px">@T("redditi diversi: titoli, ETC, obbligazioni, derivati")</span></h2>
+                <p class="muted" style="margin:0 0 8px">@T("Se in un anno perdi più di quanto guadagni, la differenza entra nello zainetto e si può usare per compensare i guadagni dei {0} anni successivi (la più vecchia per prima).", TaxReportCalculator.CarryForwardYears)</p>
+                @BackpackTable(_report.Diversi)
+                <p class="note">@T("Dei fondi ETF/OICR qui contano solo le minusvalenze: le plusvalenze sono redditi di capitale e non si compensano.")</p>
+                @if (_report.Diversi.Lots.Count > 0)
+                {
+                    <h3 style="margin:14px 0 6px">@T("Minusvalenze ancora utilizzabili")</h3>
+                    <table class="grid">
+                        <thead><tr><th>@T("Nate nel")</th><th class="r">@T("Importo originale")</th><th class="r">@T("Ancora disponibile")</th><th>@T("Utilizzabile fino al")</th></tr></thead>
+                        <tbody>
+                            @foreach (var lot in _report.Diversi.Lots)
+                            {
+                                <tr><td>@lot.LossYear</td><td class="r">@Fmt.Money(lot.Original)</td><td class="r strong">@Fmt.Money(lot.Remaining)</td><td>31/12/@lot.LastUsableYear</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                @if (_report.Cripto.Years.Any(y => y.Net != 0m))
+                {
+                    <h3 style="margin:14px 0 6px">@T("Cripto-attività (zainetto a parte)")</h3>
+                    @BackpackTable(_report.Cripto)
+                }
+            </div>
+
+            <div class="panel" style="margin-bottom:16px" data-help="tax.year">
+                <div class="row" style="margin-bottom:10px">
+                    <h2 style="margin:0">@T("Dettaglio del {0}", _year)</h2>
+                    <div class="chips" style="margin-left:auto">
+                        @foreach (var y in _yearRows.Select(r => r.Year).OrderByDescending(y => y))
+                        {
+                            var yy = y;
+                            <button class="chip @(yy == _year ? "on" : "")" @onclick="() => SelectYear(yy)">@yy</button>
+                        }
+                    </div>
+                </div>
+
+                @if (_missingCostSales > 0)
+                {
+                    <div class="disclaimer" data-help="tax.missing">
+                        <i class="ti ti-alert-triangle"></i>
+                        <div>@T("In {0} vendite di quest'anno mancano gli acquisti nel file: il costo mancante conta come zero e il risultato può risultare troppo alto.", _missingCostSales)</div>
+                    </div>
+                }
+
+                <div class="cards">
+                    <div class="card" data-help="tax.card.diversi">
+                        <div class="label"><i class="ti ti-scale"></i> @T("Redditi diversi")</div>
+                        <div class="value @Fmt.Sign(_diversiNet)">@Fmt.Money(_diversiNet)</div>
+                        <div class="delta muted">@T("dopo lo zainetto restano da tassare {0}", Fmt.Money(_diversiRow?.Taxable ?? 0m))</div>
+                    </div>
+                    <div class="card" data-help="tax.card.capitale">
+                        <div class="label"><i class="ti ti-coin"></i> @T("Redditi di capitale")</div>
+                        <div class="value">@Fmt.Money(_capitale)</div>
+                        <div class="delta muted">@T("guadagni di ETF e fondi (non compensabili) e interessi")</div>
+                    </div>
+                    <div class="card" data-help="tax.card.cripto">
+                        <div class="label"><i class="ti ti-currency-bitcoin"></i> @T("Cripto-attività")</div>
+                        <div class="value @Fmt.Sign(_criptoNet)">@Fmt.Money(_criptoNet)</div>
+                        <div class="delta muted">@T("dopo lo zainetto restano da tassare {0}", Fmt.Money(_criptoRow?.Taxable ?? 0m))</div>
+                    </div>
+                    <div class="card" data-help="tax.card.paid">
+                        <div class="label"><i class="ti ti-receipt-2"></i> @T("Imposte già trattenute")</div>
+                        <div class="value">@Fmt.Money(_paidOnSales + _paidOnIncome)</div>
+                        <div class="delta muted">@T("vendite {0} · interessi {1}", Fmt.Money(_paidOnSales), Fmt.Money(_paidOnIncome))</div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin:10px 0 6px">
+                    <h3 style="margin:0">@T("Per strumento")</h3>
+                    <label class="chip @(_byUnderlying ? "on" : "")" style="margin-left:auto" data-help="closed.group">
+                        <input type="checkbox" checked="@_byUnderlying" @onchange="OnGroup" />
+                        @T("Raggruppa per sottostante")
+                    </label>
+                </div>
+                <DataTable TableId="taxinst" Items="_instrumentRows" Columns="_instrumentColumns" ExportName="@("zainetto-fiscale-strumenti-" + _year)" DefaultSortTitle="Risultato" DefaultDescending="true" FooterLabel="Totale" />
+
+                @if (_incomeRows.Count > 0)
+                {
+                    <h3 style="margin:16px 0 6px">@T("Interessi e cedole")</h3>
+                    <table class="grid">
+                        <thead><tr><th>@T("Tipo")</th><th class="r">@T("Importo lordo")</th><th class="r taxpaid">@T("Imposta già pagata")</th></tr></thead>
+                        <tbody>
+                            @foreach (var line in _incomeRows)
+                            {
+                                <tr><td>@T(line.Kind)</td><td class="r">@Fmt.Money(line.Gross)</td><td class="r taxpaid">@Fmt.Money(line.TaxWithheld)</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                <h3 style="margin:16px 0 6px">@T("Dettaglio delle vendite")</h3>
+                <p class="muted" style="margin:0 0 8px">@T("Ogni vendita con il costo abbinato: è il materiale da passare al commercialista (usa «CSV» o «Excel» qui sotto).")</p>
+                <DataTable TableId="taxsales" Items="_saleRows" Columns="_saleColumns" ExportName="@("zainetto-fiscale-vendite-" + _year)" DefaultSortTitle="Data" FooterLabel="Totale" />
+            </div>
+
+            @if (_funds.Count > 0)
+            {
+                <div class="panel" style="margin-bottom:16px" data-help="tax.funds">
+                    <h2>@T("Come trattare i fondi")</h2>
+                    <p class="muted" style="margin:0 0 8px">@T("Il file non dice se un «fondo» è un ETF (le plusvalenze sono redditi di capitale, non compensabili) o un ETC/ETN (redditi diversi, compensabili). Ho provato a dedurlo dal nome: correggilo se serve.")</p>
+                    <table class="grid">
+                        <thead><tr><th>@T("Titolo")</th><th>@T("Trattamento")</th></tr></thead>
+                        <tbody>
+                            @foreach (var f in _funds)
+                            {
+                                <tr>
+                                    <td><NameCell Name="@f.Name" Code="@f.Key" /> <Isin Code="@f.Key" /></td>
+                                    <td>
+                                        <select class="field-input" @onchange="e => SetFund(f.Key, e.Value?.ToString())">
+                                            <option value="etf" selected="@(f.Category == TaxCategory.EtfOicr)">@T("ETF e fondi (OICR)")</option>
+                                            <option value="etc" selected="@(f.Category == TaxCategory.EtcEtn)">@T("ETC / ETN")</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <div class="panel" data-help="tax.assumptions">
+                <h2>@T("Come sono calcolati i numeri")</h2>
+                <ul class="credit-list">
+                    <li>@T("Il costo di ogni vendita è abbinato agli acquisti con il metodo LIFO (si vendono per primi i titoli acquistati per ultimi) per azioni, obbligazioni, derivati ed ETC; a costo medio ponderato per ETF/fondi e cripto-attività.")</li>
+                    <li>@T("Le commissioni si sommano al costo e si tolgono dal ricavo. Le imposte trattenute dal broker non riducono il risultato: si mostrano a parte, come «già pagate».")</li>
+                    <li>@T("Le plusvalenze degli ETF e dei fondi sono redditi di capitale e non si compensano con le minusvalenze; le loro minusvalenze invece entrano tra i redditi diversi.")</li>
+                    <li>@T("Le minusvalenze non compensate si possono riportare fino al quarto anno successivo; le cripto-attività hanno uno zainetto a parte (ipotesi prudente: compensano solo se stesse).")</li>
+                    <li>@T("Le fusioni di fondi e le vendite annullate nel file si compensano e non contano come vendite; le cripto ricevute gratis (premi) hanno costo zero.")</li>
+                    <li>@T("I turbo andati a zero senza una vendita registrata nel file non sono inclusi: la minusvalenza si realizza quando il broker li chiude. Importi in euro come nel file.")</li>
+                    <li>@T("Aliquote, soglie ed esenzioni non sono calcolate: qui trovi gli importi, non l'imposta dovuta. Le regole cambiano negli anni: verifica sempre quelle in vigore.")</li>
+                </ul>
+            </div>
+        }
+    </NeedData>
+</div>
+
+@code {
+    private sealed record YearRow(int Year, Dictionary<TaxCategory, decimal> ByCategory, decimal Interest, decimal Taxes, decimal? YearEndValue);
+    private sealed record InstrumentRow(string Name, string Category, int Sales, decimal Proceeds, decimal Cost, decimal Result, decimal TaxPaid);
+    private sealed record SaleRow(DateOnly Date, string Key, string Name, string Issuer, string Category, string Type, decimal Shares, decimal Proceeds, decimal Cost, decimal Result, decimal TaxPaid, decimal Unmatched);
+    private sealed record FundRow(string Key, string Name, TaxCategory Category);
+
+    private static readonly TaxCategory[] Categories = Enum.GetValues<TaxCategory>();
+
+    private TaxReport _report = new();
+    private TaxReconciliation _recon = new(Array.Empty<TaxCheck>(), Array.Empty<YearTaxRow>());
+    private List<YearRow> _yearRows = new();
+    private List<InstrumentRow> _instrumentRows = new();
+    private List<SaleRow> _saleRows = new();
+    private List<FundRow> _funds = new();
+    private int _year;
+    private bool _byUnderlying;
+    private decimal _diversiNet, _capitale, _criptoNet, _paidOnSales, _paidOnIncome;
+    private int _missingCostSales;
+    private BackpackYear? _diversiRow, _criptoRow;
+    private List<IncomeLine> _incomeRows = new();
+
+    private static readonly List<Column<InstrumentRow>> _instrumentColumns = new()
+    {
+        Col.Text<InstrumentRow>("Titolo", r => r.Name),
+        Col.Badge<InstrumentRow>("Trattamento", r => T(r.Category)),
+        Col.Num<InstrumentRow>("Vendite", r => r.Sales, 0),
+        Col.Money<InstrumentRow>("Ricavi", r => r.Proceeds, total: rows => rows.Sum(r => r.Proceeds)),
+        Col.Money<InstrumentRow>("Costo abbinato", r => r.Cost, total: rows => rows.Sum(r => r.Cost)),
+        Col.Money<InstrumentRow>("Risultato", r => r.Result, signColor: true, total: rows => rows.Sum(r => r.Result), bar: true),
+        Col.Money<InstrumentRow>("Imposte già pagate", r => r.TaxPaid, total: rows => rows.Sum(r => r.TaxPaid), headerCss: "taxpaid", cellCss: "taxpaid"),
+    };
+
+    private static readonly List<Column<SaleRow>> _saleColumns = new()
+    {
+        Col.Date<SaleRow>("Data", r => r.Date.ToDateTime(TimeOnly.MinValue)),
+        Col.Name<SaleRow>("Titolo", r => r.Name, r => r.Key),
+        Col.Isin<SaleRow>("Codice", r => r.Key),
+        Col.Text<SaleRow>("Emittente", r => r.Issuer),
+        Col.Badge<SaleRow>("Trattamento", r => T(r.Category)),
+        Col.Text<SaleRow>("Tipo", r => r.Type),
+        Col.Num<SaleRow>("Quantità", r => r.Shares),
+        Col.Money<SaleRow>("Ricavo", r => r.Proceeds, total: rows => rows.Sum(r => r.Proceeds)),
+        Col.Money<SaleRow>("Costo abbinato", r => r.Cost, total: rows => rows.Sum(r => r.Cost)),
+        Col.Num<SaleRow>("Quote senza acquisto", r => r.Unmatched),
+        Col.Money<SaleRow>("Risultato", r => r.Result, signColor: true, total: rows => rows.Sum(r => r.Result), bar: true),
+        Col.Money<SaleRow>("Imposta già pagata", r => r.TaxPaid, total: rows => rows.Sum(r => r.TaxPaid), headerCss: "taxpaid", cellCss: "taxpaid"),
+    };
+
+    protected override void OnInitialized()
+    {
+        _byUnderlying = Prefs.Get("tax.group") != "0";
+        base.OnInitialized();
+    }
+
+    private TaxCategory? FundOverride(string key) => Prefs.Get("tax.fund." + key) switch
+    {
+        "etf" => TaxCategory.EtfOicr,
+        "etc" => TaxCategory.EtcEtn,
+        _ => null,
+    };
+
+    protected override void Rebuild()
+    {
+        var ops = State.Operations!;
+        _report = TaxReportCalculator.Compute(ops, FundOverride);
+
+        var prices = State.Holdings.ToDictionary(h => h.Key, h => h.LastPrice);
+        _recon = TaxReconciliationCalculator.Compute(ops, _report, ClosedPositionCalculator.Compute(ops, key => prices.GetValueOrDefault(key)),
+            key => Prefs.Get("tax.fund." + key) is { Length: > 0 }, State.FullNameOf);
+
+        var brokerTaxes = CostCalculator.ByYear(ops).ToDictionary(r => int.Parse(r.Period), r => r.NetTax);
+        _yearRows = _report.Years.OrderByDescending(y => y).Select(year => new YearRow(
+            year,
+            Categories.ToDictionary(c => c, c => _report.Sales.Where(s => s.Year == year && s.Category == c).Sum(s => s.Result)),
+            _report.Income.Where(i => i.Year == year).Sum(i => i.Gross),
+            brokerTaxes.GetValueOrDefault(year),
+            YearEndValue(year))).ToList();
+
+        _funds = _report.Sales.Where(s => s.AssetClass == "FUND").GroupBy(s => s.Key)
+            .Select(g => new FundRow(g.Key, State.FullNameOf(g.Key, g.First().Name), g.First().Category))
+            .OrderBy(f => f.Name).ToList();
+
+        var saved = int.TryParse(Prefs.Get("tax.year"), out var y) ? y : 0;
+        _year = _yearRows.Any(r => r.Year == saved) ? saved : _yearRows.Select(r => r.Year).DefaultIfEmpty(DateTime.Today.Year).Max();
+        BuildYear();
+    }
+
+    private decimal? YearEndValue(int year)
+    {
+        var last = State.Snapshots.Where(s => s.Date <= new DateOnly(year, 12, 31)).OrderByDescending(s => s.Date).FirstOrDefault();
+        return last is null ? null : last.Securities + last.Bonds + last.Crypto;
+    }
+
+    private void BuildYear()
+    {
+        var sales = _report.Sales.Where(s => s.Year == _year).ToList();
+
+        _diversiRow = _report.Diversi.Years.FirstOrDefault(r => r.Year == _year);
+        _criptoRow = _report.Cripto.Years.FirstOrDefault(r => r.Year == _year);
+        _diversiNet = _diversiRow?.Net ?? 0m;
+        _criptoNet = _criptoRow?.Net ?? 0m;
+        _incomeRows = _report.Income.Where(i => i.Year == _year).ToList();
+        _capitale = sales.Where(s => s.Category == TaxCategory.EtfOicr).Sum(s => Math.Max(0m, s.Result)) + _incomeRows.Sum(i => i.Gross);
+        _paidOnSales = sales.Sum(s => s.TaxWithheld);
+        _paidOnIncome = _incomeRows.Sum(i => i.TaxWithheld);
+        _missingCostSales = sales.Count(s => s.HasMissingCost);
+
+        var groups = sales.GroupBy(s => _byUnderlying ? (s.Category, Name: ClosedPositionCalculator.Underlying(State.FullNameOf(s.Key, s.Name))) : (s.Category, Name: State.FullNameOf(s.Key, s.Name)));
+        _instrumentRows = groups.Select(g => new InstrumentRow(g.Key.Name, TaxCategories.Label(g.Key.Category), g.Count(), g.Sum(s => s.Proceeds), g.Sum(s => s.CostBasis),
+            g.Sum(s => s.Result), g.Sum(s => s.TaxWithheld))).ToList();
+
+        _saleRows = sales.Select(s => new SaleRow(s.Date, s.Key, State.FullNameOf(s.Key, s.Name), Issuers.ShortName(s.Key, s.AssetClass), TaxCategories.Label(s.Category), s.Type, s.Shares, s.Proceeds, s.CostBasis, s.Result, s.TaxWithheld, s.Unmatched)).ToList();
+    }
+
+    private static string Cell(decimal value) => value == 0m ? "—" : Fmt.Money(value);
+
+    private static string CheckIcon(FindingLevel level) => level switch
+    {
+        FindingLevel.Warning => "ti-alert-triangle",
+        FindingLevel.Info => "ti-info-circle",
+        _ => "ti-circle-check",
+    };
+
+    private void SelectYear(int year)
+    {
+        _year = year;
+        Prefs.Set("tax.year", year.ToString());
+        BuildYear();
+    }
+
+    private void OnGroup(ChangeEventArgs e)
+    {
+        _byUnderlying = e.Value is true;
+        Prefs.Set("tax.group", _byUnderlying ? "1" : "0");
+        BuildYear();
+    }
+
+    private void SetFund(string key, string? value)
+    {
+        Prefs.Set("tax.fund." + key, value ?? "");
+        Rebuild();
+    }
+
+    private RenderFragment BackpackTable(Backpack backpack) => @<table class="grid">
+        <thead><tr>
+            <th>@T("Anno")</th><th class="r">@T("Risultato netto")</th><th class="r">@T("Disponibili a inizio anno")</th><th class="r">@T("Usate")</th>
+            <th class="r">@T("Nuove minusvalenze")</th><th class="r">@T("Scadute")</th><th class="r">@T("Disponibili a fine anno")</th><th class="r">@T("Da tassare dopo la compensazione")</th>
+        </tr></thead>
+        <tbody>
+            @foreach (var row in backpack.Years.Reverse())
+            {
+                <tr>
+                    <td><b>@row.Year</b></td>
+                    <td class="r @Fmt.Sign(row.Net)">@Fmt.Money(row.Net)</td><td class="r">@Fmt.Money(row.OpeningAvailable)</td><td class="r">@Fmt.Money(row.Used)</td>
+                    <td class="r">@Fmt.Money(row.NewLoss)</td><td class="r">@Fmt.Money(row.Expired)</td><td class="r strong">@Fmt.Money(row.ClosingAvailable)</td><td class="r">@Fmt.Money(row.Taxable)</td>
+                </tr>
+            }
+        </tbody>
+    </table>;
+}

@@ -1,0 +1,23 @@
+@inject NameEditor Editor
+@inject AppState State
+
+<span class="name-cell">
+    @Name
+    @if (!string.IsNullOrWhiteSpace(Code))
+    {
+        @if (State.Names.Has(Code))
+        {
+            <i class="ti ti-tag name-custom" title="@T("Nome scelto da te")" aria-hidden="true"></i>
+        }
+        <button class="name-edit" title="@T("Cambia il nome")" aria-label="@T("Cambia il nome")" @onclick="Open" @onclick:stopPropagation="true"><i class="ti ti-pencil"></i></button>
+    }
+</span>
+
+@code {
+    [Parameter] public string Name { get; set; } = "";
+
+    /// <summary>Il codice del titolo a cui dare il nome (ISIN, ticker o chiave).</summary>
+    [Parameter] public string? Code { get; set; }
+
+    private void Open() => Editor.Open(Code);
+}

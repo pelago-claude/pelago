@@ -1,0 +1,37 @@
+@inject AppState State
+@implements IDisposable
+
+<div class="toasts">
+    @foreach (var toast in _toasts)
+    {
+        <div class="toast" @onclick="() => Dismiss(toast.Id)"><i class="ti ti-info-circle"></i><span>@toast.Text</span></div>
+    }
+</div>
+
+@code {
+    private sealed record ToastItem(int Id, string Text);
+
+    private readonly List<ToastItem> _toasts = new();
+    private int _nextId;
+
+    protected override void OnInitialized() => State.Toast += OnToast;
+
+    private void OnToast(string text) => _ = InvokeAsync(async () =>
+    {
+        var toast = new ToastItem(++_nextId, text);
+        _toasts.Add(toast);
+        StateHasChanged();
+        await Task.Delay(7000);
+        Dismiss(toast.Id);
+    });
+
+    private void Dismiss(int id)
+    {
+        if (_toasts.RemoveAll(t => t.Id == id) > 0)
+        {
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose() => State.Toast -= OnToast;
+}

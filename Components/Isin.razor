@@ -1,0 +1,26 @@
+@inject NameEditor Editor
+@inject AppState State
+
+@if (!string.IsNullOrWhiteSpace(Code))
+{
+    <a class="isin" role="button" tabindex="0" data-isin="@Code" title="@Tooltip" @onclick="Open" @onclick:stopPropagation="true" @onkeydown="OnKey">@Code</a>
+}
+
+@code {
+    /// <summary>Il codice del titolo (ISIN, ticker o chiave): cliccandolo si apre la finestra per dargli un nome.</summary>
+    [Parameter] public string? Code { get; set; }
+
+    private string Tooltip => State.Names.Get(Code) is { } name
+        ? T("Nome scelto da te: {0}. Clicca per cambiarlo.", name)
+        : T("Clicca per dare un nome a questo titolo");
+
+    private void Open() => Editor.Open(Code);
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            Open();
+        }
+    }
+}

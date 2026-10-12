@@ -1,0 +1,47 @@
+@page "/checks"
+@inherits StatePage
+
+<div class="page">
+    <h1><i class="ti ti-shield-check"></i>@T("Controlli")</h1>
+    <p class="sub">@T("Verifiche automatiche sui tuoi dati: servono ad accorgersi subito di numeri che non possono essere giusti.")</p>
+
+    <NeedData>
+        <div class="row" style="margin-bottom:14px">
+            <span class="pill @(State.WarningCount == 0 ? "ok" : "warn")">
+                <i class="ti @(State.WarningCount == 0 ? "ti-circle-check" : "ti-alert-triangle")"></i>
+                @(State.WarningCount == 0 ? T("Tutto a posto") : T("{0} da controllare", State.WarningCount))
+            </span>
+            <span class="muted">@T("{0} verifiche eseguite", State.Findings.Count)</span>
+            <div class="grow"></div>
+            <button class="btn" data-help="checks.rerun" @onclick="Rerun"><i class="ti ti-refresh"></i> @T("Ricontrolla")</button>
+        </div>
+
+        <div class="findings">
+            @foreach (var f in State.Findings.OrderByDescending(f => f.Level).ThenBy(f => f.Title))
+            {
+                <div class="finding @f.Level.ToString().ToLowerInvariant()" data-help="@("check:" + f.Code)">
+                    <i class="ti @Icon(f.Level)"></i>
+                    <div class="body">
+                        <div class="t">@f.Title</div>
+                        <div class="d">@f.Detail</div>
+                    </div>
+                    @if (f.Route is { } route)
+                    {
+                        <a class="btn" href="@route">@T("Vai") <i class="ti ti-arrow-right"></i></a>
+                    }
+                </div>
+            }
+        </div>
+    </NeedData>
+</div>
+
+@code {
+    private static string Icon(FindingLevel level) => level switch
+    {
+        FindingLevel.Warning => "ti-alert-triangle",
+        FindingLevel.Info => "ti-info-circle",
+        _ => "ti-circle-check",
+    };
+
+    private void Rerun() => State.ReloadQuotes();
+}

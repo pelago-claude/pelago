@@ -1,0 +1,130 @@
+@implements IDisposable
+@inject UiPrefs Prefs
+
+<div class="date-slider" data-help="slider.date">
+    <button class="btn" data-help="slider.play" @onclick="TogglePlay" title="@(_playing ? T("Pausa") : T("Riproduci"))" aria-pressed="@_playing">
+        <i class="ti @(_playing ? "ti-player-pause" : "ti-player-play")"></i> @(_playing ? T("Pausa") : T("Riproduci"))
+    </button>
+    <button class="btn ghost" data-help="slider.speed" @onclick="CycleSpeed" title="@T("Velocità della riproduzione")">×@_speed</button>
+    <span class="ds-end">@Min.ToString("dd/MM/yy")</span>
+    <input type="range" class="ds-range" min="0" max="@_span" step="1" value="@_index" @oninput="OnInput" aria-label="@T("Giorno")" />
+    <span class="ds-end">@Max.ToString("dd/MM/yy")</span>
+    <b class="ds-date">@Value.ToString("dd/MM/yyyy")</b>
+</div>
+
+@code {
+    /// <summary>In quanti passi, circa, si percorre tutto l'intervallo durante la riproduzione (a ogni passo la mappa si ridisegna per intero).</summary>
+    private const int StepsPerRun = 80;
+
+    [Parameter, EditorRequired] public DateOnly Min { get; set; }
+    [Parameter, EditorRequired] public DateOnly Max { get; set; }
+    [Parameter, EditorRequired] public DateOnly Value { get; set; }
+    [Parameter] public EventCallback<DateOnly> ValueChanged { get; set; }
+
+    private int _span;
+    private int _index;
+    private int _speed = 1;
+    private bool _playing;
+    private CancellationTokenSource? _run;
+
+    /// <summary>Di quanti giorni avanza ogni passo della riproduzione (per intervalli lunghi, qualche giorno alla volta).</summary>
+    internal static int DaysPerStep(DateOnly min, DateOnly max) =>
+        Math.Max(1, (int)Math.Ceiling((max.DayNumber - min.DayNumber) / (double)StepsPerRun));
+
+    /// <summary>
+    /// Quanto si aspetta, dopo aver aggiornato la mappa, prima del passo successivo: il tempo di vederla disegnata. È un'attesa vera tra un passo e l'altro,
+    /// non un orologio che batte a intervalli fissi: se il disegno è lento i passi non si accavallano.
+    /// </summary>
+    internal static int FrameMilliseconds(int speed) => speed switch { 2 => 500, 4 => 250, _ => 1000 };
+
+    protected override void OnInitialized()
+    {
+        _speed = int.TryParse(Prefs.Get("slider.speed"), out var s) && s is 1 or 2 or 4 ? s : 1;
+    }
+
+    protected override void OnParametersSet()
+    {
+        _span = Math.Max(0, Max.DayNumber - Min.DayNumber);
+        _index = Math.Clamp(Value.DayNumber - Min.DayNumber, 0, _span);
+    }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        Stop();
+        if (int.TryParse(e.Value?.ToString(), out var index))
+        {
+            await ValueChanged.InvokeAsync(Min.AddDays(Math.Clamp(index, 0, _span)));
+        }
+    }
+
+    private void CycleSpeed()
+    {
+        _speed = _speed switch { 1 => 2, 2 => 4, _ => 1 };
+        Prefs.Set("slider.speed", _speed.ToString());
+    }
+
+    private async Task TogglePlay()
+    {
+        if (_playing)
+        {
+            Stop();
+            return;
+        }
+
+        if (Value >= Max)
+        {
+            await ValueChanged.InvokeAsync(Min);          // alla fine si riparte dall'inizio
+        }
+
+        _playing = true;
+        _run = new CancellationTokenSource();
+        _ = PlayAsync(_run.Token);
+    }
+
+    private async Task PlayAsync(CancellationToken token)
+    {
+        try
+        {
+            while (!token.IsCancellationRequested)
+            {
+                await Task.Delay(FrameMilliseconds(_speed), token);
+                await InvokeAsync(async () =>
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    var next = Value.AddDays(DaysPerStep(Min, Max));
+                    if (next >= Max)
+                    {
+                        next = Max;
+                        _playing = false;                 // ultimo passo: la riproduzione finisce qui
+                        _run?.Cancel();
+                    }
+                    await ValueChanged.InvokeAsync(next);
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+    }
+
+    private void Stop()
+    {
+        _playing = false;
+        _run?.Cancel();
+        _run = null;
+    }
+
+    public void Dispose()
+    {
+        _run?.Cancel();
+        _run?.Dispose();
+    }
+}

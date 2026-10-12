@@ -1,0 +1,53 @@
+@page "/gains"
+@inherits StatePage
+
+<div class="page fill">
+    <h1><i class="ti ti-trending-up"></i>@T("Plusvalenze")</h1>
+    <p class="sub">@T("Plus e minusvalenze realizzate su ogni cessione, a costo medio ponderato. Non è una dichiarazione fiscale.")</p>
+
+    <NeedData>
+        <div class="cards">
+            <div class="card" data-help="gains.total"><div class="label">@T("Totale realizzato")</div><div class="value @Fmt.Sign(_total)">@Fmt.Money(_total)</div></div>
+            <div class="card" data-help="gains.wins"><div class="label">@T("Cessioni in utile")</div><div class="value pos">@_wins</div></div>
+            <div class="card" data-help="gains.losses"><div class="label">@T("Cessioni in perdita")</div><div class="value neg">@(_rows.Count - _wins)</div></div>
+        </div>
+        <DataTable TableId="gains" Items="_rows" Columns="_columns" ExportName="plusvalenze"
+                   DefaultSortTitle="Data" DefaultDescending="true" FooterLabel="SALDO" />
+    </NeedData>
+</div>
+
+@code {
+    private sealed record Row(DateTime Date, string Key, string Name, string Symbol, string AssetClass, string ClassLabel, decimal Shares, decimal Proceeds, decimal Cost, decimal Gain);
+
+    private List<Row> _rows = new();
+    private decimal _total;
+    private int _wins;
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Date<Row>("Data", r => r.Date),
+        Col.Name<Row>("Nome", r => r.Name, r => r.Key),
+        Col.Isin<Row>("Simbolo", r => r.Symbol),
+        Col.Issuer<Row>(r => r.Symbol, r => r.AssetClass),
+        Col.Badge<Row>("Categoria", r => r.ClassLabel),
+        Col.Num<Row>("Quantità ceduta", r => r.Shares),
+        Col.Money<Row>("Ricavo", r => r.Proceeds, total: rows => rows.Sum(r => r.Proceeds)),
+        Col.Money<Row>("Costo (medio)", r => r.Cost, total: rows => rows.Sum(r => r.Cost)),
+        Col.Money<Row>("Plus/Minus", r => r.Gain, signColor: true, total: rows => rows.Sum(r => r.Gain), bar: true),
+    };
+
+    protected override void Rebuild()
+    {
+        _rows = RealizedGainsCalculator.Compute(State.Operations!).Select(e =>
+        {
+            var key = string.IsNullOrWhiteSpace(e.Symbol) ? e.Name : e.Symbol;      // la chiave con cui l'app riconosce il titolo
+            return new Row(
+                e.Date,
+                key,
+                State.ChosenNameOf(key) ?? AssetNameResolver.ResolveDisplayName(e.Name, e.AssetClass, new[] { e.Description }),
+                e.Symbol, e.AssetClass, Fmt.ClassLabel(e.AssetClass), e.SharesDisposed, e.Proceeds, e.CostBasis, e.Gain);
+        }).ToList();
+        _total = _rows.Sum(r => r.Gain);
+        _wins = _rows.Count(r => r.Gain >= 0m);
+    }
+}

@@ -1,0 +1,48 @@
+name: Segnalazione di un problema / Bug report
+description: Un numero che non torna, un errore, un testo sbagliato, un file che non si legge
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Non allegare il tuo CSV vero né schermate con i tuoi importi, nomi di titoli o ISIN: questa pagina è pubblica.**
+        Descrivi il problema a parole, oppure riproducilo con `samples/esempio-operazioni.csv`.
+        *Never attach your real CSV or screenshots showing your real amounts/ISINs: this page is public.*
+  - type: input
+    id: versione
+    attributes:
+      label: Versione di Pelago / Pelago version
+      description: La trovi nella pagina Crediti.
+      placeholder: "2.12"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Versione di Windows / Windows version
+      placeholder: "Windows 11 23H2"
+  - type: input
+    id: pagina
+    attributes:
+      label: Pagina o funzione / Page or feature
+      placeholder: "Mappa del portafoglio, Plusvalenze, ..."
+    validations:
+      required: true
+  - type: textarea
+    id: cosa
+    attributes:
+      label: Che cosa è successo, e che cosa ti aspettavi / What happened and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: passi
+    attributes:
+      label: Come riprodurlo / Steps to reproduce
+      description: Se serve un esempio di una riga del CSV, sostituisci importi, ISIN, nomi, IBAN e id con valori inventati.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Conferma
+      options:
+        - label: Non ho allegato il mio CSV vero né dati personali del mio conto / I did not attach my real CSV or personal account data
+          required: true

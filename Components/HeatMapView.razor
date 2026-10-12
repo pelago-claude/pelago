@@ -1,0 +1,70 @@
+@inject AppState State
+@inject NavigationManager Nav
+
+@if (Map is { Items.Count: > 0 } && _data is not null)
+{
+    <EChart Kind="treemap" Data="_data" Height="@Height" Help="chart:heatmap" OnItemClick="Clicked" />
+    @if (ShowLegend)
+    {
+        <div class="hm-legend" data-help="heatmap.legend">
+            <span>@T("−50% o meno")</span>
+            <i class="hm-grad" style="background:linear-gradient(90deg, @HeatColor.LossHex, @HeatColor.NeutralHex, @HeatColor.GainHex)"></i>
+            <span>@T("+50% o più")</span>
+            <span class="hm-na"><i style="background:@HeatColor.NeutralHex"></i>@T("costo non noto")</span>
+        </div>
+    }
+    @if (Map.Hidden > 0)
+    {
+        <div class="hm-note">@Plural(Map.Hidden, "{0} titolo a valore zero (o senza prezzo) non compare nella mappa.", "{0} titoli a valore zero (o senza prezzo) non compaiono nella mappa.")</div>
+    }
+}
+else
+{
+    <div class="empty">
+        <i class="ti ti-layout-grid"></i>
+        <h2>@T("Nessun titolo in portafoglio")</h2>
+        <p class="muted">@T("A questa data non possedevi titoli di cui si conosca il valore.")</p>
+    </div>
+}
+
+@code {
+    /// <summary>La composizione da disegnare (la calcola la pagina, così può mostrarne anche i totali).</summary>
+    [Parameter] public HeatMap? Map { get; set; }
+
+    [Parameter] public string Height { get; set; } = "420px";
+
+    /// <summary>La scala dei colori sotto la mappa.</summary>
+    [Parameter] public bool ShowLegend { get; set; } = true;
+
+    private HeatMap? _built;
+    private object? _data;
+    private HashSet<string> _keys = new(StringComparer.Ordinal);
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(Map, _built))
+        {
+            return;
+        }
+
+        _built = Map;
+        _data = Map is null ? null : ChartData.HeatMapTree(Map, item => State.FullNameOf(item.Key, item.Name));
+        _keys = Map is null ? new HashSet<string>(StringComparer.Ordinal) : Map.Items.Select(i => i.Key).ToHashSet(StringComparer.Ordinal);
+    }
+
+    /// <summary>Un clic su un riquadro apre il titolo (alla data della mappa, se non è oggi); il clic sul nome di una categoria non fa nulla.</summary>
+    private void Clicked(string key)
+    {
+        if (Map is null || !_keys.Contains(key))
+        {
+            return;
+        }
+
+        var target = $"security?key={Uri.EscapeDataString(key)}";
+        if (Map.Date < State.MaxDate)
+        {
+            target += $"&asof={Map.Date:yyyy-MM-dd}";
+        }
+        Nav.NavigateTo(target);
+    }
+}

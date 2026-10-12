@@ -1,0 +1,45 @@
+@using System.Text.RegularExpressions
+
+@foreach (var part in Split(Text))
+{
+    if (part.IsCode)
+    {
+        <Isin Code="@part.Text" />
+    }
+    else
+    {
+        @part.Text
+    }
+}
+
+@code {
+    private static readonly Regex IsinPattern = new(@"\b[A-Z]{2}[A-Z0-9]{9}\d\b", RegexOptions.Compiled);
+
+    private sealed record Part(string Text, bool IsCode);
+
+    /// <summary>Un testo qualunque (per esempio la descrizione di un'operazione) in cui ogni ISIN diventa un codice cliccabile.</summary>
+    [Parameter] public string? Text { get; set; }
+
+    private static IEnumerable<Part> Split(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            yield break;
+        }
+
+        var last = 0;
+        foreach (Match match in IsinPattern.Matches(text))
+        {
+            if (match.Index > last)
+            {
+                yield return new Part(text[last..match.Index], false);
+            }
+            yield return new Part(match.Value, true);
+            last = match.Index + match.Length;
+        }
+        if (last < text.Length)
+        {
+            yield return new Part(text[last..], false);
+        }
+    }
+}

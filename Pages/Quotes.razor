@@ -1,0 +1,175 @@
+@page "/quotes"
+@inherits StatePage
+
+
+<div class="page fill">
+    <h1><i class="ti ti-refresh"></i>@T("Quotazioni")</h1>
+    <p class="sub">@T("Aggiorna i prezzi da CoinGecko, Yahoo Finance e Frankfurter. Fino a 5 richieste in parallelo.")</p>
+
+    <div class="row" style="margin-bottom:14px">
+        <button class="btn primary" data-help="update.all" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "CRYPTO", "STOCK", "FUND", "FX", "DERIVATIVE" }, "tutti gli asset supportati")'><i class="ti ti-refresh"></i> @T("Aggiorna tutto")</button>
+        <button class="btn" data-help="update.crypto" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "CRYPTO" }, "Crypto")'><i class="ti ti-currency-bitcoin"></i> @T("Crypto")</button>
+        <button class="btn" data-help="update.stocks" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "STOCK", "FUND" }, "Azioni e Fondi")'><i class="ti ti-chart-candle"></i> @T("Azioni e Fondi")</button>
+        <button class="btn" data-help="update.fx" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "FX" }, "Cambio EUR/USD")'><i class="ti ti-currency-euro"></i> @T("Cambio EUR/USD")</button>
+        @if (State.VontobelEnabled || State.SocGenEnabled)
+        {
+            <button class="btn" data-help="update.derivatives" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "DERIVATIVE" }, "Derivati")'><i class="ti ti-chart-arrows-vertical"></i> @T("Derivati")</button>
+        }
+        @if (State.IsUpdating)
+        {
+            <span class="muted"><i class="ti ti-loader-2 spin"></i> @T("Aggiornamento in corso: {0}…", State.UpdateTitle)</span>
+        }
+        <label class="chip @(State.AutoUpdateEnabled ? "on" : "")" data-help="update.auto">
+            <input type="checkbox" checked="@State.AutoUpdateEnabled" @onchange="ToggleAuto" /> @T("Aggiorna da sola all'apertura")
+        </label>
+        @if (State.VontobelEnabled)
+        {
+            <label class="chip on" data-help="update.vontobel">
+                <input type="checkbox" checked="@State.VontobelEnabled" @onchange="ToggleVontobel" /> @T("Prezzi dei derivati da Vontobel")
+            </label>
+        }
+        @if (State.SocGenEnabled)
+        {
+            <label class="chip on" data-help="update.socgen">
+                <input type="checkbox" checked="@State.SocGenEnabled" @onchange="ToggleSocGen" /> @T("Prezzi dei derivati da Société Générale")
+            </label>
+        }
+        <div class="grow"></div>
+        <button class="btn ghost" data-help="update.clear" @onclick="State.ClearUpdateLog"><i class="ti ti-eraser"></i> @T("Pulisci registro")</button>
+    </div>
+
+    @if (!State.VontobelEnabled && _openDerivatives > 0)
+    {
+        <div class="banner info" data-help="update.vontobel">
+            <i class="ti ti-chart-arrows-vertical"></i>
+            <div>
+                <b>@Plural(_openDerivatives, "{0} derivato aperto ha il prezzo fermo all'ultimo scambio.", "{0} derivati aperti hanno il prezzo fermo all'ultimo scambio.")</b>
+                @T("Posso leggere il prezzo (Geld) dal sito di Vontobel, l'emittente dei prodotti con codice DE000V… e DE000BD…. Mando al sito solo il codice del prodotto, una richiesta al secondo circa, all'apertura e quando premi Aggiorna. Il sito dichiara che le informazioni sono per uso privato non commerciale e rivolte a chi risiede in Germania, Austria, Lussemburgo e Liechtenstein, e che i prezzi possono essere in ritardo: attivando, scegli tu di usarlo.")
+            </div>
+            <span class="grow"></span>
+            <button class="btn primary" @onclick="EnableVontobel">@T("Attiva i prezzi Vontobel")</button>
+        </div>
+    }
+
+    @if (!State.SocGenEnabled && _openSocGen > 0)
+    {
+        <div class="banner info" data-help="update.socgen">
+            <i class="ti ti-chart-arrows-vertical"></i>
+            <div>
+                <b>@Plural(_openSocGen, "{0} derivato aperto di Société Générale ha il prezzo fermo all'ultimo scambio.", "{0} derivati aperti di Société Générale hanno il prezzo fermo all'ultimo scambio.")</b>
+                @T("Posso leggere il prezzo (Geld) dal sito di Société Générale, l'emittente dei prodotti con codice DE000F… e DE000S…. Mando al sito solo il codice del prodotto, una richiesta al secondo circa, all'apertura e quando premi Aggiorna. Le Note Legali del sito vietano la riproduzione dei contenuti con qualsiasi mezzo, memorizzazione compresa, senza autorizzazione scritta, e il sito chiede di accettare una dichiarazione (informazioni destinate a chi risiede in Italia): attivando, decidi tu di usarlo, sotto la tua responsabilità.")
+            </div>
+            <span class="grow"></span>
+            <button class="btn primary" @onclick="EnableSocGen">@T("Attiva i prezzi Société Générale")</button>
+        </div>
+    }
+
+    @if (!State.HasData)
+    {
+        <div class="warn">@T("Per aggiornare servono le operazioni del CSV (da lì si sa quali asset possiedi): aprilo con «Apri CSV…». L'elenco qui sotto resta consultabile.")</div>
+    }
+
+    <div class="logbox" id="updatelog" data-help="update.log">@foreach (var line in _log)
+    {
+        <div class="@LineClass(line)">@line</div>
+    }
+    @if (_log.Count == 0)
+    {
+        <span class="muted">@T("Il registro dell'aggiornamento comparirà qui.")</span>
+    }</div>
+
+    <div style="height:16px"></div>
+
+    <DataTable TableId="quotes" Items="_rows" Columns="_columns" ExportName="quotazioni"
+               DefaultSortTitle="Nome" OnRowClick="Open" />
+</div>
+
+@code {
+    private sealed record Row(string Key, string Name, string Symbol, string AssetClass, string ClassLabel, int Count, DateTime? LastUpdate, decimal? LastValue, string Currency);
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private List<Row> _rows = new();
+    private IReadOnlyList<string> _log = Array.Empty<string>();
+    private int _openDerivatives;
+    private int _openSocGen;
+
+    private void EnableSocGen()
+    {
+        State.SocGenEnabled = true;
+        _ = State.RunUpdateAsync(new[] { "DERIVATIVE" }, "Derivati");
+    }
+
+    private void ToggleSocGen(ChangeEventArgs e) => State.SocGenEnabled = e.Value is true;
+
+    private void EnableVontobel()
+    {
+        State.VontobelEnabled = true;
+        _ = State.RunUpdateAsync(new[] { "DERIVATIVE" }, "Derivati");
+    }
+
+    private void ToggleVontobel(ChangeEventArgs e) => State.VontobelEnabled = e.Value is true;
+
+    private static readonly List<Column<Row>> _columns = new()
+    {
+        Col.Name<Row>("Nome", r => r.Name, r => r.Key),
+        Col.Isin<Row>("Simbolo", r => r.Symbol),
+        Col.Issuer<Row>(r => r.Symbol, r => r.AssetClass),
+        Col.Badge<Row>("Categoria", r => r.ClassLabel),
+        Col.Num<Row>("N. aggiornamenti", r => r.Count, 0),
+        Col.Date<Row>("Ultimo aggiornamento", r => r.LastUpdate, "dd/MM/yyyy HH:mm"),
+        Col.Num<Row>("Ultimo valore", r => r.LastValue),
+        Col.Text<Row>("Valuta", r => r.Currency),
+    };
+
+    protected override void OnInitialized()
+    {
+        _log = State.UpdateLog;
+        State.UpdateLogChanged += OnLogChanged;
+        LoadRows();
+        base.OnInitialized();
+    }
+
+    protected override void Rebuild() => LoadRows();
+
+    private void LoadRows()
+    {
+        _openDerivatives = State.OpenDerivatives(Issuer.Vontobel).Count;
+        _openSocGen = State.OpenDerivatives(Issuer.SocieteGenerale).Count;
+        _rows = AssetCatalogStore.Load().Select(entry =>
+        {
+            var quotes = QuoteHistoryStore.Load(entry);
+            var last = quotes.OrderByDescending(q => q.Timestamp).FirstOrDefault();
+            return new Row(entry.Key, State.FullNameOf(entry.Key, entry.Name), entry.Symbol, entry.AssetClass, Fmt.ClassLabel(entry.AssetClass), quotes.Count,
+                last?.Timestamp.ToLocalTime(), last?.Price, last?.Currency ?? "");
+        }).ToList();
+    }
+
+    private void OnLogChanged() => _ = InvokeAsync(async () =>
+    {
+        _log = State.UpdateLog;
+        StateHasChanged();
+        try
+        {
+            await JS.InvokeVoidAsync("eval", "var l=document.getElementById('updatelog'); if(l){l.scrollTop=l.scrollHeight;}");
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    });
+
+    private static string LineClass(string line) =>
+        line.Contains("] OK ") ? "l-ok" : line.Contains("] " + T("ERRORE")) ? "l-err" : line.Contains("---") ? "l-head" : "";
+
+    private Task Run(string[] classes, string label) => State.RunUpdateAsync(classes, label);
+
+    private void ToggleAuto(ChangeEventArgs e) => State.AutoUpdateEnabled = e.Value is true;
+
+    private void Open(Row row) => Nav.NavigateTo($"quote?key={Uri.EscapeDataString(row.Key)}");
+
+    public override void Dispose()
+    {
+        State.UpdateLogChanged -= OnLogChanged;
+        base.Dispose();
+    }
+}

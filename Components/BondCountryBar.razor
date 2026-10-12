@@ -1,0 +1,53 @@
+@inject NavigationManager Nav
+@inject UiPrefs Prefs
+
+<div class="bond-countries" data-help="bonds.countries">
+    <span class="muted">@T("Stato:")</span>
+    @foreach (var code in GovBonds.Featured)
+    {
+        var country = GovBonds.Find(code)!;
+        <button class="chip @(Selected == code ? "on" : "")" @onclick="() => Go(code)"><Flag Code="@country.Flag" />@Label(country)</button>
+    }
+    <button class="chip @(IsOther ? "on" : "")" title="@T("Altri Stati")" @onclick="() => _more = !_more">
+        @if (IsOther && GovBonds.Find(Selected) is { } current)
+        {
+            <Flag Code="@current.Flag" />@T(current.Name)
+        }
+        else
+        {
+            @T("Altri Stati…")
+        }
+        <i class="ti @(_more ? "ti-chevron-up" : "ti-chevron-down")"></i>
+    </button>
+</div>
+
+@if (_more)
+{
+    <div class="bond-countries more">
+        @foreach (var country in Others)
+        {
+            <button class="chip @(Selected == country.Code ? "on" : "")" @onclick="() => Go(country.Code)"><Flag Code="@country.Flag" />@T(country.Name)</button>
+        }
+    </div>
+}
+
+@code {
+    /// <summary>Il codice del paese mostrato (IT per i BTP).</summary>
+    [Parameter, EditorRequired] public string Selected { get; set; } = "IT";
+
+    private bool _more;
+
+    private IEnumerable<GovCountry> Others => GovBonds.Countries.Where(c => !GovBonds.Featured.Contains(c.Code)).OrderBy(c => T(c.Name), StringComparer.CurrentCultureIgnoreCase);
+    private bool IsOther => !GovBonds.Featured.Contains(Selected);
+
+    private static string Label(GovCountry country) => country.Kind == GovKind.EuroAggregate ? T("Area euro") : T(country.Name);
+
+    private void Go(string code)
+    {
+        Prefs.Set("bonds.country", code);
+        Nav.NavigateTo(HrefFor(code));
+    }
+
+    /// <summary>L'indirizzo della pagina di un paese: per l'Italia c'è l'elenco dei BTP, per gli altri la pagina dei rendimenti.</summary>
+    public static string HrefFor(string code) => string.IsNullOrEmpty(code) || code == "IT" ? "btp" : $"bonds/{code}";
+}
