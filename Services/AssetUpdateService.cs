@@ -164,13 +164,24 @@ public static class AssetUpdateService
             string source;
             decimal? originalPrice = null;
             string? originalCurrency = null;
+            string? foundNow = null;
 
             switch (entry.AssetClass)
             {
                 case "CRYPTO":
-                    if (!entry.ProviderMappings.TryGetValue("coingecko", out var coinGeckoId) || string.IsNullOrWhiteSpace(coinGeckoId))
+                    var coinGeckoId = entry.ProviderMappings.TryGetValue("coingecko", out var knownId) && !string.IsNullOrWhiteSpace(knownId) ? knownId : null;
+                    if (coinGeckoId is null)
                     {
-                        return Fail(entry, T("Nessun mapping CoinGecko configurato per questo asset."));
+                        // come per i titoli su Yahoo: la prima volta si cerca l'id sul sito, e si salva nel catalogo
+                        coinGeckoId = await coinGecko.FindIdAsync(entry.Symbol, cancellationToken);
+                        if (coinGeckoId is null)
+                        {
+                            return Fail(entry, T("Nessun id CoinGecko per «{0}»: la ricerca non ha trovato una crypto con questo simbolo. Puoi scriverlo a mano in catalog.json.", entry.Symbol));
+                        }
+
+                        AssetCatalogStore.UpdateMapping(entry.Key, "coingecko", coinGeckoId);
+                        entry.ProviderMappings["coingecko"] = coinGeckoId;
+                        foundNow = coinGeckoId;
                     }
                     price = await coinGecko.GetPriceEurAsync(coinGeckoId, cancellationToken);
                     currency = "EUR";
@@ -237,7 +248,8 @@ public static class AssetUpdateService
             };
             QuoteHistoryStore.Append(entry, quote);
 
-            var message = originalCurrency is null ? "OK" : T("OK (convertito da {0:0.####} {1})", originalPrice, originalCurrency);
+            var message = foundNow is not null ? T("OK (associata a «{0}» su CoinGecko: se non è quella giusta, correggila in catalog.json)", foundNow)
+                : originalCurrency is null ? "OK" : T("OK (convertito da {0:0.####} {1})", originalPrice, originalCurrency);
             return new AssetUpdateResult(entry, true, price, message);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

@@ -32,6 +32,7 @@ public static class AssetCatalogStore
         ["HBAR"] = "hedera-hashgraph",
         ["ADA"] = "cardano",
         ["DOT"] = "polkadot",
+        ["QNT"] = "quant-network",   // non «quant»: è l'indirizzo della pagina, ma con quell'id il prezzo è di un'altra moneta
     };
 
     public static List<AssetCatalogEntry> Load()
@@ -82,8 +83,16 @@ public static class AssetCatalogStore
 
         foreach (var op in assets)
         {
-            if (byKey.ContainsKey(op.PositionKey))
+            if (byKey.TryGetValue(op.PositionKey, out var existing))
             {
+                // una voce creata prima che il simbolo fosse nell'elenco, senza id CoinGecko: la si completa invece di lasciarla per sempre senza prezzo
+                if (existing.AssetClass == "CRYPTO"
+                    && (!existing.ProviderMappings.TryGetValue("coingecko", out var current) || string.IsNullOrWhiteSpace(current))
+                    && DefaultCoinGeckoIds.TryGetValue(existing.Symbol, out var knownId))
+                {
+                    existing.ProviderMappings["coingecko"] = knownId;
+                    changed = true;
+                }
                 continue;
             }
 

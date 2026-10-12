@@ -16,6 +16,20 @@ public static class ChangeLog
 
     public static readonly IReadOnlyList<Release> Releases = new[]
     {
+        new Release("2.13", new DateOnly(2026, 10, 12), "Crypto che si trovano da sole",
+            "Le crypto che l'app non conosceva trovano da sole il loro id su CoinGecko, e quindi il prezzo.",
+            new[]
+            {
+                "Alcune crypto del conto restavano senza prezzo. La causa era un elenco scritto a mano dei simboli che l'app sapeva cercare su CoinGecko: se un simbolo non c'era, nessun prezzo; e una voce creata prima che il simbolo entrasse nell'elenco restava senza id per sempre. C'è anche una trappola: l'id che serve per i prezzi non è quello che si legge nell'indirizzo della pagina della moneta, e con l'id sbagliato si ottiene il prezzo di un'altra moneta, migliaia di volte più basso.",
+                "Ora, quando una crypto non ha ancora un id, l'app lo cerca su CoinGecko dal simbolo, sceglie la moneta con quel simbolo esatto e la capitalizzazione più alta, e lo ricorda. Se trova solo monete senza capitalizzazione non sceglie nulla, perché un prezzo che manca è meglio di quello di una moneta sbagliata. Nel registro dell'aggiornamento si legge a quale moneta è stata associata, così si può controllare; se non è quella giusta, si corregge in catalog.json. Le voci già create e senza id vengono completate.",
+            },
+            new[]
+            {
+                "Una crypto senza id CoinGecko lo cerca da sola la prima volta, dal simbolo, e lo ricorda",
+                "Il registro dell'aggiornamento dice a quale moneta è stata associata, per poterla controllare",
+                "Le voci del catalogo create prima, senza id, vengono completate",
+                "Nuovi test automatici per la scelta dell'id e per il completamento del catalogo",
+            }),
         new Release("2.12", new DateOnly(2026, 10, 12), "Codice aperto",
             "Pelago diventa software libero con licenza GPL-3.0: nella pagina Crediti compaiono la licenza, l'avviso di assenza di garanzia e i componenti di terzi.",
             new[]
