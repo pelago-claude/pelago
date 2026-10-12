@@ -42,7 +42,9 @@ The code is public, so you can check there is nothing else (search for `http` in
 
 1. Download the transactions CSV from your Trade Republic account.
 2. Download `pelago.exe` from the [**Releases**](https://github.com/pelago-claude/pelago/releases) page of this repository and run it (64-bit Windows 10/11; it needs the *WebView2 Runtime*, already included in Windows 11 and in most up-to-date Windows 10).
-3. Click **Open CSV** and choose the file. To try it without your own data: [samples/esempio-operazioni.csv](samples/esempio-operazioni.csv).
+3. Click **Open CSV** and choose the file.
+
+**Want to try it without your own data?** Download the [sample CSV](https://raw.githubusercontent.com/pelago-claude/pelago/main/samples/esempio-operazioni.csv) (right-click → *Save link as*; it is also attached to every release). It is an **invented** account with about 160 transactions between March 2025 and October 2026 — stocks, funds, bonds, derivatives and crypto — ideal for trying the portfolio map and the time slider.
 
 Every release lists the **SHA-256** of `pelago.exe`: compare it with `Get-FileHash pelago.exe`. The executable is not code-signed, so Windows may show a SmartScreen warning the first time. If you prefer not to trust a downloaded file, build it yourself (below).
 

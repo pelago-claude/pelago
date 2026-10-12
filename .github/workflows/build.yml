@@ -46,4 +46,4 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ github.ref_name }}" out/pelago.exe out/pelago.exe.sha256 --title "Pelago ${{ github.ref_name }}" --generate-notes
+        run: gh release create "${{ github.ref_name }}" out/pelago.exe out/pelago.exe.sha256 samples/esempio-operazioni.csv --title "Pelago ${{ github.ref_name }}" --generate-notes
