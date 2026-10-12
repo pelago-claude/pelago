@@ -49,12 +49,15 @@ public static class AssetUpdateService
         // chiesto una sola volta per tutto il lotto.
         var rates = new RateCache(fx);
 
+        // le crypto si chiedono tutte insieme con una richiesta sola (vedi LookUpCryptoAsync); chi le aspetta è solo chi ne ha bisogno
+        var cryptoLookups = LookUpCryptoAsync(entries.Where(e => e.AssetClass == "CRYPTO").ToList(), coinGecko, cancellationToken);
+
         var tasks = entries.Where(e => e.AssetClass != "DERIVATIVE").Select(async entry =>
         {
             await throttle.WaitAsync(cancellationToken);
             try
             {
-                var result = await UpdateOneAsync(entry, coinGecko, yahoo, fx, rates, cancellationToken);
+                var result = await UpdateOneAsync(entry, cryptoLookups, yahoo, fx, rates, cancellationToken);
                 onAssetCompleted(result);
             }
             finally
@@ -153,8 +156,94 @@ public static class AssetUpdateService
         }
     }
 
+    /// <summary>Il prezzo di una crypto (o perché non c'è) e, se l'id è stato cercato adesso, quale.</summary>
+    internal sealed record CryptoLookup(decimal? Price, string? Error, string? FoundNow);
+
+    /// <summary>Pausa tra due ricerche di id sul sito di CoinGecko.</summary>
+    private const int CoinGeckoSearchPauseMilliseconds = 1200;
+
+    /// <summary>
+    /// I prezzi di tutte le crypto del lotto con UNA richiesta, dopo aver cercato (una alla volta, con una pausa) l'id di quelle che
+    /// non l'hanno ancora. L'API gratuita di CoinGecko rifiuta le richieste in raffica: con una per moneta, le ultime della lista
+    /// restavano senza prezzo. Non lancia errori: ogni crypto ha il suo esito.
+    /// </summary>
+    internal static async Task<Dictionary<string, CryptoLookup>> LookUpCryptoAsync(
+        List<AssetCatalogEntry> cryptoEntries, CoinGeckoQuoteProvider coinGecko, CancellationToken cancellationToken,
+        int searchPauseMilliseconds = CoinGeckoSearchPauseMilliseconds)
+    {
+        var outcomes = new Dictionary<string, CryptoLookup>();
+        var idOf = new Dictionary<string, string>();
+        var foundNow = new Dictionary<string, string>();
+        var searched = false;
+
+        foreach (var entry in cryptoEntries)
+        {
+            var id = entry.ProviderMappings.TryGetValue("coingecko", out var known) && !string.IsNullOrWhiteSpace(known) ? known : null;
+            if (id is null)
+            {
+                // come per i titoli su Yahoo: la prima volta si cerca l'id sul sito, e si salva nel catalogo
+                if (searched)
+                {
+                    await Task.Delay(searchPauseMilliseconds, cancellationToken);
+                }
+                searched = true;
+                try
+                {
+                    id = await coinGecko.FindIdAsync(entry.Symbol, cancellationToken);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    outcomes[entry.Key] = new CryptoLookup(null, ex.Message, null);
+                    continue;
+                }
+
+                if (id is null)
+                {
+                    outcomes[entry.Key] = new CryptoLookup(null,
+                        T("Nessun id CoinGecko per «{0}»: la ricerca non ha trovato una crypto con questo simbolo. Puoi scriverlo a mano in catalog.json.", entry.Symbol), null);
+                    continue;
+                }
+
+                AssetCatalogStore.UpdateMapping(entry.Key, "coingecko", id);
+                entry.ProviderMappings["coingecko"] = id;
+                foundNow[entry.Key] = id;
+            }
+
+            if (!CoinGeckoQuoteProvider.IsValidId(id))
+            {
+                outcomes[entry.Key] = new CryptoLookup(null, T("L'id CoinGecko «{0}» non è valido: correggilo in catalog.json.", id), null);
+                continue;
+            }
+
+            idOf[entry.Key] = id;
+        }
+
+        if (idOf.Count > 0)
+        {
+            try
+            {
+                var prices = await coinGecko.GetPricesEurAsync(idOf.Values, cancellationToken);
+                foreach (var (key, id) in idOf)
+                {
+                    outcomes[key] = prices.TryGetValue(id, out var price)
+                        ? new CryptoLookup(price, null, foundNow.GetValueOrDefault(key))
+                        : new CryptoLookup(null, T("CoinGecko non ha restituito una quotazione per \"{0}\".", id), null);
+                }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                foreach (var key in idOf.Keys)
+                {
+                    outcomes[key] = new CryptoLookup(null, ex.Message, null);
+                }
+            }
+        }
+
+        return outcomes;
+    }
+
     private static async Task<AssetUpdateResult> UpdateOneAsync(
-        AssetCatalogEntry entry, CoinGeckoQuoteProvider coinGecko, YahooFinanceQuoteProvider yahoo,
+        AssetCatalogEntry entry, Task<Dictionary<string, CryptoLookup>> cryptoLookups, YahooFinanceQuoteProvider yahoo,
         ExchangeRateProvider fx, RateCache rates, CancellationToken cancellationToken)
     {
         try
@@ -169,21 +258,17 @@ public static class AssetUpdateService
             switch (entry.AssetClass)
             {
                 case "CRYPTO":
-                    var coinGeckoId = entry.ProviderMappings.TryGetValue("coingecko", out var knownId) && !string.IsNullOrWhiteSpace(knownId) ? knownId : null;
-                    if (coinGeckoId is null)
+                    var lookups = await cryptoLookups;
+                    if (!lookups.TryGetValue(entry.Key, out var lookup))
                     {
-                        // come per i titoli su Yahoo: la prima volta si cerca l'id sul sito, e si salva nel catalogo
-                        coinGeckoId = await coinGecko.FindIdAsync(entry.Symbol, cancellationToken);
-                        if (coinGeckoId is null)
-                        {
-                            return Fail(entry, T("Nessun id CoinGecko per «{0}»: la ricerca non ha trovato una crypto con questo simbolo. Puoi scriverlo a mano in catalog.json.", entry.Symbol));
-                        }
-
-                        AssetCatalogStore.UpdateMapping(entry.Key, "coingecko", coinGeckoId);
-                        entry.ProviderMappings["coingecko"] = coinGeckoId;
-                        foundNow = coinGeckoId;
+                        return Fail(entry, T("CoinGecko non ha restituito una quotazione per \"{0}\".", entry.Symbol));
                     }
-                    price = await coinGecko.GetPriceEurAsync(coinGeckoId, cancellationToken);
+                    if (lookup.Price is not { } cryptoPrice)
+                    {
+                        return Fail(entry, lookup.Error ?? "");
+                    }
+                    price = cryptoPrice;
+                    foundNow = lookup.FoundNow;
                     currency = "EUR";
                     source = "coingecko";
                     break;
