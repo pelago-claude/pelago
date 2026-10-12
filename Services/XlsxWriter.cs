@@ -104,7 +104,7 @@ public static class XlsxWriter
                 DateTime => 18,
                 DateOnly => 12,
                 decimal or double or float or int or long or short => 16,
-                var other => (other.ToString() ?? "").Length + 2,
+                var other => (other?.ToString() ?? "").Length + 2,
             };
             width = Math.Max(width, length);
         }
