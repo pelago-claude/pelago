@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Elenca i pagamenti di interessi sulla liquidità, con importo lordo, tassa trattenuta e netto,

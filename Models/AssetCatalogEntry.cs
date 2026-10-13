@@ -1,4 +1,4 @@
-namespace DPOper.Models;
+namespace Pelago.Models;
 
 /// <summary>
 /// Anagrafica di un asset per cui teniamo uno storico quotazioni: le sue identità note

@@ -1,7 +1,7 @@
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Elenca le plusvalenze/minusvalenze realizzate su ogni cessione (a costo medio ponderato),

@@ -1,8 +1,8 @@
 using System.Globalization;
-using DPOper.Models;
-using static DPOper.Services.Loc;
+using Pelago.Models;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Stato condiviso dell'interfaccia: operazioni caricate dal CSV, andamento giornaliero, quotazioni, controlli di coerenza e
@@ -21,8 +21,8 @@ public sealed class AppState : IDisposable
     private readonly object _logLock = new();
     private readonly List<string> _updateLog = new();
 
-    // Nelle prove automatiche (DPOPER_TEST=1) niente attività in rete o su disco che non siano state chieste.
-    private readonly bool _quiet = Environment.GetEnvironmentVariable("DPOPER_TEST") == "1" && Environment.GetEnvironmentVariable("DPOPER_AUTO") != "1";
+    // Nelle prove automatiche (PELAGO_TEST=1) niente attività in rete o su disco che non siano state chieste.
+    private readonly bool _quiet = Environment.GetEnvironmentVariable("PELAGO_TEST") == "1" && Environment.GetEnvironmentVariable("PELAGO_AUTO") != "1";
 
     private bool _initialized;
     private FileSystemWatcher? _watcher;
@@ -306,7 +306,7 @@ public sealed class AppState : IDisposable
         }
 
         // Solo per le prove automatiche: aggiunge subito un CSV (come farebbe «Aggiungi movimenti…»), per fotografare l'esito
-        if (Environment.GetEnvironmentVariable("DPOPER_TEST_ADD") is { Length: > 0 } testAdd && File.Exists(testAdd))
+        if (Environment.GetEnvironmentVariable("PELAGO_TEST_ADD") is { Length: > 0 } testAdd && File.Exists(testAdd))
         {
             await AddMovementsAsync(testAdd);
         }
@@ -614,7 +614,7 @@ public sealed class AppState : IDisposable
     // ---------------------------------------------------------------- aggiornamento quotazioni
 
     /// <summary>Il nome di un asset nel registro: quello intero (per i derivati il nome del file è solo «Long 150,00 $»), accorciato a 44 caratteri.</summary>
-    private string LogName(DPOper.Models.AssetCatalogEntry entry)
+    private string LogName(Pelago.Models.AssetCatalogEntry entry)
     {
         var name = FullNameOf(entry.Key, entry.Name);
         return name.Length > 44 ? name[..43] + "…" : name;

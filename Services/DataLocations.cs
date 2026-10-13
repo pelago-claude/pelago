@@ -1,17 +1,17 @@
 using System.IO.Compression;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Dove l'app tiene i propri file, e come elencarli o salvarne un backup.</summary>
 public static class DataLocations
 {
     /// <summary>
-    /// La cartella dati. Di solito <c>%LocalAppData%\DPOper</c>; la variabile d'ambiente <c>DPOPER_DATA</c> la sposta
+    /// La cartella dati. Di solito <c>%LocalAppData%\Pelago</c>; la variabile d'ambiente <c>PELAGO_DATA</c> la sposta
     /// altrove (serve per le prove e per le demo con dati di esempio, senza toccare i dati veri).
     /// </summary>
-    public static readonly string Root = Environment.GetEnvironmentVariable("DPOPER_DATA") is { Length: > 0 } custom
+    public static readonly string Root = Environment.GetEnvironmentVariable("PELAGO_DATA") is { Length: > 0 } custom
         ? custom
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DPOper");
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Pelago");
 
     public static string QuotesFolder => Path.Combine(Root, "quotes");
 

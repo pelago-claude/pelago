@@ -1,7 +1,7 @@
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Elenco dei BTP italiani a tasso fisso con i dati di ciascuno (cedola, scadenza, prezzo, rateo, rendimenti),

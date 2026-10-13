@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Backup automatico dei dati dell'app (quotazioni, catalogo, BTP, preferenze) in uno zip: una copia ogni 7 giorni, tenendo

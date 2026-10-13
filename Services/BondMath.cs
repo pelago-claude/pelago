@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Posizione di una data di regolamento nel calendario cedolare di un titolo.</summary>
 public sealed record CouponInfo(

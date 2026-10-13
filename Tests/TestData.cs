@@ -1,4 +1,4 @@
-using DPOper.Models;
+using Pelago.Models;
 
 namespace Pelago.Tests;
 

@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Globalization;
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Composizione del conto a una data scelta: a sinistra una checkbox per ciascuna categoria

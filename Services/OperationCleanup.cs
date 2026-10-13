@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Toglie dai movimenti le righe che si annullano a vicenda, così i calcoli per titolo (cicli, costo fiscale, plusvalenze) non vedono vendite

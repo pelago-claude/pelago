@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Il trattamento fiscale indicativo di uno strumento (in italiano la chiave: sono i nomi mostrati nel prospetto).</summary>
 public enum TaxCategory

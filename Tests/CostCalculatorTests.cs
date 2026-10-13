@@ -1,5 +1,5 @@
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;

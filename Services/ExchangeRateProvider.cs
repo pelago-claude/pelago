@@ -1,8 +1,8 @@
 using System.Net.Http.Json;
-using static DPOper.Services.Loc;
+using static Pelago.Services.Loc;
 using System.Text.Json.Serialization;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Recupera il tasso di cambio tra due valute: quello corrente da Yahoo Finance (con ripiego sul riferimento BCE) e quelli storici da

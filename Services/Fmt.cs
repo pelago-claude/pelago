@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Formattazione all'italiana condivisa da tutte le pagine (importi, quantità, date, percentuali).</summary>
 public static class Fmt

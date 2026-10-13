@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DPOper.csproj" />
+    <ProjectReference Include="..\Pelago.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-using DPOper.Services;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;
@@ -8,12 +8,12 @@ public class AppStateArchiveTests : IDisposable
 {
     private const string Header = "\"datetime\",\"date\",\"account_type\",\"category\",\"type\",\"asset_class\",\"name\",\"symbol\",\"shares\",\"price\",\"amount\",\"fee\",\"tax\",\"currency\",\"description\",\"transaction_id\"";
     private readonly string _folder = Path.Combine(Path.GetTempPath(), "pelago-appstate-" + Guid.NewGuid().ToString("N"));
-    private readonly string? _previousTestMode = Environment.GetEnvironmentVariable("DPOPER_TEST");
+    private readonly string? _previousTestMode = Environment.GetEnvironmentVariable("PELAGO_TEST");
 
     public AppStateArchiveTests()
     {
         Directory.CreateDirectory(_folder);
-        Environment.SetEnvironmentVariable("DPOPER_TEST", "1");   // niente attività in rete durante la prova
+        Environment.SetEnvironmentVariable("PELAGO_TEST", "1");   // niente attività in rete durante la prova
         if (File.Exists(OperationArchive.ArchivePath))
         {
             File.Delete(OperationArchive.ArchivePath);
@@ -22,7 +22,7 @@ public class AppStateArchiveTests : IDisposable
 
     public void Dispose()
     {
-        Environment.SetEnvironmentVariable("DPOPER_TEST", _previousTestMode);
+        Environment.SetEnvironmentVariable("PELAGO_TEST", _previousTestMode);
         Directory.Delete(_folder, recursive: true);
         if (File.Exists(OperationArchive.ArchivePath))
         {

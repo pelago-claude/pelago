@@ -1,7 +1,7 @@
 using System.Text.Json;
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Anagrafica degli asset per cui teniamo uno storico quotazioni (catalog.json), separata dallo

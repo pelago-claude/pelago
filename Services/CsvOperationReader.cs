@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text;
-using DPOper.Models;
-using static DPOper.Services.Loc;
+using Pelago.Models;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Legge il file CSV di export delle operazioni del conto (formato con intestazione,

@@ -7,9 +7,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Version>2.14.0</Version>
-    <!-- Il file si chiama pelago.exe (minuscolo); il progetto e i namespace restano DPOper. -->
+    <!-- Il file si chiama pelago.exe (minuscolo); il progetto e i namespace restano Pelago. -->
     <AssemblyName>pelago</AssemblyName>
-    <RootNamespace>DPOper</RootNamespace>
+    <RootNamespace>Pelago</RootNamespace>
     <Product>Pelago</Product>
     <Description>Pelago - il conto sotto controllo</Description>
     <ApplicationIcon>Assets\pelago.ico</ApplicationIcon>

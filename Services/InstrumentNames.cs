@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Il nome che l'utente ha dato a un titolo e quando l'ha scelto.</summary>
 public sealed record NameEntry(string Name, DateTime ChangedUtc);

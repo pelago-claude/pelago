@@ -1,5 +1,5 @@
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;
@@ -106,8 +106,8 @@ public class IssuerTests : IDisposable
     [Fact]
     public async Task The_name_shown_is_the_users_then_the_issuers_then_the_one_from_the_file()
     {
-        var previous = Environment.GetEnvironmentVariable("DPOPER_TEST");
-        Environment.SetEnvironmentVariable("DPOPER_TEST", "1");
+        var previous = Environment.GetEnvironmentVariable("PELAGO_TEST");
+        Environment.SetEnvironmentVariable("PELAGO_TEST", "1");
         Directory.CreateDirectory(_dir);
         try
         {
@@ -142,7 +142,7 @@ public class IssuerTests : IDisposable
         }
         finally
         {
-            Environment.SetEnvironmentVariable("DPOPER_TEST", previous);
+            Environment.SetEnvironmentVariable("PELAGO_TEST", previous);
         }
     }
 

@@ -1,8 +1,8 @@
-using DPOper.Forms;
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Forms;
+using Pelago.Models;
+using Pelago.Services;
 
-namespace DPOper;
+namespace Pelago;
 
 public partial class MainForm : Form
 {
@@ -283,7 +283,7 @@ public partial class MainForm : Form
             return true;
         }
 
-        MessageBox.Show(this, "Carica prima un file CSV da File > Carica CSV operazioni...", "DPOper",
+        MessageBox.Show(this, "Carica prima un file CSV da File > Carica CSV operazioni...", "Pelago",
             MessageBoxButtons.OK, MessageBoxIcon.Information);
         return false;
     }
@@ -318,7 +318,7 @@ public partial class MainForm : Form
             var operations = CsvOperationReader.Read(path);
             if (operations.Count == 0)
             {
-                MessageBox.Show(this, "Il file non contiene operazioni.", "DPOper",
+                MessageBox.Show(this, "Il file non contiene operazioni.", "Pelago",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -333,13 +333,13 @@ public partial class MainForm : Form
             var first = snapshots.Min(s => s.Date);
             var last = snapshots.Max(s => s.Date);
             statusLabel.Text = $"{Path.GetFileName(path)} — {operations.Count} operazioni dal {first:dd/MM/yyyy} al {last:dd/MM/yyyy}";
-            Text = $"DPOper - {Path.GetFileName(path)}";
+            Text = $"Pelago - {Path.GetFileName(path)}";
 
             OpenChild(ref _dailyOverviewForm, () => new DailyOverviewForm(_snapshots));
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, $"Impossibile leggere il file:\n{ex.Message}", "DPOper",
+            MessageBox.Show(this, $"Impossibile leggere il file:\n{ex.Message}", "Pelago",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         finally

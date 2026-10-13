@@ -1,11 +1,11 @@
-using DPOper.Services;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;
 
 public class RealizedGainsTests
 {
-    private static DPOper.Models.Operation[] Scenario() => new[]
+    private static Pelago.Models.Operation[] Scenario() => new[]
     {
         Ops.Buy("2026-01-10", "AAA", "STOCK", 10, 10m, fee: 1m),   // costo 101
         Ops.Buy("2026-02-10", "AAA", "STOCK", 10, 20m, fee: 1m),   // costo 201: in tutto 302 per 20 quote = 15,10 l'una
@@ -47,7 +47,7 @@ public class RealizedGainsTests
     [Fact]
     public void Free_shares_dilute_the_average_cost()
     {
-        var gift = new DPOper.Models.Operation
+        var gift = new Pelago.Models.Operation
         {
             DateTime = Ops.At("2026-02-01"), Date = DateOnly.Parse("2026-02-01"), Category = "DELIVERY", Type = "FREE_RECEIPT",
             AssetClass = "CRYPTO", Symbol = "BTC", Name = "Bitcoin", Shares = 1m, Amount = 0m,

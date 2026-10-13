@@ -21,7 +21,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$real = Join-Path $env:LOCALAPPDATA 'DPOper'
+$real = Join-Path $env:LOCALAPPDATA 'Pelago'
 if ((Resolve-Path -LiteralPath $Data).Path.TrimEnd('\') -ieq $real.TrimEnd('\')) { throw 'Usa una copia dei dati, non la cartella vera.' }
 if (-not (Test-Path -LiteralPath $Exe)) { throw "Non trovo $Exe (compila prima il progetto)." }
 
@@ -32,7 +32,7 @@ if (Test-Path -LiteralPath $prefsPath) { (Get-Content -LiteralPath $prefsPath -R
 $prefs['lang'] = $Lang; $prefs['theme'] = 'light'
 ($prefs | ConvertTo-Json) | Set-Content -LiteralPath $prefsPath -Encoding UTF8
 
-$env:DPOPER_TEST = '1'; $env:DPOPER_CDP_PORT = "$Port"; $env:DPOPER_DATA = $Data
+$env:PELAGO_TEST = '1'; $env:PELAGO_CDP_PORT = "$Port"; $env:PELAGO_DATA = $Data
 $proc = Start-Process $Exe -PassThru
 $problems = New-Object System.Collections.Generic.List[string]
 try {
@@ -91,7 +91,7 @@ try {
 }
 finally {
     if ($proc -and -not $proc.HasExited) { $proc.Kill() }
-    Remove-Item Env:\DPOPER_DATA, Env:\DPOPER_TEST, Env:\DPOPER_CDP_PORT -ErrorAction SilentlyContinue
+    Remove-Item Env:\PELAGO_DATA, Env:\PELAGO_TEST, Env:\PELAGO_CDP_PORT -ErrorAction SilentlyContinue
 }
 
 if ($problems.Count -gt 0) { ''; $problems | ForEach-Object { "PROBLEMA: $_" }; exit 1 }

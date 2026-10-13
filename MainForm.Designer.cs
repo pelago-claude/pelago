@@ -1,4 +1,4 @@
-namespace DPOper;
+namespace Pelago;
 
 partial class MainForm
 {
@@ -256,7 +256,7 @@ partial class MainForm
         MinimumSize = new Size(700, 400);
         Name = "MainForm";
         StartPosition = FormStartPosition.CenterScreen;
-        Text = "DPOper";
+        Text = "Pelago";
         WindowState = FormWindowState.Maximized;
         Load += MainForm_Load;
         menuStrip1.ResumeLayout(false);

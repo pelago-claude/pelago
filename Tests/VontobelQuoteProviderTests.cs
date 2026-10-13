@@ -1,5 +1,5 @@
 using System.Net;
-using DPOper.Services;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;
@@ -159,8 +159,8 @@ public class VontobelQuoteProviderTests
     {
         var folder = Path.Combine(Path.GetTempPath(), "pelago-vontobel-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(folder);
-        var previous = Environment.GetEnvironmentVariable("DPOPER_TEST");
-        Environment.SetEnvironmentVariable("DPOPER_TEST", "1");
+        var previous = Environment.GetEnvironmentVariable("PELAGO_TEST");
+        Environment.SetEnvironmentVariable("PELAGO_TEST", "1");
         try
         {
             var path = Path.Combine(folder, "d.csv");
@@ -186,7 +186,7 @@ public class VontobelQuoteProviderTests
         }
         finally
         {
-            Environment.SetEnvironmentVariable("DPOPER_TEST", previous);
+            Environment.SetEnvironmentVariable("PELAGO_TEST", previous);
             Directory.Delete(folder, recursive: true);
         }
     }

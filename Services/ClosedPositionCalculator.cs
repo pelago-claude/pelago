@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Un «ciclo» di una posizione: dal primo acquisto (la quantità sale da zero) fino a quando la quantità torna a zero. Se compri, vendi tutto e

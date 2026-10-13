@@ -33,7 +33,7 @@ jobs:
           dotnet-version: 8.0.x
       - name: Pubblica pelago.exe
         run: >
-          dotnet publish DPOper.csproj -c Release -r win-x64 --self-contained true
+          dotnet publish Pelago.csproj -c Release -r win-x64 --self-contained true
           -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
           -o out
       - name: Impronta SHA-256

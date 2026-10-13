@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Parametri dell'investimento (gli stessi input gialli del foglio Excel).</summary>
 public sealed record BtpParams(decimal Capital, decimal Commission, decimal TaxRate, decimal Lot, DateOnly Settlement);

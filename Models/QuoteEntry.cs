@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace DPOper.Models;
+namespace Pelago.Models;
 
 /// <summary>
 /// Una quotazione puntuale registrata nello storico di un asset. <see cref="Price"/> è sempre in euro:

@@ -27,7 +27,7 @@ Le schermate usano un conto di esempio con **dati inventati** (vedi [samples/](s
 
 ## Privacy: cosa esce dal tuo PC
 
-Il CSV e i tuoi dati restano sul PC (cartella `%LOCALAPPDATA%\DPOper`). Pelago **non chiede mai login o password** e non si collega al conto.
+Il CSV e i tuoi dati restano sul PC (cartella `%LOCALAPPDATA%\Pelago`). Pelago **non chiede mai login o password** e non si collega al conto.
 
 Per i prezzi l'app fa richieste a servizi pubblici e **invia solo codici di titoli e date, mai dati personali, importi o quantità**:
 
@@ -61,7 +61,7 @@ Pelago è un **singolo file portabile**: non ha un installatore, non scrive nel 
 
 Quello che salva, sul tuo PC:
 
-- `%LOCALAPPDATA%\DPOper`: preferenze, quotazioni scaricate, i nomi dei titoli che scegli, la copia dell'archivio delle operazioni e la cartella `webview2` del browser incorporato. Per cancellare tutto, elimina questa cartella.
+- `%LOCALAPPDATA%\Pelago`: preferenze, quotazioni scaricate, i nomi dei titoli che scegli, la copia dell'archivio delle operazioni e la cartella `webview2` del browser incorporato. Per cancellare tutto, elimina questa cartella.
 - Un **backup automatico** (se non lo spegni in *Dati e file*): una copia compressa dei dati ogni 7 giorni, nelle ultime 8 versioni, in `Documenti\Pelago backup`. Da *Dati e file* puoi cambiare la cartella o disattivarlo.
 - L'**aggiornamento dei prezzi all'apertura** (se i prezzi hanno più di 12 ore) si spegne dalla pagina *Quotazioni*.
 
@@ -73,7 +73,7 @@ Servono Windows e l'SDK .NET 8.
 
 ```bash
 dotnet test Tests/Pelago.Tests.csproj
-dotnet publish DPOper.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/win-x64
+dotnet publish Pelago.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/win-x64
 ```
 
 L'eseguibile finale è `publish/win-x64/pelago.exe`. L'app è in C# (.NET 8, Windows Forms con interfaccia Blazor in un WebView2); i grafici sono [Apache ECharts](https://echarts.apache.org). I testi sorgente sono in italiano, le traduzioni in `i18n/`.

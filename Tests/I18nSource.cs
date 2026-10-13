@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using DPOper.Services;
+using Pelago.Services;
 
 namespace Pelago.Tests;
 

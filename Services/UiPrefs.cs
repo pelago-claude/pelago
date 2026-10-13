@@ -1,8 +1,8 @@
 using System.Text.Json;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
-/// <summary>Preferenze della nuova interfaccia (tema, ordinamento delle tabelle...) in <c>%LocalAppData%\DPOper\webprefs.json</c>.</summary>
+/// <summary>Preferenze della nuova interfaccia (tema, ordinamento delle tabelle...) in <c>%LocalAppData%\Pelago\webprefs.json</c>.</summary>
 public sealed class UiPrefs
 {
     private static readonly string PrefsPath = Path.Combine(

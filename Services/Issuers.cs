@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Gli emittenti dei derivati che si trovano nel portafoglio (Trade Republic offre solo prodotti di questi due).</summary>
 public enum Issuer

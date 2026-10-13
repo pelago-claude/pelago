@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Ricorda l'ultimo file CSV caricato, così l'app può riaprirlo automaticamente al prossimo avvio.

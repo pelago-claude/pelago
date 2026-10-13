@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Normalizzazione delle valute di quotazione (pence, centesimi) e conversione in euro.</summary>
 public static class CurrencyConverter

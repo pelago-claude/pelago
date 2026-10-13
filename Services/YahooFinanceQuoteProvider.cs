@@ -1,8 +1,8 @@
 using System.Net.Http.Json;
-using static DPOper.Services.Loc;
+using static Pelago.Services.Loc;
 using System.Text.Json.Serialization;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Risolve un ISIN nel ticker Yahoo Finance corrispondente e ne recupera la quotazione corrente.
@@ -62,7 +62,7 @@ public sealed class YahooFinanceQuoteProvider : IDisposable
     {
         _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) DPOper/1.0");
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Pelago/1.0");
         _httpClient.DefaultRequestHeaders.Accept.ParseAdd("application/json");
     }
 

@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Lingue dell'app: italiano (la lingua in cui sono scritti i testi), inglese, francese, tedesco, spagnolo.

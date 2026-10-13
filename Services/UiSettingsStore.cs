@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 public sealed class GridColumnState
 {
@@ -27,8 +27,8 @@ public sealed class FormLayoutState
 
 /// <summary>
 /// Persiste su disco (JSON) la disposizione delle finestre e delle griglie: stessa idea di
-/// WSDoc24Tools (un file unico, chiave per form), qui in <c>%LocalAppData%\DPOper\uisettings.json</c>
-/// perché DPOper è mono-utente e non serve il sottopercorso per utente di dominio.
+/// WSDoc24Tools (un file unico, chiave per form), qui in <c>%LocalAppData%\Pelago\uisettings.json</c>
+/// perché Pelago è mono-utente e non serve il sottopercorso per utente di dominio.
 /// </summary>
 public static class UiSettingsStore
 {

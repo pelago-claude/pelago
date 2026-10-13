@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Text;
-using static DPOper.Services.Loc;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Cosa è successo aggiungendo un CSV allo storico delle operazioni.</summary>
 public sealed record MergeReport(

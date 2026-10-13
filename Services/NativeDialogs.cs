@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Finestre di dialogo di Windows (apri/salva file) richiamabili dall'interfaccia web.</summary>
 public sealed class NativeDialogs

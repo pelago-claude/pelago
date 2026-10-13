@@ -1,7 +1,7 @@
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Elenca tutti gli asset presenti nel catalogo quotazioni, con data e valore dell'ultimo

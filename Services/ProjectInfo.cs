@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Dati fissi del progetto che compaiono nella pagina Crediti: chi detiene il copyright e dove sta il codice.</summary>
 public static class ProjectInfo

@@ -1,6 +1,6 @@
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
-using DPOper.Services;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;
@@ -10,7 +10,7 @@ internal static class TestEnvironment
 {
     [ModuleInitializer]
     public static void Init() =>
-        Environment.SetEnvironmentVariable("DPOPER_DATA", Path.Combine(Path.GetTempPath(), "pelago-tests-" + Guid.NewGuid().ToString("N")));
+        Environment.SetEnvironmentVariable("PELAGO_DATA", Path.Combine(Path.GetTempPath(), "pelago-tests-" + Guid.NewGuid().ToString("N")));
 }
 
 public class BackupServiceTests

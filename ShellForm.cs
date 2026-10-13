@@ -1,9 +1,9 @@
-using DPOper.Services;
+using Pelago.Services;
 using Microsoft.AspNetCore.Components.WebView.WindowsForms;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.WinForms;
 
-namespace DPOper;
+namespace Pelago;
 
 /// <summary>
 /// Finestra della nuova interfaccia: un'unica finestra che ospita l'interfaccia web (Blazor) a pagine,
@@ -13,8 +13,8 @@ public sealed class ShellForm : Form
 {
     public ShellForm()
     {
-        var testMode = Environment.GetEnvironmentVariable("DPOPER_TEST") == "1";
-        var debugPort = Environment.GetEnvironmentVariable("DPOPER_CDP_PORT");
+        var testMode = Environment.GetEnvironmentVariable("PELAGO_TEST") == "1";
+        var debugPort = Environment.GetEnvironmentVariable("PELAGO_CDP_PORT");
 
         // La lingua scelta (o quella di Windows) vale da subito, anche per i testi di questa finestra.
         var prefs = new UiPrefs();
@@ -29,7 +29,7 @@ public sealed class ShellForm : Form
         }
         Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", browserArgs);
 
-        Text = "Pelago";
+        Text = $"Pelago {ChangeLog.Current.Version}";
         Icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? Icon;
         Font = new Font("Segoe UI", 9f);
         MinimumSize = new Size(960, 620);

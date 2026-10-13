@@ -1,7 +1,7 @@
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Elenca gli asset movimentati (di default tutte le classi), con la quantità attualmente

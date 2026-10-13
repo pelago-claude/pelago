@@ -1,4 +1,4 @@
-namespace DPOper.Models;
+namespace Pelago.Models;
 
 /// <summary>
 /// Una singola riga del file di export operazioni (movimento di cassa, acquisto/vendita

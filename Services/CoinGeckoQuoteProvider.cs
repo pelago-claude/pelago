@@ -1,8 +1,8 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using static DPOper.Services.Loc;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Recupera le quotazioni correnti delle crypto da CoinGecko (API pubblica, senza chiave). Le chiede tutte insieme con una
@@ -23,7 +23,7 @@ public sealed class CoinGeckoQuoteProvider : IDisposable
         _httpClient = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(15) };
         // Senza uno User-Agent "da browser" CoinGecko risponde 403 (HttpClient non ne invia uno di default).
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) DPOper/1.0");
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Pelago/1.0");
         _httpClient.DefaultRequestHeaders.Accept.ParseAdd("application/json");
     }
 

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Una spiegazione: titolo, versione breve, approfondimento (facoltativo: l'assistente lo mostra sempre sotto la versione breve) e parole chiave per la ricerca.</summary>
 public sealed record HelpEntry(string Key, string Title, string Short, string? More, string Keywords);
@@ -734,8 +734,8 @@ public static class HelpTexts
         E("history.note", "Numeri di versione", "La prima cifra cambia solo per un rifacimento importante, la seconda per ogni gruppo di novità.", keywords: "numeri versione numerazione");
         E("name.pelago", "Perché si chiama Pelago",
             "«Pelago» in italiano è il mare aperto: rende l'idea di navigare tra i propri soldi. L'icona è una barca a vela sulle onde.",
-            "Prima si chiamava DPOper («Oper» come operazioni). Tra Pelago, Quota, Bussola e Fiorino ha vinto Pelago. Il file si chiama pelago.exe, tutto minuscolo.",
-            "nome pelago perche chiama dpoper icona barca vela mare");
+            "Tra Pelago, Quota, Bussola e Fiorino ha vinto Pelago. Il file si chiama pelago.exe, tutto minuscolo.",
+            "nome pelago perche chiama icona barca vela mare");
         foreach (var release in ChangeLog.Releases)
         {
             E("release:" + release.Version, $"Versione {release.Version}: {release.Title}",

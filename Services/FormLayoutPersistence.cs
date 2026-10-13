@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Aggancia una form a <see cref="UiSettingsStore"/>: al Load ripristina posizione/dimensione della

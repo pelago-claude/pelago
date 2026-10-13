@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Stampa la pagina visibile in un PDF. Lo fa il browser incorporato (il guscio WinForms collega <see cref="Printer"/> dopo

@@ -1,7 +1,7 @@
 using System.Text.Json;
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Storico delle quotazioni: un file JSON per asset (il nome è quello registrato in

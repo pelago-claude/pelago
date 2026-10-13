@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <param name="Unrecognized">Nomi di titoli in lista che non sono né BTP a tasso fisso riconosciuti né una famiglia esclusa nota:
 /// se non è vuoto, Borsa Italiana potrebbe aver introdotto un nuovo formato di nome e qualche BTP andrebbe aggiunto al riconoscimento.</param>
@@ -33,7 +33,7 @@ public static partial class BtpOnlineProvider
     private static HttpClient CreateClient()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) DPOper/1.0");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Pelago/1.0");
         client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("it-IT,it;q=0.9");
         return client;
     }

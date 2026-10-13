@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Prezzi dei derivati emessi da Société Générale, letti dal sito dei prodotti per l'Italia (<c>prodotti.societegenerale.it</c>). La pagina del prodotto è

@@ -1,7 +1,7 @@
-using DPOper.Services;
+using Pelago.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace DPOper.Components;
+namespace Pelago.Components;
 
 /// <summary>Base delle pagine: ricalcola il modello (<see cref="Rebuild"/>) quando cambiano i dati e si ridisegna.</summary>
 public abstract class StatePage : ComponentBase, IDisposable

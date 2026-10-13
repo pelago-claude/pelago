@@ -22,7 +22,7 @@ The screenshots use a sample account with **invented data** (see [samples/](samp
 
 ## Privacy: what leaves your PC
 
-The CSV and your data stay on your PC (folder `%LOCALAPPDATA%\DPOper`). Pelago **never asks for a login or password** and never connects to your account.
+The CSV and your data stay on your PC (folder `%LOCALAPPDATA%\Pelago`). Pelago **never asks for a login or password** and never connects to your account.
 
 To get prices, the app calls public services and **sends only instrument codes and dates — never personal data, amounts or quantities**:
 
@@ -56,7 +56,7 @@ Pelago is a **single portable file**: there is no installer, it does not write t
 
 What it stores on your PC:
 
-- `%LOCALAPPDATA%\DPOper`: preferences, downloaded quotes, the instrument names you choose, the copy of the transactions archive and the `webview2` folder of the embedded browser. To wipe everything, delete this folder.
+- `%LOCALAPPDATA%\Pelago`: preferences, downloaded quotes, the instrument names you choose, the copy of the transactions archive and the `webview2` folder of the embedded browser. To wipe everything, delete this folder.
 - An **automatic backup** (unless you turn it off in *Data and files*): a compressed copy of your data every 7 days, keeping the last 8, in `Documents\Pelago backup`. In *Data and files* you can change the folder or switch it off.
 - The **price update on startup** (when prices are older than 12 hours) can be switched off on the *Quotes* page.
 
@@ -68,7 +68,7 @@ You need Windows and the .NET 8 SDK.
 
 ```bash
 dotnet test Tests/Pelago.Tests.csproj
-dotnet publish DPOper.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/win-x64
+dotnet publish Pelago.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/win-x64
 ```
 
 The result is `publish/win-x64/pelago.exe`. The app is written in C# (.NET 8, Windows Forms with a Blazor UI inside WebView2); charts use [Apache ECharts](https://echarts.apache.org). Source strings are in Italian, translations live in `i18n/`.

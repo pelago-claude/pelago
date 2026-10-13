@@ -1,7 +1,7 @@
-using DPOper.Models;
-using static DPOper.Services.Loc;
+using Pelago.Models;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Ripara le quotazioni salvate in passato con una valuta diversa dall'euro e usate come se fossero euro

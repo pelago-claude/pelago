@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Un incasso futuro di un'obbligazione posseduta: una cedola o il rimborso a scadenza.</summary>
 public sealed record CouponEvent(DateOnly Date, string Isin, string Name, string Kind, decimal Gross, decimal Net);

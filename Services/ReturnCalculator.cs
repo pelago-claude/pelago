@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Rendimento di un periodo: guadagno in euro, rendimento ponderato nel tempo (TWR) e per i flussi di cassa (XIRR).</summary>
 public sealed record ReturnPeriod(

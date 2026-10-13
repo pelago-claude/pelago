@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Etichetta e colore condivisi per ogni categoria di asset, così tutte le viste (composizione ad

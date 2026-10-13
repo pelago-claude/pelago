@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Una singola cessione (vendita, esercizio di warrant, ecc.) con il relativo utile/perdita

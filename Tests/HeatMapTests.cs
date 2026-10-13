@@ -1,5 +1,5 @@
-using DPOper.Components;
-using DPOper.Services;
+using Pelago.Components;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;
@@ -57,7 +57,7 @@ public class HeatMapTests : IDisposable
         Directory.CreateDirectory(_dir);
         var path = Path.Combine(_dir, "h.csv");
         File.WriteAllLines(path, new[] { Header }.Concat(rows));
-        Environment.SetEnvironmentVariable("DPOPER_TEST", "1");
+        Environment.SetEnvironmentVariable("PELAGO_TEST", "1");
         var state = new AppState(new UiPrefs());
         Assert.True(await state.LoadFileAsync(path));
         return (state, _dir);

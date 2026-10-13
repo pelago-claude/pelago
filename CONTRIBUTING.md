@@ -25,7 +25,7 @@ Se per sbaglio hai pubblicato dati tuoi, modifica o cancella il commento subito 
 - Servono Windows e l'SDK .NET 8. Compila e prova: `dotnet test Tests/Pelago.Tests.csproj`.
 - Prima di una PR i test devono passare e i nuovi comportamenti devono avere un test (i test usano **solo dati inventati**: nei codici ISIN non mettere titoli veri del tuo conto).
 - Ogni testo visibile passa da `T("…")` (testo italiano). Se ne aggiungi uno, aggiungi anche le quattro traduzioni, o segnalalo nella PR: `LocalizationTests` fallisce se ne manca una.
-- Ogni versione ha una voce nuova in `Services/ChangeLog.cs` e `<Version>` allineata in `DPOper.csproj`.
+- Ogni versione ha una voce nuova in `Services/ChangeLog.cs` e `<Version>` allineata in `Pelago.csproj`.
 - Il codice di chi contribuisce è distribuito con la stessa licenza del progetto, **GPL-3.0**.
 
 ## Cosa non verrà accettato

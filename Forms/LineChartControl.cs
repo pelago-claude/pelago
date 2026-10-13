@@ -1,8 +1,8 @@
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using DPOper.Services;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Grafico a linee disegnato "a mano" (senza dipendenze esterne) per confrontare più serie

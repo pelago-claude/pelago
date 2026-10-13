@@ -1,6 +1,6 @@
-using DPOper.Services;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Vista principale: il saldo del conto giorno per giorno, suddiviso per disponibilità, titoli,

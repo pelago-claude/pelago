@@ -1,11 +1,11 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Una versione dell'app: numero, data, titolo, racconto e novità.</summary>
 public sealed record Release(string Version, DateOnly Date, string Title, string Summary, string[] Story, string[] News);
 
 /// <summary>
 /// La storia dell'app, dalla più recente alla più vecchia. È la fonte di verità del numero di versione (Credits, Storia) e va
-/// aggiornata a ogni nuova versione: una voce in cima, e <c>&lt;Version&gt;</c> in DPOper.csproj allineata.
+/// aggiornata a ogni nuova versione: una voce in cima, e <c>&lt;Version&gt;</c> in Pelago.csproj allineata.
 ///
 /// Regola dei numeri: la prima cifra cambia solo per un rifacimento importante; la seconda per ogni gruppo di novità;
 /// niente terza cifra. Le versioni 0.x e 1.x sono state assegnate a posteriori, ricostruendo l'ordine del lavoro.
@@ -29,6 +29,7 @@ public static class ChangeLog
                 "Se CoinGecko limita le richieste, il registro lo dice in chiaro e suggerisce di riprovare tra un minuto",
                 "Un id CoinGecko scritto male nel catalogo viene segnalato e non mandato al sito",
                 "Nuovi test automatici sulla richiesta unica, sull'errore «troppe richieste» e sulla ricerca dell'id",
+                "Il titolo della finestra mostra la versione",
             }),
         new Release("2.13", new DateOnly(2026, 10, 12), "Crypto che si trovano da sole",
             "Le crypto che l'app non conosceva trovano da sole il loro id su CoinGecko, e quindi il prezzo.",
@@ -243,7 +244,7 @@ public static class ChangeLog
             new[]
             {
                 "Con la nuova interfaccia l'app era diventata bella, ma restava una domanda: chi la apre tra sei mesi ricorderà cosa significa «rateo per 100» o da dove arrivano i prezzi? Da qui l'idea di un assistente che risponde mentre si guarda una colonna, e a cui si può anche scrivere. Abbiamo ragionato a lungo sul fatto che potesse essere un vero chatbot: la scelta è stata di farlo restare tutto sul tuo PC, senza che nulla esca verso terzi. Un'intelligenza artificiale collegata ai tuoi dati potrà arrivare, se e quando lo vorrai.",
-                "Nello stesso giorno ci siamo accorti che un'app così curata meritava un nome vero. «DPOper» era un nome provvisorio, da cartella di lavoro: «Oper» come operazioni. Ne abbiamo considerati quattro (Pelago, Quota, Bussola, Fiorino) e ha vinto Pelago: in italiano è il mare aperto, e rende bene l'idea di navigare tra i propri soldi. L'icona è una barca a vela sulle onde. Il file è diventato pelago.exe, tutto minuscolo.",
+                "Nello stesso giorno ci siamo accorti che un'app così curata meritava un nome vero. Ne abbiamo considerati quattro (Pelago, Quota, Bussola, Fiorino) e ha vinto Pelago: in italiano è il mare aperto, e rende bene l'idea di navigare tra i propri soldi. L'icona è una barca a vela sulle onde. Il file è diventato pelago.exe, tutto minuscolo.",
                 "Dopo il rifacimento, la vecchia interfaccia è stata abbandonata: la teniamo nel progetto, ma non la aggiorniamo più.",
             },
             new[]
@@ -362,7 +363,7 @@ public static class ChangeLog
             "L'inizio: un file CSV di migliaia di righe e il desiderio di capire il conto giorno per giorno.",
             new[]
             {
-                "Tutto è cominciato con un file: l'esportazione delle operazioni del broker, un CSV troppo lungo per essere letto a occhio. Serviva un programma semplice che lo aprisse e mostrasse, per ogni giorno, quanto valeva il conto diviso tra disponibilità, titoli, obbligazioni e crypto. Lo chiamammo DPOper: «Oper» come operazioni.",
+                "Tutto è cominciato con un file: l'esportazione delle operazioni del broker, un CSV troppo lungo per essere letto a occhio. Serviva un programma semplice che lo aprisse e mostrasse, per ogni giorno, quanto valeva il conto diviso tra disponibilità, titoli, obbligazioni e crypto.",
                 "La prima versione sbagliava un numero importante: la disponibilità. Non contava commissioni e tasse, e il saldo non coincideva con quello che si vedeva nell'app del broker. È stata la prima lezione, che ci siamo portati dietro: ogni numero va confrontato con la realtà. Corretto quel dettaglio, il saldo è tornato.",
             },
             new[]

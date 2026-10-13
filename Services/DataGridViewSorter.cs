@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Ordina manualmente una griglia il cui DataSource è un semplice <c>List&lt;T&gt;</c>: DataGridView

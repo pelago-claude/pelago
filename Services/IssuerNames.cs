@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Il nome che l'emittente dà a un prodotto («Turbo su Oro»), letto dal suo sito, e quando.</summary>
 public sealed record IssuerNameEntry(string Product, DateTime FetchedUtc);

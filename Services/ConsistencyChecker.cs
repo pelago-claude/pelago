@@ -1,7 +1,7 @@
-using DPOper.Models;
-using static DPOper.Services.Loc;
+using Pelago.Models;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 public enum FindingLevel { Ok, Info, Warning }
 

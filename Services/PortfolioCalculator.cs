@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Il valore del conto a fine giornata, suddiviso per tipologia. <see cref="Contributions"/> è il

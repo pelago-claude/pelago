@@ -1,4 +1,4 @@
-﻿namespace DPOper.Services;
+﻿namespace Pelago.Services;
 
 /// <summary>
 /// Il prezzo di un derivato letto dal sito dell'emittente: l'ultimo Geld (quello a cui potresti vendere) e, se c'è, il Brief.

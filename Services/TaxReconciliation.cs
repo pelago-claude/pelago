@@ -1,7 +1,7 @@
-using DPOper.Models;
-using static DPOper.Services.Loc;
+using Pelago.Models;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Un riscontro sul prospetto fiscale: cosa è stato controllato, com'è andata e (se serve) cosa guardare. I testi sono già nella lingua corrente.</summary>
 public sealed record TaxCheck(string Code, FindingLevel Level, string Title, string Detail);

@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 public sealed record FxCurrencyInfo(string Code, string Name);
 

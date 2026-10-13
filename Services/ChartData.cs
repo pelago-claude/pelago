@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Prepara i dati (già in forma semplice: nomi, colori, numeri) che <c>wwwroot/js/charts.js</c> disegna con ECharts.</summary>
 public static class ChartData

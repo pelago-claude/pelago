@@ -1,5 +1,5 @@
 using System.Net;
-using DPOper.Services;
+using Pelago.Services;
 using Xunit;
 
 namespace Pelago.Tests;

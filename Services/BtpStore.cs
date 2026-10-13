@@ -1,7 +1,7 @@
 using System.Text.Json;
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Gli ultimi valori usati nel calcolatore, così alla prossima apertura si riparte da lì.</summary>
 public sealed class BtpInputs
@@ -21,7 +21,7 @@ public sealed class BtpData
     public BtpInputs Inputs { get; set; } = new();
 }
 
-/// <summary>Persistenza dell'elenco BTP in <c>%LocalAppData%\DPOper\btp.json</c> (stessa cartella degli altri dati).</summary>
+/// <summary>Persistenza dell'elenco BTP in <c>%LocalAppData%\Pelago\btp.json</c> (stessa cartella degli altri dati).</summary>
 public static class BtpStore
 {
     private static readonly string StorePath = Path.Combine(

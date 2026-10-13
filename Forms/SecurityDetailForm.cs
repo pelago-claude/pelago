@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Storico completo dei movimenti di un singolo asset (acquisti, vendite, ricevute gratuite,

@@ -1,4 +1,4 @@
-namespace DPOper;
+namespace Pelago;
 
 static class Program
 {

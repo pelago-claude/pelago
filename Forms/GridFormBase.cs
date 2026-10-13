@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Globalization;
-using DPOper.Services;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Base comune per le finestre di dettaglio: una griglia a tutta finestra (ordinabile, con colonne

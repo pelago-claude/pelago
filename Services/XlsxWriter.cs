@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using System.Text;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Come formattare una colonna in Excel.</summary>
 public enum ColumnKind { Text, Number, Money, Percent, Date }

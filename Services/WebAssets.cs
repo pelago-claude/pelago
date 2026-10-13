@@ -1,10 +1,10 @@
 using System.Reflection;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// I file dell'interfaccia web (HTML, CSS, JS, grafici, icone) sono incorporati nell'eseguibile, così l'exe portabile
-/// resta un file unico. All'avvio vengono copiati in <c>%LocalAppData%\DPOper\www</c> (solo se mancano o sono cambiati),
+/// resta un file unico. All'avvio vengono copiati in <c>%LocalAppData%\Pelago\www</c> (solo se mancano o sono cambiati),
 /// da dove li serve il browser incorporato.
 /// </summary>
 public static class WebAssets

@@ -1,4 +1,4 @@
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>Finestra modale che chiede il capitale da investire prima di aprire il calcolatore BTP.</summary>
 public sealed class CapitalPromptForm : Form

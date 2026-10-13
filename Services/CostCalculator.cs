@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Costi e imposte di un periodo, espressi come importi PAGATI (positivi = soldi usciti, negativi = rimborsi).

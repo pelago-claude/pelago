@@ -1,7 +1,7 @@
-using DPOper.Models;
-using DPOper.Services;
+using Pelago.Models;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Calcolatore per un singolo BTP, come il foglio Calcolatore_BTP.xlsx: dato il capitale (chiesto prima

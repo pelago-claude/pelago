@@ -1,15 +1,3 @@
 [
-  "12 ottobre 2026 — Le crypto si chiedono a CoinGecko tutte insieme: prima le ultime della lista restavano spesso senza prezzo.",
-  "CoinGecko ha limitato le richieste (troppe in poco tempo): riprova tra un minuto.",
-  "Il sito che dà i prezzi delle crypto accetta solo poche richieste ravvicinate: nelle prove, dopo le prime sei in un secondo rifiutava le altre con l'errore «troppe richieste». L'app ne faceva una per ogni moneta, e restavano senza prezzo proprio le ultime della lista, cioè le crypto comprate più di recente, mentre le più vecchie andavano bene. Era una causa diversa da quella della versione 2.13, e si vedeva solo con più crypto in portafoglio.",
-  "L'id CoinGecko «{0}» non è valido: correggilo in catalog.json.",
-  "Le crypto in una richiesta sola",
-  "Le crypto si chiedono a CoinGecko tutte insieme: prima le ultime della lista restavano spesso senza prezzo.",
-  "Nuovi test automatici sulla richiesta unica, sull'errore «troppe richieste» e sulla ricerca dell'id",
-  "Ora tutte le crypto si chiedono con una sola richiesta, e i prezzi tornano tutti insieme. Se il sito dice comunque «troppe richieste», l'app lo scrive chiaramente nel registro e suggerisce di riprovare tra un minuto, invece di mostrare un errore tecnico. Un id scritto male nel catalogo non viene mandato al sito.",
-  "Se CoinGecko limita le richieste, il registro lo dice in chiaro e suggerisce di riprovare tra un minuto",
-  "Un id CoinGecko scritto male nel catalogo viene segnalato e non mandato al sito",
-  "Una richiesta sola a CoinGecko per tutte le crypto, invece di una per moneta",
-  "Versione 2.14: Le crypto in una richiesta sola",
-  "versione storia novita Le crypto in una richiesta sola Le crypto si chiedono a CoinGecko tutte insieme: prima le ultime della lista restavano spesso senza prezzo."
+  "Il titolo della finestra mostra la versione"
 ]

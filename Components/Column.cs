@@ -1,7 +1,7 @@
-using DPOper.Services;
+using Pelago.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace DPOper.Components;
+namespace Pelago.Components;
 
 /// <summary>Descrizione di una colonna della <see cref="DataTable{TItem}"/>: valore per ordinare, testo da mostrare, totale opzionale.</summary>
 public sealed class Column<T>
@@ -109,8 +109,8 @@ public static class Col
         {
             if (!string.IsNullOrWhiteSpace(value(x)))
             {
-                builder.OpenComponent<DPOper.Components.Isin>(0);
-                builder.AddAttribute(1, nameof(DPOper.Components.Isin.Code), value(x));
+                builder.OpenComponent<Pelago.Components.Isin>(0);
+                builder.AddAttribute(1, nameof(Pelago.Components.Isin.Code), value(x));
                 builder.CloseComponent();
             }
         },

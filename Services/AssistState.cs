@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Un messaggio della chat dell'assistente: la domanda dell'utente oppure una risposta (con eventuali argomenti suggeriti).</summary>
 public sealed record ChatMessage(bool FromUser, string Text, string? EntryKey = null, IReadOnlyList<string>? SuggestedKeys = null);

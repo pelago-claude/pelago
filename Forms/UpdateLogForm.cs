@@ -1,6 +1,6 @@
-using DPOper.Services;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Finestra di log non modale che mostra l'avanzamento di un aggiornamento quotazioni: resta

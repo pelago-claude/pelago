@@ -1,7 +1,7 @@
-using DPOper.Models;
-using static DPOper.Services.Loc;
+using Pelago.Models;
+using static Pelago.Services.Loc;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <param name="Blocked">Il sito dell'emittente ha rifiutato la richiesta (403, 429, errori del server): dopo due di fila si smette per questa volta.</param>
 /// <param name="ProductName">Il nome del prodotto secondo l'emittente (derivati), se il sito l'ha dato: l'app lo ricorda (vedi <see cref="IssuerNames"/>).</param>

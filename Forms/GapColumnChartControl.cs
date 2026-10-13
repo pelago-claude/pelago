@@ -1,8 +1,8 @@
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using DPOper.Services;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Colonne impilate pensate apposta per "quanto sono sopra/sotto i versamenti": ogni colonna

@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Prezzi dei derivati emessi da Vontobel, letti dalla pagina pubblica del prodotto (<c>markets.vontobel.com</c>): la pagina contiene un blocco di

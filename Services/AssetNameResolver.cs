@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>
 /// Per i derivati (turbo/warrant) il campo "name" del CSV contiene solo un'etichetta sintetica

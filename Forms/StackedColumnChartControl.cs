@@ -1,8 +1,8 @@
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using DPOper.Services;
+using Pelago.Services;
 
-namespace DPOper.Forms;
+namespace Pelago.Forms;
 
 /// <summary>
 /// Grafico a colonne impilate (senza dipendenze esterne): per ogni periodo, mostra la

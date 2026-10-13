@@ -1,4 +1,4 @@
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Un'operazione completa (un ciclo di acquisto e vendita) con il titolo a cui appartiene.</summary>
 public sealed record TradeRef(string Key, string Name, string Underlying, string AssetClass, PositionCycle Cycle)

@@ -1,6 +1,6 @@
-using DPOper.Models;
+using Pelago.Models;
 
-namespace DPOper.Services;
+namespace Pelago.Services;
 
 /// <summary>Un titolo posseduto a una certa data, per la mappa: quanto vale, quanto è costato e quanto pesa sul conto.</summary>
 public sealed record HeatItem(string Key, string Name, string Symbol, string AssetClass, decimal Shares, decimal? Price, decimal Value, decimal? Cost, double Weight)
