@@ -9,7 +9,15 @@
 
 <div class="shell">
     <aside class="sidebar">
-        <div class="brand"><img src="img/pelago.png" alt="" /><span>@T("Pelago")</span></div>
+        @if (State.IsWeb)
+        {
+            @* nella demo nel browser il logo riporta al sito (nella lingua attuale): e' l'abitudine di tutti, e il pulsante nel banner lo rende evidente *@
+            <a class="brand" href="@SiteUrl" title="@T("Torna al sito di Pelago")" aria-label="@T("Torna al sito di Pelago")"><img src="img/pelago.png" alt="" /><span>@T("Pelago")</span></a>
+        }
+        else
+        {
+            <div class="brand"><img src="img/pelago.png" alt="" /><span>@T("Pelago")</span></div>
+        }
 
         <nav>
             <button class="nav-group-head @(IsOpen(GToday) ? "open" : "")" aria-expanded="@IsOpen(GToday)" data-help="nav:group" @onclick="() => Toggle(GToday)"><i class="ti ti-chevron-right"></i>@T("Oggi")</button>
@@ -137,6 +145,7 @@
                 <i class="ti ti-flask"></i>
                 <span>@T("Demo nel browser con dati inventati: non fa richieste a internet e, chiusa la pagina, non resta nulla.")</span>
                 <span class="grow"></span>
+                <a class="btn" href="@SiteUrl"><i class="ti ti-arrow-left"></i> @T("Torna al sito")</a>
                 <a class="btn primary" href="@SiteUrl">@T("Scarica il programma")</a>
             </div>
         }
