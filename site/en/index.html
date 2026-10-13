@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pelago: your Trade Republic portfolio, over time</title>
+<meta name="description" content="A free, open-source Windows app that turns your Trade Republic CSV file into a portfolio map with a slider to go back to any day. Everything stays on your PC.">
+<link rel="canonical" href="https://pelago-claude.github.io/pelago/en/">
+<link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/">
+<link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/">
+<link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/">
+<link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/">
+<link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/">
+<link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1620" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pelago">
+<meta property="og:title" content="Pelago: your Trade Republic portfolio, over time">
+<meta property="og:description" content="A free, open-source Windows app that turns your Trade Republic CSV file into a portfolio map with a slider to go back to any day. Everything stays on your PC.">
+<meta property="og:url" content="https://pelago-claude.github.io/pelago/en/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pelago-claude.github.io/pelago/assets/img/og-en.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/pelago-32.png">
+<link rel="apple-touch-icon" href="../assets/img/pelago-180.png">
+<link rel="preload" href="../assets/fonts/InstrumentSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Pelago","applicationCategory":"FinanceApplication","operatingSystem":"Windows 10, Windows 11","description":"A free, open-source Windows app that turns your Trade Republic CSV file into a portfolio map with a slider to go back to any day. Everything stays on your PC.","inLanguage":"en","url":"https://pelago-claude.github.io/pelago/en/","downloadUrl":"https://github.com/pelago-claude/pelago/releases/latest","license":"https://www.gnu.org/licenses/gpl-3.0.html","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"David"},"image":"https://pelago-claude.github.io/pelago/assets/img/og-en.jpg"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="./" aria-label="Pelago, top of the page"><img src="../assets/img/pelago-64.png" alt="" width="32" height="32"><span>Pelago</span></a>
+    <nav class="menu" aria-label="Page sections">
+      <a href="#features">What it does</a>
+      <a href="#start">How to use it</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#verify">Verify</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <nav class="langs" aria-label="Language">
+      <a href="../" hreflang="it" lang="it" title="Italiano" aria-label="Italiano"><img src="../assets/img/flags/it.svg" alt="" width="24" height="18"></a>
+      <a href="./" hreflang="en" lang="en" title="English" aria-label="English" aria-current="page"><img src="../assets/img/flags/gb.svg" alt="" width="24" height="18"></a>
+      <a href="../fr/" hreflang="fr" lang="fr" title="Français" aria-label="Français"><img src="../assets/img/flags/fr.svg" alt="" width="24" height="18"></a>
+      <a href="../de/" hreflang="de" lang="de" title="Deutsch" aria-label="Deutsch"><img src="../assets/img/flags/de.svg" alt="" width="24" height="18"></a>
+      <a href="../es/" hreflang="es" lang="es" title="Español" aria-label="Español"><img src="../assets/img/flags/es.svg" alt="" width="24" height="18"></a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <h1>How has your portfolio changed over time?</h1>
+        <p class="lead">The Trade Republic CSV file doesn't tell you. Pelago does: a colored tile map of your portfolio, with a slider to go back to any day in the past.</p>
+        <p class="sub">Free, no ads, free software. Everything stays on your PC.</p>
+        <p class="cta">
+          <a class="btn primary" href="https://github.com/pelago-claude/pelago/releases/latest">Download for Windows</a>
+          <a class="btn" href="https://github.com/pelago-claude/pelago">View the code</a>
+        </p>
+        <p class="meta">64-bit Windows 10/11 · GPL-3.0 · not affiliated with Trade Republic</p>
+      </div>
+      <figure class="hero-media">
+        <video controls preload="metadata" playsinline muted width="1280" height="720" poster="../assets/img/shots/en/map-1600.webp" aria-label="Video without audio: the portfolio map changes as the days go by">
+          <source src="../assets/video/pelago-en.mp4" type="video/mp4">
+          Your browser cannot play this video.
+        </video>
+        <figcaption>Press play: the portfolio changes over time (example account with invented data, no audio).</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>What it does</h2>
+      <p class="intro">One CSV file, many ways to read it. The screenshots show an example account with invented data.</p>
+      <ul class="cards">
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/map-1600.webp" aria-label="Open the full image: Portfolio map"><img src="../assets/img/shots/en/map-800.webp" srcset="../assets/img/shots/en/map-800.webp 800w, ../assets/img/shots/en/map-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="Portfolio map: colored tiles grouped by category" loading="lazy" decoding="async"></a>
+          <h3>Portfolio map</h3>
+          <p>One tile per holding: the bigger, the more it is worth; the color tells you whether you are up or down against cost.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/time-1600.webp" aria-label="Open the full image: Time slider"><img src="../assets/img/shots/en/time-800.webp" srcset="../assets/img/shots/en/time-800.webp 800w, ../assets/img/shots/en/time-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="The portfolio map on a day in the past, with the time slider" loading="lazy" decoding="async"></a>
+          <h3>Time slider</h3>
+          <p>Pick a day in the past, or press “Play” and watch holdings appear, grow and disappear.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/overview-1600.webp" aria-label="Open the full image: Overview"><img src="../assets/img/shots/en/overview-800.webp" srcset="../assets/img/shots/en/overview-800.webp 800w, ../assets/img/shots/en/overview-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="Account overview with totals, returns, composition and trend" loading="lazy" decoding="async"></a>
+          <h3>Overview</h3>
+          <p>Total, categories, deposits, returns and costs of the account, at a glance.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/charts-1600.webp" aria-label="Open the full image: Charts"><img src="../assets/img/shots/en/charts-800.webp" srcset="../assets/img/shots/en/charts-800.webp 800w, ../assets/img/shots/en/charts-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="Chart of the account composition month by month" loading="lazy" decoding="async"></a>
+          <h3>Charts</h3>
+          <p>What was in the account, month by month, and whether you were above or below your deposits.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/closed-1600.webp" aria-label="Open the full image: Closed positions"><img src="../assets/img/shots/en/closed-800.webp" srcset="../assets/img/shots/en/closed-800.webp 800w, ../assets/img/shots/en/closed-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="Table of closed positions with the result of each holding" loading="lazy" decoding="async"></a>
+          <h3>Closed positions</h3>
+          <p>How much you made or lost on each holding you sold, net of fees and taxes already withheld.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/tax-1600.webp" aria-label="Open the full image: Tax summary"><img src="../assets/img/shots/en/tax-800.webp" srcset="../assets/img/shots/en/tax-800.webp 800w, ../assets/img/shots/en/tax-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="Informational tax summary, with a notice that the values are estimates" loading="lazy" decoding="async"></a>
+          <h3>Tax summary</h3>
+          <p>An informational summary, year by year. These are estimates: they do not replace your broker's documents or a tax adviser.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/bonds-1600.webp" aria-label="Open the full image: BTPs and government bonds"><img src="../assets/img/shots/en/bonds-800.webp" srcset="../assets/img/shots/en/bonds-800.webp 800w, ../assets/img/shots/en/bonds-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="BTP calculator with coupons and surplus at maturity" loading="lazy" decoding="async"></a>
+          <h3>BTPs and government bonds</h3>
+          <p>For Italy, the list of fixed-rate BTPs: pick one and work out how many you can buy, the coupons and the surplus at maturity.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/assist-1600.webp" aria-label="Open the full image: Assistant mode"><img src="../assets/img/shots/en/assist-800.webp" srcset="../assets/img/shots/en/assist-800.webp 800w, ../assets/img/shots/en/assist-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="An Assistant mode tip explaining a table column" loading="lazy" decoding="async"></a>
+          <h3>Assistant mode</h3>
+          <p>Hover a column or a number: Pelago explains what it is and how it is calculated.</p>
+        </li>
+        <li class="card">
+          <a class="shot" href="../assets/img/shots/en/theme-1600.webp" aria-label="Open the full image: Five languages, light and dark theme"><img src="../assets/img/shots/en/theme-800.webp" srcset="../assets/img/shots/en/theme-800.webp 800w, ../assets/img/shots/en/theme-1600.webp 1600w" sizes="(min-width: 960px) 340px, (min-width: 620px) 46vw, 92vw" width="1600" height="900" alt="The overview in the dark theme" loading="lazy" decoding="async"></a>
+          <h3>Five languages, light and dark theme</h3>
+          <p>Italian, English, French, German and Spanish. Your CSV is never modified; a local backup is one click away.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="wrap">
+      <h2>How to use it</h2>
+      <ol class="steps">
+        <li><span class="n" aria-hidden="true">1</span><h3>Download the CSV</h3><p>From your Trade Republic account, export the CSV file of your transactions.</p></li>
+        <li><span class="n" aria-hidden="true">2</span><h3>Download Pelago</h3><p>Get <code>pelago.exe</code> from the latest version and run it: it is a single file, with no installation.</p></li>
+        <li><span class="n" aria-hidden="true">3</span><h3>Open the CSV</h3><p>Press “Open CSV” and choose the file. Your CSV is never modified.</p></li>
+      </ol>
+      <p class="cta"><a class="btn primary" href="https://github.com/pelago-claude/pelago/releases/latest">Download the latest version</a></p>
+      <p class="note">You need 64-bit Windows 10 or 11 and the WebView2 Runtime, already included in Windows 11 and in most up-to-date Windows 10 installations.</p>
+      <div class="callout">
+        <h3>Want to try it without your own data?</h3>
+        <p>Start Pelago without opening any file and press “Try an example account”: a second window opens with an invented account (about 160 transactions), in a temporary folder that disappears when you close it. If you prefer, download the example CSV and open it with “Open CSV”.</p>
+        <p><a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Download the example CSV</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <h2>What leaves your PC</h2>
+      <ul class="ticks">
+        <li>Your CSV and your data stay on your PC. Pelago never asks for a login or a password and never connects to your account.</li>
+        <li>For prices it queries public services (Yahoo Finance, CoinGecko, ECB, Borsa Italiana and a few others) and sends only security codes and dates: never amounts, quantities or personal data.</li>
+        <li>Derivative prices (Vontobel and Société Générale) are off by default: you turn them on yourself, from the Quotes page.</li>
+        <li>The code is public: you can check for yourself that there is nothing else.</li>
+      </ul>
+      <p><a class="btn" href="https://github.com/pelago-claude/pelago/blob/main/README.en.md#privacy-what-leaves-your-pc">Full list of the sites contacted</a></p>
+    </div>
+  </section>
+
+  <section id="verify">
+    <div class="wrap">
+      <h2>Verify it yourself</h2>
+      <ul class="ticks">
+        <li>The code is public (GPL-3.0): you can read it, build it yourself and see what it does.</li>
+        <li>
+          <p>Every release lists the SHA-256 fingerprint of <code>pelago.exe</code>. After downloading, in PowerShell:</p>
+          <pre><code>Get-FileHash .\pelago.exe -Algorithm SHA256</code></pre>
+          <p>Compare the result with the <code>pelago.exe.sha256</code> file of the same release.</p>
+        </li>
+        <li>The executable is not digitally signed: the first time, Windows may show the SmartScreen warning (“Windows protected your PC”). We do not hide it: if you prefer, build Pelago from source.</li>
+      </ul>
+      <p class="cta">
+        <a class="btn" href="https://github.com/pelago-claude/pelago">View the code</a>
+        <a class="btn" href="https://github.com/pelago-claude/pelago/blob/main/README.en.md#building-from-source">How to build it from source</a>
+      </p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details><summary>Is Pelago official, or connected to Trade Republic?</summary><p>No. It is a personal, unofficial project: it is not affiliated with or approved by Trade Republic, and it has no access to your account.</p></details>
+        <details><summary>How much does it cost?</summary><p>Nothing. It is free, with no ads and not for profit: free software (GPL-3.0).</p></details>
+        <details><summary>Are the numbers accurate?</summary><p>They are estimates calculated from the file: they are not an official balance. Prices come from public services and may be late or missing.</p></details>
+        <details><summary>Can I use it for my tax return?</summary><p>Not as your only source. The tax summaries are informational estimates, using simplified formulas: check them against your broker's official documents and with a tax adviser. You are responsible for what you declare.</p></details>
+        <details><summary>Does it work with other brokers, or on Mac and Linux?</summary><p>It is designed for the Trade Republic CSV: there is no guarantee with files from other brokers. For now it only runs on 64-bit Windows 10/11.</p></details>
+        <details><summary>How do I uninstall it?</summary><p>Delete <code>pelago.exe</code>: it does not write to the registry and does not start with the computer. To remove the data too, delete the folder <code>%LOCALAPPDATA%\Pelago</code> and, if you turned them on, the backups in <code>Documents\Pelago backup</code>.</p></details>
+        <details><summary>I found a mistake or have an idea: how do I report it?</summary><p>Open an <a href="https://github.com/pelago-claude/pelago/issues/new/choose">issue on GitHub</a> or write to <a href="mailto:pelago_claude@gmail.com">pelago_claude@gmail.com</a>. Never attach your real CSV: it contains all your transactions.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="warnings">
+    <div class="wrap">
+      <div class="notice">
+        <h2>Warnings and liability</h2>
+        <p>Pelago calculates values, returns and tax summaries from the CSV file you give it, using simplified formulas: they are estimates, may contain errors or fail to account for every case (different formats, corporate actions, tax regime, foreign taxes). They are not an official balance, nor financial, legal or tax advice, and they do not replace your broker's official documents or a professional: always check the numbers before using them, in particular for your tax return. Pelago is provided “as is”, without warranties of any kind (GPL-3.0, sections 15-16): to the extent permitted by law, the author is not liable for any damage arising from the use of the program or its results.</p>
+        <p><a href="https://github.com/pelago-claude/pelago/blob/main/README.en.md#known-limits-of-the-tax-backpack">Known limits of the tax summary</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <p>© 2026 David. Free software (GPL-3.0), without any warranty.</p>
+      <p>“Trade Republic” is a trademark of its respective owners, mentioned only to indicate the format of the file Pelago reads. Pelago is not affiliated with Trade Republic.</p>
+      <p>This site uses no cookies or analytics and loads no resources from other sites. It is hosted on GitHub Pages, which logs visitors' IP addresses for security reasons.</p>
+      <p>Flags: flag-icons (MIT). Typeface: Instrument Sans (SIL OFL).</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="https://github.com/pelago-claude/pelago">Code</a></li>
+      <li><a href="https://github.com/pelago-claude/pelago/releases/latest">Releases</a></li>
+      <li><a href="https://github.com/pelago-claude/pelago/issues/new/choose">Issues</a></li>
+      <li><a href="mailto:pelago_claude@gmail.com">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

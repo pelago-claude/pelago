@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{meta.title}}</title>
+<meta name="description" content="{{meta.desc}}">
+<link rel="canonical" href="{{canonical}}">
+{{hreflangs}}
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1620" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pelago">
+<meta property="og:title" content="{{meta.title}}">
+<meta property="og:description" content="{{meta.desc}}">
+<meta property="og:url" content="{{canonical}}">
+<meta property="og:locale" content="{{locale}}">
+<meta property="og:image" content="{{base}}assets/img/og-{{lang}}.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="{{root}}assets/img/pelago-32.png">
+<link rel="apple-touch-icon" href="{{root}}assets/img/pelago-180.png">
+<link rel="preload" href="{{root}}assets/fonts/InstrumentSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{root}}assets/style.css">
+<script type="application/ld+json">{{jsonld}}</script>
+{{redirect}}</head>
+<body>
+<a class="skip" href="#main">{{skip}}</a>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="./" aria-label="{{brand.home}}"><img src="{{root}}assets/img/pelago-64.png" alt="" width="32" height="32"><span>Pelago</span></a>
+    <nav class="menu" aria-label="{{nav.label}}">
+      <a href="#features">{{nav.features}}</a>
+      <a href="#start">{{nav.start}}</a>
+      <a href="#privacy">{{nav.privacy}}</a>
+      <a href="#verify">{{nav.verify}}</a>
+      <a href="#faq">{{nav.faq}}</a>
+    </nav>
+    <nav class="langs" aria-label="{{lang.label}}">
+{{langlinks}}
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <h1>{{hero.h1}}</h1>
+        <p class="lead">{{hero.lead}}</p>
+        <p class="sub">{{hero.sub}}</p>
+        <p class="cta">
+          <a class="btn primary" href="{{releases}}">{{hero.download}}</a>
+          <a class="btn" href="{{repo}}">{{hero.code}}</a>
+        </p>
+        <p class="meta">{{hero.meta}}</p>
+      </div>
+      <figure class="hero-media">
+        <video controls preload="metadata" playsinline muted width="1280" height="720" poster="{{root}}assets/img/shots/{{lang}}/map-1600.webp" aria-label="{{hero.video.label}}">
+          <source src="{{root}}assets/video/pelago-{{lang}}.mp4" type="video/mp4">
+          {{hero.video.fallback}}
+        </video>
+        <figcaption>{{hero.video.hint}}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>{{features.h}}</h2>
+      <p class="intro">{{features.lead}}</p>
+      <ul class="cards">
+{{cards}}
+      </ul>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="wrap">
+      <h2>{{start.h}}</h2>
+      <ol class="steps">
+        <li><span class="n" aria-hidden="true">1</span><h3>{{start.1.t}}</h3><p>{{start.1.d}}</p></li>
+        <li><span class="n" aria-hidden="true">2</span><h3>{{start.2.t}}</h3><p>{{start.2.d}}</p></li>
+        <li><span class="n" aria-hidden="true">3</span><h3>{{start.3.t}}</h3><p>{{start.3.d}}</p></li>
+      </ol>
+      <p class="cta"><a class="btn primary" href="{{releases}}">{{start.download}}</a></p>
+      <p class="note">{{start.req}}</p>
+      <div class="callout">
+        <h3>{{start.try.h}}</h3>
+        <p>{{start.try.p}}</p>
+        <p><a class="btn" href="{{samplecsv}}">{{start.try.csv}}</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <h2>{{privacy.h}}</h2>
+      <ul class="ticks">
+        <li>{{privacy.1}}</li>
+        <li>{{privacy.2}}</li>
+        <li>{{privacy.3}}</li>
+        <li>{{privacy.4}}</li>
+      </ul>
+      <p><a class="btn" href="{{readme_privacy}}">{{privacy.link}}</a>{{readme_badge}}</p>
+    </div>
+  </section>
+
+  <section id="verify">
+    <div class="wrap">
+      <h2>{{verify.h}}</h2>
+      <ul class="ticks">
+        <li>{{verify.1}}</li>
+        <li>
+          <p>{{verify.2}}</p>
+          <pre><code>Get-FileHash .\pelago.exe -Algorithm SHA256</code></pre>
+          <p>{{verify.2b}}</p>
+        </li>
+        <li>{{verify.3}}</li>
+      </ul>
+      <p class="cta">
+        <a class="btn" href="{{repo}}">{{hero.code}}</a>
+        <a class="btn" href="{{readme_build}}">{{verify.link}}</a>{{readme_badge}}
+      </p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>{{faq.h}}</h2>
+      <div class="faq">
+        <details><summary>{{faq.1.q}}</summary><p>{{faq.1.a}}</p></details>
+        <details><summary>{{faq.2.q}}</summary><p>{{faq.2.a}}</p></details>
+        <details><summary>{{faq.3.q}}</summary><p>{{faq.3.a}}</p></details>
+        <details><summary>{{faq.4.q}}</summary><p>{{faq.4.a}}</p></details>
+        <details><summary>{{faq.5.q}}</summary><p>{{faq.5.a}}</p></details>
+        <details><summary>{{faq.6.q}}</summary><p>{{faq.6.a}}</p></details>
+        <details><summary>{{faq.7.q}}</summary><p>{{faq.7.a}}</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="warnings">
+    <div class="wrap">
+      <div class="notice">
+        <h2>{{warn.h}}</h2>
+        <p>{{warn.p}}</p>
+        <p><a href="{{readme_limits}}">{{warn.link}}</a>{{readme_badge}}</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <p>{{footer.copy}}</p>
+      <p>{{footer.tm}}</p>
+      <p>{{footer.privacy}}</p>
+      <p>{{footer.credits}}</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="{{repo}}">{{footer.l.code}}</a></li>
+      <li><a href="{{releases}}">{{footer.l.releases}}</a></li>
+      <li><a href="{{issues}}">{{footer.l.issues}}</a></li>
+      <li><a href="mailto:{{email}}">{{footer.l.mail}}</a></li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

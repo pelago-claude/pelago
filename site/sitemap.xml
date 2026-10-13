@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/en/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/fr/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/de/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/es/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/"/>
+  </url>
+</urlset>
