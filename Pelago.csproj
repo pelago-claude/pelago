@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>2.15.0</Version>
-    <!-- Il file si chiama pelago.exe (minuscolo); il progetto e i namespace restano Pelago. -->
+    <Version>2.16.0</Version>
+    <!-- Il file si chiama pelago.exe, tutto minuscolo. -->
     <AssemblyName>pelago</AssemblyName>
     <RootNamespace>Pelago</RootNamespace>
     <Product>Pelago</Product>
@@ -35,6 +35,12 @@
   <ItemGroup>
     <!-- L'interfaccia web viaggia dentro l'exe (vedi Services/WebAssets.cs). -->
     <EmbeddedResource Include="wwwroot\**\*" LogicalName="www/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Il conto di esempio (dati inventati): viaggia dentro l'exe, vedi Services/DemoAccount.cs. Il CSV è lo stesso di samples\. -->
+    <EmbeddedResource Include="demo\**\*" LogicalName="demo/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="samples\esempio-operazioni.csv" LogicalName="demo/esempio-operazioni.csv" />
   </ItemGroup>
 
   <ItemGroup>

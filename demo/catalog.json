@@ -1,0 +1,266 @@
+﻿[
+    {
+        "Key":  "IE00DEMOWRLD",
+        "Name":  "Mondo Azionario ETF (Acc)",
+        "Symbol":  "IE00DEMOWRLD",
+        "InternalIsin":  "IE00DEMOWRLD",
+        "AssetClass":  "FUND",
+        "FileName":  "IE00DEMOWRLD.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "IE00DEMOTECH",
+        "Name":  "Tecnologia Globale ETF (Acc)",
+        "Symbol":  "IE00DEMOTECH",
+        "InternalIsin":  "IE00DEMOTECH",
+        "AssetClass":  "FUND",
+        "FileName":  "IE00DEMOTECH.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "IE00DEMOGREN",
+        "Name":  "Energia Pulita ETF (Acc)",
+        "Symbol":  "IE00DEMOGREN",
+        "InternalIsin":  "IE00DEMOGREN",
+        "AssetClass":  "FUND",
+        "FileName":  "IE00DEMOGREN.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "IE00DEMOEMRG",
+        "Name":  "Mercati Emergenti ETF (Acc)",
+        "Symbol":  "IE00DEMOEMRG",
+        "InternalIsin":  "IE00DEMOEMRG",
+        "AssetClass":  "FUND",
+        "FileName":  "IE00DEMOEMRG.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMOALFA",
+        "Name":  "Azienda Alfa",
+        "Symbol":  "US00DEMOALFA",
+        "InternalIsin":  "US00DEMOALFA",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMOALFA.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMOBETA",
+        "Name":  "Beta Software",
+        "Symbol":  "US00DEMOBETA",
+        "InternalIsin":  "US00DEMOBETA",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMOBETA.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMOGAMM",
+        "Name":  "Gamma Robotics",
+        "Symbol":  "US00DEMOGAMM",
+        "InternalIsin":  "US00DEMOGAMM",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMOGAMM.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMODELT",
+        "Name":  "Delta Energia",
+        "Symbol":  "US00DEMODELT",
+        "InternalIsin":  "US00DEMODELT",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMODELT.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "IT00DEMOBTP35",
+        "Name":  "Mar. 2035",
+        "Symbol":  "IT00DEMOBTP35",
+        "InternalIsin":  "IT00DEMOBTP35",
+        "AssetClass":  "BOND",
+        "FileName":  "IT00DEMOBTP35.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "IT00DEMOBTP29",
+        "Name":  "Set. 2029",
+        "Symbol":  "IT00DEMOBTP29",
+        "InternalIsin":  "IT00DEMOBTP29",
+        "AssetClass":  "BOND",
+        "FileName":  "IT00DEMOBTP29.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "BTC",
+        "Name":  "Bitcoin",
+        "Symbol":  "BTC",
+        "InternalIsin":  "BTC",
+        "AssetClass":  "CRYPTO",
+        "FileName":  "BTC.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "ETH",
+        "Name":  "Ether",
+        "Symbol":  "ETH",
+        "InternalIsin":  "ETH",
+        "AssetClass":  "CRYPTO",
+        "FileName":  "ETH.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "SOL",
+        "Name":  "Solana",
+        "Symbol":  "SOL",
+        "InternalIsin":  "SOL",
+        "AssetClass":  "CRYPTO",
+        "FileName":  "SOL.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMOEPSI",
+        "Name":  "Epsilon Farma",
+        "Symbol":  "US00DEMOEPSI",
+        "InternalIsin":  "US00DEMOEPSI",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMOEPSI.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMOZETA",
+        "Name":  "Zeta Banca",
+        "Symbol":  "US00DEMOZETA",
+        "InternalIsin":  "US00DEMOZETA",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMOZETA.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMOETAX",
+        "Name":  "Eta Mobilita",
+        "Symbol":  "US00DEMOETAX",
+        "InternalIsin":  "US00DEMOETAX",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMOETAX.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "US00DEMOTETA",
+        "Name":  "Theta Cloud",
+        "Symbol":  "US00DEMOTETA",
+        "InternalIsin":  "US00DEMOTETA",
+        "AssetClass":  "STOCK",
+        "FileName":  "US00DEMOTETA.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "IE00DEMOBOND",
+        "Name":  "Obbligazionario Globale ETF (Acc)",
+        "Symbol":  "IE00DEMOBOND",
+        "InternalIsin":  "IE00DEMOBOND",
+        "AssetClass":  "FUND",
+        "FileName":  "IE00DEMOBOND.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "IE00DEMOGOLD",
+        "Name":  "Oro Fisico ETC",
+        "Symbol":  "IE00DEMOGOLD",
+        "InternalIsin":  "IE00DEMOGOLD",
+        "AssetClass":  "FUND",
+        "FileName":  "IE00DEMOGOLD.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "XRP",
+        "Name":  "XRP",
+        "Symbol":  "XRP",
+        "InternalIsin":  "XRP",
+        "AssetClass":  "CRYPTO",
+        "FileName":  "XRP.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "DE000VDEM004",
+        "Name":  "Long 4.390 $",
+        "Symbol":  "DE000VDEM004",
+        "InternalIsin":  "DE000VDEM004",
+        "AssetClass":  "DERIVATIVE",
+        "FileName":  "DE000VDEM004.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "DE000VDEM005",
+        "Name":  "Long 4.460 $",
+        "Symbol":  "DE000VDEM005",
+        "InternalIsin":  "DE000VDEM005",
+        "AssetClass":  "DERIVATIVE",
+        "FileName":  "DE000VDEM005.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "DE000FDEM002",
+        "Name":  "Long 4.150 $",
+        "Symbol":  "DE000FDEM002",
+        "InternalIsin":  "DE000FDEM002",
+        "AssetClass":  "DERIVATIVE",
+        "FileName":  "DE000FDEM002.json",
+        "ProviderMappings":  {
+
+                             }
+    },
+    {
+        "Key":  "DE000FDEM003",
+        "Name":  "Long 4.205 $",
+        "Symbol":  "DE000FDEM003",
+        "InternalIsin":  "DE000FDEM003",
+        "AssetClass":  "DERIVATIVE",
+        "FileName":  "DE000FDEM003.json",
+        "ProviderMappings":  {
+
+                             }
+    }
+]

@@ -1,0 +1,122 @@
+﻿[
+    {
+        "Timestamp":  "2025-03-20T18:00:00.0000000Z",
+        "Price":  127.2032,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-04-20T18:00:00.0000000Z",
+        "Price":  130.5681,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-05-20T18:00:00.0000000Z",
+        "Price":  130.9974,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-06-20T18:00:00.0000000Z",
+        "Price":  129.0926,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-07-20T18:00:00.0000000Z",
+        "Price":  126.2497,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-08-20T18:00:00.0000000Z",
+        "Price":  123.9391,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-09-20T18:00:00.0000000Z",
+        "Price":  123.7454,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-10-20T18:00:00.0000000Z",
+        "Price":  126.3334,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-11-20T18:00:00.0000000Z",
+        "Price":  131.7313,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2025-12-20T18:00:00.0000000Z",
+        "Price":  138.6131,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-01-20T18:00:00.0000000Z",
+        "Price":  145.867,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-02-20T18:00:00.0000000Z",
+        "Price":  151.6236,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-03-20T18:00:00.0000000Z",
+        "Price":  154.5493,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-04-20T18:00:00.0000000Z",
+        "Price":  154.9627,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-05-20T18:00:00.0000000Z",
+        "Price":  153.0961,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-06-20T18:00:00.0000000Z",
+        "Price":  150.1607,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-07-20T18:00:00.0000000Z",
+        "Price":  147.9366,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-08-20T18:00:00.0000000Z",
+        "Price":  147.7299,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-09-20T18:00:00.0000000Z",
+        "Price":  150.4375,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    },
+    {
+        "Timestamp":  "2026-10-12T10:13:28.0000000Z",
+        "Price":  154.0786,
+        "Currency":  "EUR",
+        "Source":  "demo"
+    }
+]

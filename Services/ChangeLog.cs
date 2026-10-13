@@ -16,6 +16,20 @@ public static class ChangeLog
 
     public static readonly IReadOnlyList<Release> Releases = new[]
     {
+        new Release("2.16", new DateOnly(2026, 10, 13), "Un conto per provare",
+            "Senza un file caricato, la Panoramica avverte che i valori sono stime e permette di provare Pelago con un conto di esempio.",
+            new[]
+            {
+                "Chi apre Pelago per la prima volta, o ha perso il file, vedeva solo un riquadro vuoto. Ora la Panoramica dice cosa fare, ricorda che i dati restano sul PC, che Pelago non è affiliato al broker e che i valori sono stime, e che il codice è libero.",
+                "«Prova con un conto di esempio» apre una seconda finestra con un conto inventato: nomi, codici e importi sono finti, e il conto sta in una cartella a parte, così non tocca mai i tuoi dati; chiusa la finestra non resta nulla. In più abbiamo sistemato il pulsante «Apri CSV…» al centro della pagina vuota: la sua icona veniva ingrandita come quella grande sopra, e allargava il pulsante spostando il testo.",
+            },
+            new[]
+            {
+                "La Panoramica senza file ricorda che i valori sono stime e che Pelago non è affiliato al broker",
+                "Pulsante «Prova con un conto di esempio»: seconda finestra con dati inventati, in una cartella a parte",
+                "Corretto il pulsante «Apri CSV…» al centro della pagina vuota (l'icona era troppo grande)",
+                "Nuovi test automatici per il conto di esempio",
+            }),
         new Release("2.15", new DateOnly(2026, 10, 13), "Tutto si chiama Pelago",
             "Il titolo della finestra mostra la versione, e anche la cartella dei dati sul PC si chiama Pelago.",
             new[]

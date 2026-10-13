@@ -27,3 +27,5 @@ Presentazione/
 *.zip
 nomi-titoli.json
 nomi-emittenti.json
+# ...tranne il conto di esempio (dati inventati, dentro l'eseguibile)
+!demo/**

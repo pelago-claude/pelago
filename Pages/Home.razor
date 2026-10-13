@@ -11,7 +11,7 @@
         <button class="btn no-print" data-help="export.pdf" @onclick="ExportPdf"><i class="ti ti-file-type-pdf"></i> @T("Esporta PDF")</button>
     </div>
 
-    <NeedData>
+    <NeedData Welcome="true">
         @if (_latest is { } latest)
         {
             @if (State.WarningCount > 0)

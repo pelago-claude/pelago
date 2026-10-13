@@ -1,1 +1,5 @@
-[]
+[
+  "Chi apre Pelago per la prima volta, o ha perso il file, vedeva solo un riquadro vuoto. Ora la Panoramica ricorda che Pelago non è affiliato al broker e che i valori sono stime, e se l'ultimo file aperto non si trova più dice quale e dove, invece di partire vuota senza spiegare.",
+  "L'ultimo file aperto, «{0}», non si trova più in «{1}»: è stato spostato, rinominato o cancellato? Riaprilo con «Apri CSV…».",
+  "Se l'ultimo file aperto non si trova più, la Panoramica dice quale e dove"
+]

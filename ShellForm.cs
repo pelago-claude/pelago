@@ -29,7 +29,7 @@ public sealed class ShellForm : Form
         }
         Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", browserArgs);
 
-        Text = $"Pelago {ChangeLog.Current.Version}";
+        Text = $"Pelago {ChangeLog.Current.Version}" + (DemoAccount.IsActive ? " — " + Loc.T("conto di esempio") : "");
         Icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? Icon;
         Font = new Font("Segoe UI", 9f);
         MinimumSize = new Size(960, 620);

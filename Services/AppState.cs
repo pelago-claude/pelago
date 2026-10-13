@@ -22,7 +22,9 @@ public sealed class AppState : IDisposable
     private readonly List<string> _updateLog = new();
 
     // Nelle prove automatiche (PELAGO_TEST=1) niente attività in rete o su disco che non siano state chieste.
-    private readonly bool _quiet = Environment.GetEnvironmentVariable("PELAGO_TEST") == "1" && Environment.GetEnvironmentVariable("PELAGO_AUTO") != "1";
+    // Anche nel conto di esempio: niente aggiornamenti dei prezzi né backup che nessuno ha chiesto.
+    private readonly bool _quiet = (Environment.GetEnvironmentVariable("PELAGO_TEST") == "1" && Environment.GetEnvironmentVariable("PELAGO_AUTO") != "1")
+        || DemoAccount.IsActive;
 
     private bool _initialized;
     private FileSystemWatcher? _watcher;
@@ -88,6 +90,10 @@ public sealed class AppState : IDisposable
     public IReadOnlyDictionary<string, string> FullNames { get; private set; } = new Dictionary<string, string>();
 
     public string? LoadError { get; private set; }
+
+    /// <summary>Questa finestra è il conto di esempio (dati inventati, in una cartella a parte), non i dati dell'utente.</summary>
+    public bool IsDemo => DemoAccount.IsActive;
+
     public bool IsLoading { get; private set; }
     public bool IsUpdating { get; private set; }
     public string? UpdateTitle { get; private set; }

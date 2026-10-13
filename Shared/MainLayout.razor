@@ -119,6 +119,14 @@
             <button class="btn" data-help="top:open" @onclick="OpenFile"><i class="ti ti-folder-open"></i> @T("Apri CSV…")</button>
         </header>
 
+        @if (State.IsDemo)
+        {
+            <div class="banner info top" data-help="banner.demo">
+                <i class="ti ti-flask"></i>
+                <span>@T("Conto di esempio con dati inventati: quello che fai qui non tocca i tuoi dati.")</span>
+            </div>
+        }
+
         @if (State.PendingFile is { } pending)
         {
             <div class="banner info top" data-help="banner.newfile">

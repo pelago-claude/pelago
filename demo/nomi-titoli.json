@@ -1,0 +1,13 @@
+﻿{
+    "Version":  1,
+    "Names":  {
+                  "IE00DEMOWRLD":  {
+                                       "Name":  "Il mio ETF mondo",
+                                       "Changed":  "2026-10-05T10:00:00Z"
+                                   },
+                  "US00DEMOALFA":  {
+                                       "Name":  "Alfa (la mia preferita)",
+                                       "Changed":  "2026-10-05T10:00:00Z"
+                                   }
+              }
+}

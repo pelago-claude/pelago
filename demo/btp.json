@@ -1,0 +1,768 @@
+{
+  "UpdatedAt": "2026-10-12T12:54:16.0232002+02:00",
+  "Source": "Borsa Italiana (MOT), ultimo contratto",
+  "Bonds": [
+    {
+      "Isin": "IT0001086567",
+      "Description": "BTP 7,25% Nov26",
+      "Coupon": 0.0725,
+      "Maturity": "2026-11-01",
+      "Price": 100.214
+    },
+    {
+      "Isin": "IT0005210650",
+      "Description": "BTP 1,25% Dic26",
+      "Coupon": 0.0125,
+      "Maturity": "2026-12-01",
+      "Price": 99.826
+    },
+    {
+      "Isin": "IT0005390874",
+      "Description": "BTP 0,85% Gen27",
+      "Coupon": 0.0085,
+      "Maturity": "2027-01-15",
+      "Price": 99.531
+    },
+    {
+      "Isin": "IT0005580045",
+      "Description": "BTP 2,95% Feb27",
+      "Coupon": 0.0295,
+      "Maturity": "2027-02-15",
+      "Price": 100.008
+    },
+    {
+      "Isin": "IT0005633794",
+      "Description": "BTP 2,55% Feb27",
+      "Coupon": 0.0255,
+      "Maturity": "2027-02-25",
+      "Price": 99.876
+    },
+    {
+      "Isin": "IT0005484552",
+      "Description": "BTP 1,1% Apr27",
+      "Coupon": 0.011,
+      "Maturity": "2027-04-01",
+      "Price": 99.17
+    },
+    {
+      "Isin": "IT0005240830",
+      "Description": "BTP 2,2% Giu27",
+      "Coupon": 0.022,
+      "Maturity": "2027-06-01",
+      "Price": 99.468
+    },
+    {
+      "Isin": "IT0005599904",
+      "Description": "BTP 3,45% Lug27",
+      "Coupon": 0.0345,
+      "Maturity": "2027-07-15",
+      "Price": 100.215
+    },
+    {
+      "Isin": "IT0005274805",
+      "Description": "BTP 2,05% Ago27",
+      "Coupon": 0.0205,
+      "Maturity": "2027-08-01",
+      "Price": 99.188
+    },
+    {
+      "Isin": "IT0005657330",
+      "Description": "BTP 2,1% Ago27",
+      "Coupon": 0.021,
+      "Maturity": "2027-08-26",
+      "Price": 99.115
+    },
+    {
+      "Isin": "IT0005416570",
+      "Description": "BTP 0,95% Set27",
+      "Coupon": 0.0095,
+      "Maturity": "2027-09-15",
+      "Price": 98.071
+    },
+    {
+      "Isin": "IT0005622128",
+      "Description": "BTP 2,7% Ott27",
+      "Coupon": 0.027,
+      "Maturity": "2027-10-15",
+      "Price": 99.52
+    },
+    {
+      "Isin": "IT0001174611",
+      "Description": "BTP 6,5% Nov27",
+      "Coupon": 0.065,
+      "Maturity": "2027-11-01",
+      "Price": 103.33
+    },
+    {
+      "Isin": "IT0005500068",
+      "Description": "BTP 2,65% Dic27",
+      "Coupon": 0.0265,
+      "Maturity": "2027-12-01",
+      "Price": 99.34
+    },
+    {
+      "Isin": "IT0005323032",
+      "Description": "BTP 2% Feb28",
+      "Coupon": 0.02,
+      "Maturity": "2028-02-01",
+      "Price": 98.37
+    },
+    {
+      "Isin": "IT0005692410",
+      "Description": "BTP 2,2% Feb28",
+      "Coupon": 0.022,
+      "Maturity": "2028-02-28",
+      "Price": 98.45
+    },
+    {
+      "Isin": "IT0005433690",
+      "Description": "BTP 0,25% Mar28",
+      "Coupon": 0.0025,
+      "Maturity": "2028-03-15",
+      "Price": 95.84
+    },
+    {
+      "Isin": "IT0005521981",
+      "Description": "BTP 3,4% Apr28",
+      "Coupon": 0.034,
+      "Maturity": "2028-04-01",
+      "Price": 100.07
+    },
+    {
+      "Isin": "IT0005641029",
+      "Description": "BTP 2,65% Giu28",
+      "Coupon": 0.0265,
+      "Maturity": "2028-06-15",
+      "Price": 98.78
+    },
+    {
+      "Isin": "IT0005445306",
+      "Description": "BTP 0,5% Lug28",
+      "Coupon": 0.005,
+      "Maturity": "2028-07-15",
+      "Price": 95.14
+    },
+    {
+      "Isin": "IT0005548315",
+      "Description": "BTP 3,8% Ago28",
+      "Coupon": 0.038,
+      "Maturity": "2028-08-01",
+      "Price": 100.60
+    },
+    {
+      "Isin": "IT0004889033",
+      "Description": "BTP 4,75% Set28",
+      "Coupon": 0.0475,
+      "Maturity": "2028-09-01",
+      "Price": 102.40
+    },
+    {
+      "Isin": "IT0005729733",
+      "Description": "BTP 3% Ott28",
+      "Coupon": 0.03,
+      "Maturity": "2028-10-30",
+      "Price": 99.01
+    },
+    {
+      "Isin": "IT0005340929",
+      "Description": "BTP 2,8% Dic28",
+      "Coupon": 0.028,
+      "Maturity": "2028-12-01",
+      "Price": 98.64
+    },
+    {
+      "Isin": "IT0005660052",
+      "Description": "BTP 2,35% Gen29",
+      "Coupon": 0.0235,
+      "Maturity": "2029-01-15",
+      "Price": 97.39
+    },
+    {
+      "Isin": "IT0005566408",
+      "Description": "BTP 4,1% Feb29",
+      "Coupon": 0.041,
+      "Maturity": "2029-02-01",
+      "Price": 101.14
+    },
+    {
+      "Isin": "IT0005467482",
+      "Description": "BTP 0,45% Feb29",
+      "Coupon": 0.0045,
+      "Maturity": "2029-02-15",
+      "Price": 93.20
+    },
+    {
+      "Isin": "IT0005689960",
+      "Description": "BTP 2,4% Mar29",
+      "Coupon": 0.024,
+      "Maturity": "2029-03-15",
+      "Price": 97.30
+    },
+    {
+      "Isin": "IT0005495731",
+      "Description": "BTP 2,8% Giu29",
+      "Coupon": 0.028,
+      "Maturity": "2029-06-15",
+      "Price": 97.94
+    },
+    {
+      "Isin": "IT0005584849",
+      "Description": "BTP 3,35% Lug29",
+      "Coupon": 0.0335,
+      "Maturity": "2029-07-01",
+      "Price": 99.27
+    },
+    {
+      "Isin": "IT0005365165",
+      "Description": "BTP 3% Ago29",
+      "Coupon": 0.03,
+      "Maturity": "2029-08-01",
+      "Price": 98.40
+    },
+    {
+      "Isin": "IT0005716839",
+      "Description": "BTP 3% Set29",
+      "Coupon": 0.03,
+      "Maturity": "2029-09-15",
+      "Price": 98.12
+    },
+    {
+      "Isin": "IT0005611055",
+      "Description": "BTP 3% Ott29",
+      "Coupon": 0.03,
+      "Maturity": "2029-10-01",
+      "Price": 98.12
+    },
+    {
+      "Isin": "IT0001278511",
+      "Description": "BTP 5,25% Nov29",
+      "Coupon": 0.0525,
+      "Maturity": "2029-11-01",
+      "Price": 104.57
+    },
+    {
+      "Isin": "IT0005519787",
+      "Description": "BTP 3,85% Dic29",
+      "Coupon": 0.0385,
+      "Maturity": "2029-12-15",
+      "Price": 100.34
+    },
+    {
+      "Isin": "IT0005024234",
+      "Description": "BTP 3,5% Mar30",
+      "Coupon": 0.035,
+      "Maturity": "2030-03-01",
+      "Price": 99.34
+    },
+    {
+      "Isin": "IT0005383309",
+      "Description": "BTP 1,35% Apr30",
+      "Coupon": 0.0135,
+      "Maturity": "2030-04-01",
+      "Price": 92.37
+    },
+    {
+      "Isin": "IT0005542797",
+      "Description": "BTP 3,7% Giu30",
+      "Coupon": 0.037,
+      "Maturity": "2030-06-15",
+      "Price": 99.64
+    },
+    {
+      "Isin": "IT0005637399",
+      "Description": "BTP 2,95% Lug30",
+      "Coupon": 0.0295,
+      "Maturity": "2030-07-01",
+      "Price": 97.04
+    },
+    {
+      "Isin": "IT0005403396",
+      "Description": "BTP 0,95% Ago30",
+      "Coupon": 0.0095,
+      "Maturity": "2030-08-01",
+      "Price": 90.08
+    },
+    {
+      "Isin": "IT0005654642",
+      "Description": "BTP 2,7% Ott30",
+      "Coupon": 0.027,
+      "Maturity": "2030-10-01",
+      "Price": 95.77
+    },
+    {
+      "Isin": "IT0005561888",
+      "Description": "BTP 4% Nov30",
+      "Coupon": 0.04,
+      "Maturity": "2030-11-15",
+      "Price": 100.47
+    },
+    {
+      "Isin": "IT0005413171",
+      "Description": "BTP 1,65% Dic30",
+      "Coupon": 0.0165,
+      "Maturity": "2030-12-01",
+      "Price": 91.68
+    },
+    {
+      "Isin": "IT0005671273",
+      "Description": "BTP 2,85% Feb31",
+      "Coupon": 0.0285,
+      "Maturity": "2031-02-01",
+      "Price": 95.81
+    },
+    {
+      "Isin": "IT0005580094",
+      "Description": "BTP 3,5% Feb31",
+      "Coupon": 0.035,
+      "Maturity": "2031-02-15",
+      "Price": 98.38
+    },
+    {
+      "Isin": "IT0005422891",
+      "Description": "BTP 0,9% Apr31",
+      "Coupon": 0.009,
+      "Maturity": "2031-04-01",
+      "Price": 87.85
+    },
+    {
+      "Isin": "IT0001444378",
+      "Description": "BTP 6% Mag31",
+      "Coupon": 0.06,
+      "Maturity": "2031-05-01",
+      "Price": 108.67
+    },
+    {
+      "Isin": "IT0005707614",
+      "Description": "BTP 3,15% Giu31",
+      "Coupon": 0.0315,
+      "Maturity": "2031-06-01",
+      "Price": 96.65
+    },
+    {
+      "Isin": "IT0005595803",
+      "Description": "BTP 3,45% Lug31",
+      "Coupon": 0.0345,
+      "Maturity": "2031-07-15",
+      "Price": 97.87
+    },
+    {
+      "Isin": "IT0005436693",
+      "Description": "BTP 0,6% Ago31",
+      "Coupon": 0.006,
+      "Maturity": "2031-08-01",
+      "Price": 85.64
+    },
+    {
+      "Isin": "IT0005542359",
+      "Description": "BTP Green 4% Ott31",
+      "Coupon": 0.04,
+      "Maturity": "2031-10-30",
+      "Price": 100.25
+    },
+    {
+      "Isin": "IT0005619546",
+      "Description": "BTP 3,15% Nov31",
+      "Coupon": 0.0315,
+      "Maturity": "2031-11-15",
+      "Price": 96.18
+    },
+    {
+      "Isin": "IT0005449969",
+      "Description": "BTP 0,95% Dic31",
+      "Coupon": 0.0095,
+      "Maturity": "2031-12-01",
+      "Price": 86.11
+    },
+    {
+      "Isin": "IT0005733636",
+      "Description": "BTP 3,95% Feb32",
+      "Coupon": 0.0395,
+      "Maturity": "2032-02-01",
+      "Price": 99.55
+    },
+    {
+      "Isin": "IT0005094088",
+      "Description": "BTP 1,65% Mar32",
+      "Coupon": 0.0165,
+      "Maturity": "2032-03-01",
+      "Price": 88.72
+    },
+    {
+      "Isin": "IT0005466013",
+      "Description": "BTP 0,95% Giu32",
+      "Coupon": 0.0095,
+      "Maturity": "2032-06-01",
+      "Price": 84.62
+    },
+    {
+      "Isin": "IT0005647265",
+      "Description": "BTP 3,25% Lug32",
+      "Coupon": 0.0325,
+      "Maturity": "2032-07-15",
+      "Price": 95.73
+    },
+    {
+      "Isin": "IT0005668220",
+      "Description": "BTP 3,25% Nov32",
+      "Coupon": 0.0325,
+      "Maturity": "2032-11-15",
+      "Price": 95.30
+    },
+    {
+      "Isin": "IT0005494239",
+      "Description": "BTP 2,5% Dic32",
+      "Coupon": 0.025,
+      "Maturity": "2032-12-01",
+      "Price": 91.44
+    },
+    {
+      "Isin": "IT0003256820",
+      "Description": "BTP 5,75% Feb33",
+      "Coupon": 0.0575,
+      "Maturity": "2033-02-01",
+      "Price": 108.91
+    },
+    {
+      "Isin": "IT0005689994",
+      "Description": "BTP 3,15% Mar33",
+      "Coupon": 0.0315,
+      "Maturity": "2033-03-15",
+      "Price": 94.27
+    },
+    {
+      "Isin": "IT0005518128",
+      "Description": "BTP 4,4% Mag33",
+      "Coupon": 0.044,
+      "Maturity": "2033-05-01",
+      "Price": 101.34
+    },
+    {
+      "Isin": "IT0005704868",
+      "Description": "BTP 3,3% Giu33",
+      "Coupon": 0.033,
+      "Maturity": "2033-06-15",
+      "Price": 94.76
+    },
+    {
+      "Isin": "IT0005240350",
+      "Description": "BTP 2,45% Set33",
+      "Coupon": 0.0245,
+      "Maturity": "2033-09-01",
+      "Price": 89.75
+    },
+    {
+      "Isin": "IT0005722845",
+      "Description": "BTP 3,35% Set33",
+      "Coupon": 0.0335,
+      "Maturity": "2033-09-15",
+      "Price": 94.63
+    },
+    {
+      "Isin": "IT0005544082",
+      "Description": "BTP 4,35% Nov33",
+      "Coupon": 0.0435,
+      "Maturity": "2033-11-01",
+      "Price": 100.63
+    },
+    {
+      "Isin": "IT0005560948",
+      "Description": "BTP 4,2% Mar34",
+      "Coupon": 0.042,
+      "Maturity": "2034-03-01",
+      "Price": 99.44
+    },
+    {
+      "Isin": "IT0005584856",
+      "Description": "BTP 3,85% Lug34",
+      "Coupon": 0.0385,
+      "Maturity": "2034-07-01",
+      "Price": 96.94
+    },
+    {
+      "Isin": "IT0003535157",
+      "Description": "BTP 5% Ago34",
+      "Coupon": 0.05,
+      "Maturity": "2034-08-01",
+      "Price": 104.60
+    },
+    {
+      "Isin": "IT0005607970",
+      "Description": "BTP 3,85% Feb35",
+      "Coupon": 0.0385,
+      "Maturity": "2035-02-01",
+      "Price": 96.28
+    },
+    {
+      "Isin": "IT0005358806",
+      "Description": "BTP 3,35% Mar35",
+      "Coupon": 0.0335,
+      "Maturity": "2035-03-01",
+      "Price": 93.00
+    },
+    {
+      "Isin": "IT0005508590",
+      "Description": "BTP Green 4% Apr35",
+      "Coupon": 0.04,
+      "Maturity": "2035-04-30",
+      "Price": 97.34
+    },
+    {
+      "Isin": "IT0005631590",
+      "Description": "BTP 3,65% Ago35",
+      "Coupon": 0.0365,
+      "Maturity": "2035-08-01",
+      "Price": 94.34
+    },
+    {
+      "Isin": "IT0005648149",
+      "Description": "BTP 3,6% Ott35",
+      "Coupon": 0.036,
+      "Maturity": "2035-10-01",
+      "Price": 93.77
+    },
+    {
+      "Isin": "IT0005676504",
+      "Description": "BTP 3,45% Feb36",
+      "Coupon": 0.0345,
+      "Maturity": "2036-02-01",
+      "Price": 92.30
+    },
+    {
+      "Isin": "IT0005402117",
+      "Description": "BTP 1,45% Mar36",
+      "Coupon": 0.0145,
+      "Maturity": "2036-03-01",
+      "Price": 77.08
+    },
+    {
+      "Isin": "IT0005706285",
+      "Description": "BTP 3,8% Lug36",
+      "Coupon": 0.038,
+      "Maturity": "2036-07-01",
+      "Price": 94.36
+    },
+    {
+      "Isin": "IT0005177909",
+      "Description": "BTP 2,25% Set36",
+      "Coupon": 0.0225,
+      "Maturity": "2036-09-01",
+      "Price": 82.28
+    },
+    {
+      "Isin": "IT0005729931",
+      "Description": "BTP 4% Ott36",
+      "Coupon": 0.04,
+      "Maturity": "2036-10-01",
+      "Price": 95.69
+    },
+    {
+      "Isin": "IT0003934657",
+      "Description": "BTP 4% Feb37",
+      "Coupon": 0.04,
+      "Maturity": "2037-02-01",
+      "Price": 95.95
+    },
+    {
+      "Isin": "IT0005433195",
+      "Description": "BTP 0,95% Mar37",
+      "Coupon": 0.0095,
+      "Maturity": "2037-03-01",
+      "Price": 70.56
+    },
+    {
+      "Isin": "IT0005596470",
+      "Description": "BTP Green 4,05% Ott37",
+      "Coupon": 0.0405,
+      "Maturity": "2037-10-30",
+      "Price": 95.46
+    },
+    {
+      "Isin": "IT0005496770",
+      "Description": "BTP 3,25% Mar38",
+      "Coupon": 0.0325,
+      "Maturity": "2038-03-01",
+      "Price": 87.99
+    },
+    {
+      "Isin": "IT0005321325",
+      "Description": "BTP 2,95% Set38",
+      "Coupon": 0.0295,
+      "Maturity": "2038-09-01",
+      "Price": 84.75
+    },
+    {
+      "Isin": "IT0005733099",
+      "Description": "BTP Green 4,4% Ott38",
+      "Coupon": 0.044,
+      "Maturity": "2038-10-30",
+      "Price": 97.61
+    },
+    {
+      "Isin": "IT0004286966",
+      "Description": "BTP 5% Ago39",
+      "Coupon": 0.05,
+      "Maturity": "2039-08-01",
+      "Price": 103.02
+    },
+    {
+      "Isin": "IT0005582421",
+      "Description": "BTP 4,15% Ott39",
+      "Coupon": 0.0415,
+      "Maturity": "2039-10-01",
+      "Price": 94.64
+    },
+    {
+      "Isin": "IT0005377152",
+      "Description": "BTP 3,1% Mar40",
+      "Coupon": 0.031,
+      "Maturity": "2040-03-01",
+      "Price": 84.00
+    },
+    {
+      "Isin": "IT0004532559",
+      "Description": "BTP 5% Set40",
+      "Coupon": 0.05,
+      "Maturity": "2040-09-01",
+      "Price": 102.62
+    },
+    {
+      "Isin": "IT0005635583",
+      "Description": "BTP 3,85% Ott40",
+      "Coupon": 0.0385,
+      "Maturity": "2040-10-01",
+      "Price": 90.67
+    },
+    {
+      "Isin": "IT0005421703",
+      "Description": "BTP 1,8% Mar41",
+      "Coupon": 0.018,
+      "Maturity": "2041-03-01",
+      "Price": 69.27
+    },
+    {
+      "Isin": "IT0005694630",
+      "Description": "BTP 3,95% Ott41",
+      "Coupon": 0.0395,
+      "Maturity": "2041-10-01",
+      "Price": 90.67
+    },
+    {
+      "Isin": "IT0005530032",
+      "Description": "BTP 4,45% Set43",
+      "Coupon": 0.0445,
+      "Maturity": "2043-09-01",
+      "Price": 95.06
+    },
+    {
+      "Isin": "IT0004923998",
+      "Description": "BTP 4,75% Set44",
+      "Coupon": 0.0475,
+      "Maturity": "2044-09-01",
+      "Price": 98.56
+    },
+    {
+      "Isin": "IT0005438004",
+      "Description": "BTP Green 1,5% Apr45",
+      "Coupon": 0.015,
+      "Maturity": "2045-04-30",
+      "Price": 58.94
+    },
+    {
+      "Isin": "IT0005631608",
+      "Description": "BTP Green 4,1% Apr46",
+      "Coupon": 0.041,
+      "Maturity": "2046-04-30",
+      "Price": 89.61
+    },
+    {
+      "Isin": "IT0005083057",
+      "Description": "BTP 3,25% Set46",
+      "Coupon": 0.0325,
+      "Maturity": "2046-09-01",
+      "Price": 78.77
+    },
+    {
+      "Isin": "IT0005162828",
+      "Description": "BTP 2,7% Mar47",
+      "Coupon": 0.027,
+      "Maturity": "2047-03-01",
+      "Price": 71.37
+    },
+    {
+      "Isin": "IT0005273013",
+      "Description": "BTP 3,45% Mar48",
+      "Coupon": 0.0345,
+      "Maturity": "2048-03-01",
+      "Price": 80.30
+    },
+    {
+      "Isin": "IT0005363111",
+      "Description": "BTP 3,85% Set49",
+      "Coupon": 0.0385,
+      "Maturity": "2049-09-01",
+      "Price": 84.82
+    },
+    {
+      "Isin": "IT0005398406",
+      "Description": "BTP 2,45% Set50",
+      "Coupon": 0.0245,
+      "Maturity": "2050-09-01",
+      "Price": 64.92
+    },
+    {
+      "Isin": "IT0005425233",
+      "Description": "BTP 1,7% Set51",
+      "Coupon": 0.017,
+      "Maturity": "2051-09-01",
+      "Price": 53.70
+    },
+    {
+      "Isin": "IT0005480980",
+      "Description": "BTP 2,15% Set52",
+      "Coupon": 0.0215,
+      "Maturity": "2052-09-01",
+      "Price": 59.02
+    },
+    {
+      "Isin": "IT0005534141",
+      "Description": "BTP 4,5% Ott53",
+      "Coupon": 0.045,
+      "Maturity": "2053-10-01",
+      "Price": 91.86
+    },
+    {
+      "Isin": "IT0005611741",
+      "Description": "BTP 4,3% Ott54",
+      "Coupon": 0.043,
+      "Maturity": "2054-10-01",
+      "Price": 88.59
+    },
+    {
+      "Isin": "IT0005668238",
+      "Description": "BTP 4,65% Ott55",
+      "Coupon": 0.0465,
+      "Maturity": "2055-10-01",
+      "Price": 93.23
+    },
+    {
+      "Isin": "IT0005217390",
+      "Description": "BTP 2,8% Mar67",
+      "Coupon": 0.028,
+      "Maturity": "2067-03-01",
+      "Price": 64.02
+    },
+    {
+      "Isin": "IT0005441883",
+      "Description": "BTP 2,15% Mar72",
+      "Coupon": 0.0215,
+      "Maturity": "2072-03-01",
+      "Price": 52.85
+    }
+  ],
+  "Inputs": {
+    "Capital": 50000,
+    "Commission": 0,
+    "TaxRate": 0.125,
+    "Lot": 1000
+  }
+}

@@ -1,5 +1,6 @@
 @inject AppState State
 @inject NativeDialogs Dialogs
+@inject UiPrefs Prefs
 @implements IDisposable
 
 @if (State.HasData)
@@ -15,17 +16,47 @@ else
     <div class="empty">
         <i class="ti ti-file-spreadsheet"></i>
         <h2>@T("Nessun file caricato")</h2>
-        <p>@T("Apri il file CSV delle operazioni esportato dal broker.")</p>
+        @if (Welcome)
+        {
+            <p>@T("Apri il file CSV delle transazioni di Trade Republic con «Apri CSV…».")</p>
+        }
+        else
+        {
+            <p>@T("Apri il file CSV delle operazioni esportato dal broker.")</p>
+        }
         @if (State.LoadError is not null)
         {
             <p class="neg">@State.LoadError</p>
         }
-        <button class="btn primary" @onclick="Open"><i class="ti ti-folder-open"></i> @T("Apri CSV…")</button>
+        @if (_demoError is not null)
+        {
+            <p class="neg">@_demoError</p>
+        }
+        <div class="btn-row">
+            <button class="btn primary" @onclick="Open"><i class="ti ti-folder-open"></i> @T("Apri CSV…")</button>
+            @if (Welcome)
+            {
+                <button class="btn" data-help="demo.open" @onclick="StartDemo"><i class="ti ti-flask"></i> @T("Prova con un conto di esempio")</button>
+            }
+        </div>
+        @if (Welcome)
+        {
+            <div class="notes">
+                <p class="note"><i class="ti ti-lock"></i><span>@T("I tuoi dati restano su questo PC: il file non viene mai modificato né inviato. Per i prezzi, l'app chiede a siti pubblici solo i codici dei titoli.")</span></p>
+                <p class="note"><i class="ti ti-info-circle"></i><span>@T("Pelago non è affiliato a Trade Republic. I valori sono stime calcolate dal file: non sono un saldo ufficiale, né consulenza finanziaria o fiscale.")</span></p>
+                <p class="note"><i class="ti ti-file-text"></i><span>@H("Software libero (GPL-3.0), senza alcuna garanzia. Dettagli in <a href=\"credits\">{0}</a>.", T("Credits"))</span></p>
+            </div>
+        }
     </div>
 }
 
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Solo la Panoramica: il benvenuto con le tre avvertenze e il conto di esempio. Le altre pagine restano brevi.</summary>
+    [Parameter] public bool Welcome { get; set; }
+
+    private string? _demoError;
 
     protected override void OnInitialized() => State.Changed += OnChanged;
 
@@ -37,6 +68,19 @@ else
         if (path is not null)
         {
             await State.LoadFileAsync(path);
+        }
+    }
+
+    private void StartDemo()
+    {
+        _demoError = null;
+        try
+        {
+            DemoAccount.Launch(Loc.Culture.TwoLetterISOLanguageName, Prefs.Get("theme"));
+        }
+        catch (Exception ex)
+        {
+            _demoError = T("Non riesco ad aprire il conto di esempio: {0}", ex.Message);
         }
     }
 
