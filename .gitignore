@@ -29,3 +29,7 @@ nomi-titoli.json
 nomi-emittenti.json
 # ...tranne il conto di esempio (dati inventati, dentro l'eseguibile)
 !demo/**
+
+# Demo nel browser: il progetto completo viene generato da tools/build-demo.ps1 (sorgenti copiati)
+Web/_build/
+site/provalo/demo/

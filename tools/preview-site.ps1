@@ -9,6 +9,7 @@ USO:   .\tools\preview-site.ps1                      apre http://localhost:8080/
        .\tools\preview-site.ps1 -Port 9000 -NoOpen   un'altra porta, senza aprire il browser
 
 Si ferma con Ctrl+C. Dopo aver cambiato testi o stile: .\tools\build-site.ps1 e poi ricarica la pagina (non serve riavviare).
+La demo nel browser (site\provalo\demo) non sta nel repository: per vederla in anteprima serve prima .\tools\build-demo.ps1.
 #>
 param(
     [int]$Port = 8080,
@@ -24,7 +25,8 @@ if (-not $Prefix.StartsWith('/')) { $Prefix = '/' + $Prefix }
 if (-not $Prefix.EndsWith('/')) { $Prefix += '/' }
 
 $mime = @{ '.html' = 'text/html; charset=utf-8'; '.css' = 'text/css; charset=utf-8'; '.js' = 'text/javascript'; '.svg' = 'image/svg+xml'; '.png' = 'image/png'
-    '.jpg' = 'image/jpeg'; '.webp' = 'image/webp'; '.mp4' = 'video/mp4'; '.woff2' = 'font/woff2'; '.txt' = 'text/plain; charset=utf-8'; '.xml' = 'application/xml' }
+    '.jpg' = 'image/jpeg'; '.webp' = 'image/webp'; '.mp4' = 'video/mp4'; '.woff2' = 'font/woff2'; '.txt' = 'text/plain; charset=utf-8'; '.xml' = 'application/xml'
+    '.wasm' = 'application/wasm'; '.json' = 'application/json'; '.dat' = 'application/octet-stream'; '.dll' = 'application/octet-stream'; '.ico' = 'image/x-icon' }
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$Port/")

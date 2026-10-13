@@ -9,10 +9,13 @@
     <BondCountryBar Selected="IT" />
 
     <div class="row" style="margin:14px 0 12px">
-        <a class="btn" href="bonds/IT" data-help="bonds.yields"><i class="ti ti-chart-line"></i> @T("Rendimenti e spread dell'Italia")</a>
-        <button class="btn primary" data-help="btp.refresh" disabled="@_refreshing" @onclick="() => RefreshAsync(true)">
-            <i class="ti ti-refresh @(_refreshing ? "spin" : "")"></i> @T("Aggiorna da Borsa Italiana")
-        </button>
+        @if (!State.IsWeb)
+        {
+            <a class="btn" href="bonds/IT" data-help="bonds.yields"><i class="ti ti-chart-line"></i> @T("Rendimenti e spread dell'Italia")</a>
+            <button class="btn primary" data-help="btp.refresh" disabled="@_refreshing" @onclick="() => RefreshAsync(true)">
+                <i class="ti ti-refresh @(_refreshing ? "spin" : "")"></i> @T("Aggiorna da Borsa Italiana")
+            </button>
+        }
         <button class="btn @(_compare ? "primary" : "")" data-help="btp.compare" @onclick="ToggleCompare"><i class="ti ti-columns-3"></i> @(_compare ? T("Esci dal confronto") : T("Confronta BTP"))</button>
         @if (_compare)
         {
@@ -90,7 +93,7 @@
     {
         LoadRows();
         var stale = _data.UpdatedAt is not { } updated || DateTime.Now - updated > StaleAfter;
-        if (_data.Bonds.Count == 0 || stale)
+        if (!State.IsWeb && (_data.Bonds.Count == 0 || stale))       // la demo nel browser non si collega a nessuno: mostra l'elenco salvato
         {
             await RefreshAsync(false);
         }

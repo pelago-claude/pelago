@@ -8,7 +8,10 @@
             <h1><i class="ti ti-layout-dashboard"></i>@T("Panoramica")</h1>
             <p class="sub">@T("Il conto di oggi in un colpo d'occhio. Clicca un riquadro per vederne i dettagli.")</p>
         </div>
-        <button class="btn no-print" data-help="export.pdf" @onclick="ExportPdf"><i class="ti ti-file-type-pdf"></i> @T("Esporta PDF")</button>
+        @if (!State.IsWeb)
+        {
+            <button class="btn no-print" data-help="export.pdf" @onclick="ExportPdf"><i class="ti ti-file-type-pdf"></i> @T("Esporta PDF")</button>
+        }
     </div>
 
     <NeedData Welcome="true">

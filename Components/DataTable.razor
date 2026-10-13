@@ -2,6 +2,7 @@
 @using System.Text
 @inject NativeDialogs Dialogs
 @inject UiPrefs Prefs
+@inject AppState Env
 
 <div class="table-card @(_compact ? "compact" : "")">
     <div class="table-toolbar">
@@ -13,8 +14,11 @@
         <div class="grow"></div>
         @Toolbar
         <button class="btn ghost @(_compact ? "on" : "")" data-help="table.compact" @onclick="ToggleCompact" title="@T("Righe compatte")" aria-pressed="@_compact"><i class="ti ti-list"></i></button>
-        <button class="btn ghost" data-help="export" @onclick="Export" title="@T("Esporta in CSV")"><i class="ti ti-download"></i> CSV</button>
-        <button class="btn ghost" data-help="export.xlsx" @onclick="ExportXlsx" title="@T("Esporta in Excel")"><i class="ti ti-file-spreadsheet"></i> @T("Excel")</button>
+        @if (!Env.IsWeb)
+        {
+            <button class="btn ghost" data-help="export" @onclick="Export" title="@T("Esporta in CSV")"><i class="ti ti-download"></i> CSV</button>
+            <button class="btn ghost" data-help="export.xlsx" @onclick="ExportXlsx" title="@T("Esporta in Excel")"><i class="ti ti-file-spreadsheet"></i> @T("Excel")</button>
+        }
     </div>
     <div class="table-wrap">
         <table class="grid">

@@ -26,6 +26,14 @@
     <Content Remove="Tests\**" />
     <None Remove="Tests\**" />
     <EmbeddedResource Remove="Tests\**" />
+    <!-- Demo nel browser: progetto a parte (Web\Pelago.Web.csproj, si costruisce con tools\build-demo.ps1), non entra nell'app. -->
+    <Compile Remove="Web\**" />
+    <Content Remove="Web\**" />
+    <None Remove="Web\**" />
+    <EmbeddedResource Remove="Web\**" />
+    <!-- Sito vetrina: solo HTML e immagini. -->
+    <None Remove="site\**" />
+    <None Remove="site-src\**" />
   </ItemGroup>
 
   <ItemGroup>

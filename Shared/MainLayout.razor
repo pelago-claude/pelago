@@ -45,8 +45,14 @@
             <button class="nav-group-head @(IsOpen(GMarkets) ? "open" : "")" aria-expanded="@IsOpen(GMarkets)" data-help="nav:group" @onclick="() => Toggle(GMarkets)"><i class="ti ti-chevron-right"></i>@T("Mercati")</button>
             @if (IsOpen(GMarkets))
             {
-                <NavLink class="nav-item" href="quotes" data-help="nav:/quotes"><i class="ti ti-refresh @(State.IsUpdating ? "spin" : "")"></i>@T("Quotazioni")</NavLink>
-                <NavLink class="nav-item" href="currencies" data-help="nav:/currencies"><i class="ti ti-currency-euro"></i>@T("Valute")</NavLink>
+                @if (!State.IsWeb)
+                {
+                    <NavLink class="nav-item" href="quotes" data-help="nav:/quotes"><i class="ti ti-refresh @(State.IsUpdating ? "spin" : "")"></i>@T("Quotazioni")</NavLink>
+                }
+                @if (!State.IsWeb)
+                {
+                    <NavLink class="nav-item" href="currencies" data-help="nav:/currencies"><i class="ti ti-currency-euro"></i>@T("Valute")</NavLink>
+                }
                 <a class="nav-item @(GovActive ? "active" : "")" href="@GovHref" data-help="nav:/bonds"><i class="ti ti-building-bank"></i>@T("Titoli di Stato")</a>
             }
 
@@ -66,7 +72,10 @@
                         <span class="badge-count">@State.WarningCount</span>
                     }
                 </NavLink>
-                <NavLink class="nav-item" href="files" data-help="nav:/files"><i class="ti ti-folder"></i>@T("Dati e file")</NavLink>
+                @if (!State.IsWeb)
+                {
+                    <NavLink class="nav-item" href="files" data-help="nav:/files"><i class="ti ti-folder"></i>@T("Dati e file")</NavLink>
+                }
                 <NavLink class="nav-item" href="names" data-help="nav:/names"><i class="ti ti-tag"></i>@T("Nomi dei titoli")</NavLink>
                 <NavLink class="nav-item" href="history" data-help="nav:/history"><i class="ti ti-history"></i>@T("Storia")</NavLink>
                 <NavLink class="nav-item" href="credits" data-help="nav:/credits"><i class="ti ti-heart-handshake"></i>@T("Credits")</NavLink>
@@ -115,11 +124,23 @@
             {
                 <span class="muted" data-help="top:quotes"><i class="ti ti-clock"></i> @T("Quotazioni al {0}", updated.ToString("dd/MM/yyyy HH:mm"))</span>
             }
-            <button class="btn" data-help="top:add" @onclick="AddFile"><i class="ti ti-file-plus"></i> @T("Aggiungi movimenti…")</button>
-            <button class="btn" data-help="top:open" @onclick="OpenFile"><i class="ti ti-folder-open"></i> @T("Apri CSV…")</button>
+            @if (!State.IsWeb)
+            {
+                <button class="btn" data-help="top:add" @onclick="AddFile"><i class="ti ti-file-plus"></i> @T("Aggiungi movimenti…")</button>
+                <button class="btn" data-help="top:open" @onclick="OpenFile"><i class="ti ti-folder-open"></i> @T("Apri CSV…")</button>
+            }
         </header>
 
-        @if (State.IsDemo)
+        @if (State.IsWeb)
+        {
+            <div class="banner info top" data-help="banner.web">
+                <i class="ti ti-flask"></i>
+                <span>@T("Demo nel browser con dati inventati: non fa richieste a internet e, chiusa la pagina, non resta nulla.")</span>
+                <span class="grow"></span>
+                <a class="btn primary" href="@SiteUrl">@T("Scarica il programma")</a>
+            </div>
+        }
+        else if (State.IsDemo)
         {
             <div class="banner info top" data-help="banner.demo">
                 <i class="ti ti-flask"></i>
@@ -159,6 +180,9 @@
 <CommandPalette @key="@("palette-" + Lang)" OnAddFile="AddFile" Open="_palette" OnClose="ClosePalette" OnToggleTheme="ToggleTheme" OnTogglePrivacy="TogglePrivacyAsync" OnOpenFile="OpenFile" />
 
 @code {
+    /// <summary>Solo nella demo nel browser: la pagina del sito (nella lingua attuale) da cui si scarica il programma. La demo sta in .../provalo/demo/.</summary>
+    private string SiteUrl => new Uri(new Uri(Nav.BaseUri), "../../" + (Loc.Culture.TwoLetterISOLanguageName is var l && l != "it" ? l + "/" : "")).ToString();
+
     private bool _dark;
     private bool _palette;
     private bool _privacy;

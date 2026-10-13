@@ -1,6 +1,10 @@
 @inject NavigationManager Nav
 @inject UiPrefs Prefs
+@inject AppState Env
 
+@* Gli altri Stati leggono i rendimenti da internet: nella demo nel browser c'e' solo l'Italia, quindi niente scelta dello Stato. *@
+@if (!Env.IsWeb)
+{
 <div class="bond-countries" data-help="bonds.countries">
     <span class="muted">@T("Stato:")</span>
     @foreach (var code in GovBonds.Featured)
@@ -29,6 +33,7 @@
             <button class="chip @(Selected == country.Code ? "on" : "")" @onclick="() => Go(country.Code)"><Flag Code="@country.Flag" />@T(country.Name)</button>
         }
     </div>
+}
 }
 
 @code {

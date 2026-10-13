@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <!--
+    La demo nel browser: lo STESSO programma (stesse pagine, stessi calcoli) ospitato in una pagina web, con il conto di esempio
+    (dati inventati). I sorgenti non stanno qui: tools\build-demo.ps1 costruisce in Web\_build\ un progetto completo (copia di Services,
+    Pages, Components... piu' questo file, Program.cs e NativeDialogs.cs) e lo pubblica. Qui ci sono solo l'avvio (Program.cs),
+    la sostituzione delle finestre di Windows (NativeDialogs.cs) e la pagina ospite (index.web.html).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Pelago</RootNamespace>
+    <AssemblyName>Pelago.Web</AssemblyName>
+    <Version>2.18.0</Version>
+    <Product>Pelago (demo nel browser)</Product>
+    <!-- i formati di data e numero delle cinque lingue servono: niente globalizzazione invariante -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- il programma imposta la lingua all'avvio e quando l'utente la cambia: Blazor lo consente solo caricando tutti i dati di formattazione -->
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+    <!-- GitHub Pages non serve i file .br/.gz precompressi: sarebbero solo peso in piu' (la compressione la fa il server) -->
+    <BlazorEnableCompression>false</BlazorEnableCompression>
+    <CompressionEnabled>false</CompressionEnabled>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- la demo non e' il programma: niente avvisi su codice che si usa solo in Windows -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- nel programma per Windows arriva dal riferimento implicito a WinForms: qui serve solo Color (System.Drawing.Primitives) -->
+    <Using Include="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Come nel programma: traduzioni e conto di esempio viaggiano dentro l'assembly (stessi nomi logici). -->
+    <EmbeddedResource Include="i18n\??.json" LogicalName="i18n/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="demo\**\*" LogicalName="demo/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="samples\esempio-operazioni.csv" LogicalName="demo/esempio-operazioni.csv" />
+  </ItemGroup>
+
+</Project>

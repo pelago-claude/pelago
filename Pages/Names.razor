@@ -14,8 +14,11 @@
             </label>
             <span class="muted">@Plural(State.Names.Count, "{0} nome scelto da te", "{0} nomi scelti da te")@if (State.IssuerNames.Count > 0) { <text> · </text>@Plural(State.IssuerNames.Count, "{0} nome dell'emittente", "{0} nomi dell'emittente") }</span>
             <div class="grow"></div>
-            <button class="btn" data-help="names.export" @onclick="Export"><i class="ti ti-download"></i> @T("Esporta i nomi")</button>
-            <button class="btn" data-help="names.import" @onclick="Import"><i class="ti ti-upload"></i> @T("Importa i nomi")</button>
+            @if (!State.IsWeb)
+            {
+                <button class="btn" data-help="names.export" @onclick="Export"><i class="ti ti-download"></i> @T("Esporta i nomi")</button>
+                <button class="btn" data-help="names.import" @onclick="Import"><i class="ti ti-upload"></i> @T("Importa i nomi")</button>
+            }
         </div>
 
         @if (_rows.Count == 0)

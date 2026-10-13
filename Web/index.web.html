@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <!--
+        La demo non parla con nessuno: questa politica di sicurezza e' applicata dal browser stesso e vieta ogni collegamento fuori da questo
+        sito (connect-src 'self'), quindi nessun dato puo' uscire anche in caso di errore o di codice sbagliato. wasm-unsafe-eval serve a .NET.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; media-src 'self'; worker-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'none'" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Pelago (demo)</title>
+    <link rel="icon" type="image/png" href="img/pelago.png" />
+    <base href="/" />
+    <link rel="stylesheet" href="lib/tabler/tabler-icons.min.css" />
+    <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+    <div id="app"><div class="boot">Pelago…</div></div>
+    <noscript><p style="padding:24px;font-family:sans-serif">Pelago needs JavaScript to run this demo in the browser.</p></noscript>
+
+    <div id="blazor-error-ui">
+        Si è verificato un errore.
+        <a href="" class="reload">Ricarica</a>
+    </div>
+
+    <script>
+        // usate da Web\Program.cs: parametri dell'indirizzo e lingua del browser
+        window.pelagoQuery = () => location.search;
+        window.pelagoTheme = () => (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        window.pelagoLanguage = () => ((navigator.languages && navigator.languages[0]) || navigator.language || 'it').slice(0, 2).toLowerCase();
+    </script>
+    <script src="lib/echarts.min.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/assist.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>

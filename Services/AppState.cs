@@ -95,6 +95,9 @@ public sealed class AppState : IDisposable
     /// <summary>Questa finestra è il conto di esempio (dati inventati, in una cartella a parte), non i dati dell'utente.</summary>
     public bool IsDemo => DemoAccount.IsActive;
 
+    /// <summary>Questa è la demo nel browser (Web\Pelago.Web.csproj), non il programma per Windows: niente file dell'utente, finestre di Windows o rete.</summary>
+    public bool IsWeb => OperatingSystem.IsBrowser();
+
     // «Ho capito» vale solo per questa esecuzione del programma: non si salva da nessuna parte, quindi a ogni avvio la finestra ricompare.
     // Le prove automatiche (PELAGO_TEST=1 con PELAGO_TAX_ACCEPTED=1) la saltano, altrimenti coprirebbe le pagine che devono fotografare.
     private bool _taxDisclaimerAccepted = Environment.GetEnvironmentVariable("PELAGO_TEST") == "1" && Environment.GetEnvironmentVariable("PELAGO_TAX_ACCEPTED") == "1";
@@ -526,6 +529,10 @@ public sealed class AppState : IDisposable
 
     private void StartWatching(string? dir)
     {
+        if (OperatingSystem.IsBrowser())
+        {
+            return;     // nella demo nel browser non c'e' una cartella da tenere d'occhio (e FileSystemWatcher non esiste)
+        }
         if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir))
         {
             _watcher?.Dispose();

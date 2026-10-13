@@ -117,6 +117,12 @@
             new("ti-help-hexagon", T("Modalità assistita (accendi / spegni)"), T("comando"), K("assistente aiuto spiegazioni"), null, () => { Assist.Toggle(); return Task.CompletedTask; }),
         };
 
+        if (State.IsWeb)
+        {
+            // demo nel browser: niente rete, file o cartelle dell'utente
+            items.RemoveAll(i => i.Route is "quotes" or "files" or "currencies" || i.Icon is "ti-folder-open" or "ti-file-plus" || (i.Route is null && i.Icon == "ti-refresh"));
+        }
+
         foreach (var h in State.Holdings.OrderByDescending(h => h.Shares != 0m).ThenByDescending(h => h.Value))
         {
             var full = State.FullNameOf(h.Key, h.Name);
@@ -124,7 +130,7 @@
                 $"{h.Name} {h.Symbol} {h.Key}", $"security?key={Uri.EscapeDataString(h.Key)}", null));
         }
 
-        foreach (var country in GovBonds.Countries.Where(c => c.Code != "IT"))
+        foreach (var country in GovBonds.Countries.Where(c => c.Code != "IT" && !State.IsWeb))      // gli altri Stati leggono da internet: non nella demo
         {
             items.Add(new Item("ti-building-bank", T("Titoli di Stato: {0}", T(country.Name)), T("pagina"), $"{T(country.Name)} {country.Name} {country.Code} {K("titoli di stato rendimenti")}",
                 $"bonds/{country.Code}", null));

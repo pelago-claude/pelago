@@ -1,5 +1,4 @@
 [
-  "Finestra «Ho capito» a ogni avvio, alla prima apertura di una pagina del gruppo Fisco (Zainetto fiscale, Costi e tasse, Cedole e scadenze)",
-  "Gli importi dello Zainetto fiscale sono stime e c'era già un riquadro che lo diceva, ma chi usa Pelago per la dichiarazione dei redditi merita un avviso che non si possa saltare. Ora, a ogni avvio del programma, la prima volta che apri una pagina del gruppo Fisco con un file caricato compare una finestra che spiega i limiti e chiede un «Ho capito»; navigando altrove e tornando non si ripete, ma chiudendo Pelago e riaprendolo ricompare, anche dopo pochi minuti. Nella pagina Crediti c'è una frase sulla responsabilità (il programma è fornito senza garanzie, e la responsabilità di ciò che si dichiara resta di chi lo dichiara), e il riquadro dello Zainetto fiscale lo ripete in modo più netto.",
-  "Nuovi test automatici per la finestra e per l'avviso nell'Excel"
+  "Demo nel browser con dati inventati: non fa richieste a internet e, chiusa la pagina, non resta nulla.",
+  "Scarica il programma"
 ]
