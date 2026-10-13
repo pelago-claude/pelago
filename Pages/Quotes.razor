@@ -4,10 +4,10 @@
 
 <div class="page fill">
     <h1><i class="ti ti-refresh"></i>@T("Quotazioni")</h1>
-    <p class="sub">@T("Aggiorna i prezzi da CoinGecko, Yahoo Finance e Frankfurter. Fino a 5 richieste in parallelo.")</p>
+    <p class="sub">@T("Aggiorna i prezzi da CoinGecko, Yahoo Finance e Frankfurter, e l'elenco dei BTP da Borsa Italiana. Fino a 5 richieste in parallelo.")</p>
 
     <div class="row" style="margin-bottom:14px">
-        <button class="btn primary" data-help="update.all" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "CRYPTO", "STOCK", "FUND", "FX", "DERIVATIVE" }, "tutti gli asset supportati")'><i class="ti ti-refresh"></i> @T("Aggiorna tutto")</button>
+        <button class="btn primary" data-help="update.all" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "CRYPTO", "STOCK", "FUND", "FX", "DERIVATIVE", "BOND" }, "tutti gli asset supportati")'><i class="ti ti-refresh"></i> @T("Aggiorna tutto")</button>
         <button class="btn" data-help="update.crypto" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "CRYPTO" }, "Crypto")'><i class="ti ti-currency-bitcoin"></i> @T("Crypto")</button>
         <button class="btn" data-help="update.stocks" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "STOCK", "FUND" }, "Azioni e Fondi")'><i class="ti ti-chart-candle"></i> @T("Azioni e Fondi")</button>
         <button class="btn" data-help="update.fx" disabled="@State.IsUpdating" @onclick='() => Run(new[] { "FX" }, "Cambio EUR/USD")'><i class="ti ti-currency-euro"></i> @T("Cambio EUR/USD")</button>

@@ -12,7 +12,8 @@ namespace Pelago.Services;
 /// </summary>
 public sealed class AppState : IDisposable
 {
-    public static readonly string[] AllSupportedAssetClasses = { "CRYPTO", "STOCK", "FUND", "FX", "DERIVATIVE" };
+    /// <summary>«BOND» non è una categoria di prezzi: vuol dire «scarica anche l'elenco dei BTP da Borsa Italiana», se nel conto ci sono BTP.</summary>
+    public static readonly string[] AllSupportedAssetClasses = { "CRYPTO", "STOCK", "FUND", "FX", "DERIVATIVE", "BOND" };
 
     /// <summary>All'apertura i prezzi vengono aggiornati da soli se l'ultimo aggiornamento è più vecchio di così.</summary>
     public const int AutoUpdateAfterHours = 12;
@@ -265,7 +266,8 @@ public sealed class AppState : IDisposable
 
     /// <summary>
     /// Il nome di un derivato secondo l'emittente («Turbo su Oro»), con in coda l'etichetta del file («Long 4.100 $») che distingue un prodotto dall'altro
-    /// sullo stesso titolo. Null se non lo si è ancora letto dal sito.
+    /// sullo stesso titolo. Per un BTP il nome di Borsa Italiana («BTP 4,3% Ott54») ha già cedola e scadenza: è unico, e non si aggiunge nulla.
+    /// Null se non lo si è ancora letto dal sito.
     /// </summary>
     public string? IssuerNameOf(string key)
     {
@@ -274,8 +276,52 @@ public sealed class AppState : IDisposable
         {
             return null;
         }
+        if (BondKeys.Contains(InstrumentNames.Normalize(key)))
+        {
+            return product;
+        }
         return ShortNames.TryGetValue(key, out var shortName) && !string.IsNullOrWhiteSpace(shortName) ? $"{product} ({shortName})" : product;
     }
+
+    /// <summary>
+    /// Ricorda il nome che Borsa Italiana dà ai BTP che sono nel conto («Okt. 2054» nel file del broker → «BTP 4,3% Ott54»): da allora le liste usano
+    /// quello, tranne dove l'utente ha scelto un nome suo. Restituisce quanti BTP del conto sono stati trovati nell'elenco.
+    /// </summary>
+    public int LearnBondNames(IEnumerable<BtpBond> bonds)
+    {
+        var mine = BondKeys;
+        if (mine.Count == 0)
+        {
+            return 0;
+        }
+
+        var found = 0;
+        var changed = false;
+        foreach (var bond in bonds)
+        {
+            if (mine.Contains(InstrumentNames.Normalize(bond.Isin)) && !string.IsNullOrWhiteSpace(bond.Description))
+            {
+                found++;
+                changed |= _issuerNames.Set(bond.Isin, bond.Description);
+            }
+        }
+        if (changed)
+        {
+            Changed?.Invoke();
+        }
+        return found;
+    }
+
+    /// <summary>Chi scarica l'elenco dei BTP (Borsa Italiana): per le prove automatiche si può sostituire con uno finto.</summary>
+    public Func<CancellationToken, Task<BtpFetchResult>> BtpFetcher { get; set; } = BtpOnlineProvider.FetchAsync;
+
+    /// <summary>I codici delle obbligazioni che compaiono nelle operazioni.</summary>
+    private HashSet<string> BondKeys { get; set; } = new(StringComparer.Ordinal);
+
+    private static HashSet<string> BuildBondKeys(List<Operation> operations) => operations
+        .Where(o => o.AssetClass == "BOND" && !string.IsNullOrWhiteSpace(o.PositionKey))
+        .Select(o => InstrumentNames.Normalize(o.PositionKey))
+        .ToHashSet(StringComparer.Ordinal);
 
     /// <summary>Il nome del titolo nel file (senza il nome scelto dall'utente né quello dell'emittente).</summary>
     public string OriginalNameOf(string key, string fallback) => FullNames.TryGetValue(key, out var n) ? n : fallback;
@@ -348,6 +394,7 @@ public sealed class AppState : IDisposable
             Snapshots = snapshots;
             FullNames = BuildFullNames(operations);
             ShortNames = BuildShortNames(operations);
+            BondKeys = BuildBondKeys(operations);
             RecomputeDerived();
             LoadedFilePath = path;
             RecentFileStore.SetLastFilePath(path);
@@ -664,9 +711,15 @@ public sealed class AppState : IDisposable
 
         try
         {
+            var withBtp = assetClasses.Contains("BOND");
+            if (withBtp)
+            {
+                await UpdateBtpListAsync();
+            }
+
             // i derivati si leggono solo se la funzione è accesa per il loro emittente e solo per quelli aperti: sono pochi, e le richieste ai siti vanno tenute al minimo
             var derivativeKeys = OpenDerivativesToRead();
-            foreach (var assetClass in assetClasses.Where(ac => ac != "FX"))
+            foreach (var assetClass in assetClasses.Where(ac => ac != "FX" && ac != "BOND"))
             {
                 if (assetClass == "DERIVATIVE")
                 {
@@ -685,11 +738,14 @@ public sealed class AppState : IDisposable
             }
 
             var entries = AssetCatalogStore.Load()
-                .Where(e => assetClasses.Contains(e.AssetClass) && (e.AssetClass != "DERIVATIVE" || derivativeKeys.Contains(e.Key)))
+                .Where(e => e.AssetClass != "BOND" && assetClasses.Contains(e.AssetClass) && (e.AssetClass != "DERIVATIVE" || derivativeKeys.Contains(e.Key)))
                 .ToList();
             if (entries.Count == 0)
             {
-                AppendLog(T("Nessun asset da aggiornare per questa categoria."));
+                if (!withBtp)
+                {
+                    AppendLog(T("Nessun asset da aggiornare per questa categoria."));
+                }
                 return;
             }
 
@@ -736,6 +792,36 @@ public sealed class AppState : IDisposable
             IsUpdating = false;
             UpdateTitle = null;
             Changed?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// Scarica l'elenco dei BTP da Borsa Italiana (una richiesta sola, come dal pulsante nella pagina dei BTP), lo salva e ne ricorda i nomi per i BTP del
+    /// conto. Si fa solo se nel conto c'è almeno un titolo italiano tra le obbligazioni: senza BTP non c'è motivo di disturbare il sito.
+    /// </summary>
+    private async Task UpdateBtpListAsync()
+    {
+        if (!BondKeys.Any(k => k.StartsWith("IT", StringComparison.Ordinal)))
+        {
+            return;
+        }
+
+        AppendLog(T("Scarico l'elenco dei BTP da Borsa Italiana…"));
+        try
+        {
+            var result = await BtpFetcher(CancellationToken.None);
+            var data = BtpStore.Load();
+            data.Bonds = result.Bonds;
+            data.UpdatedAt = DateTime.Now;
+            data.Source = BtpOnlineProvider.SourceName;
+            BtpStore.Save(data);
+
+            var named = LearnBondNames(result.Bonds);
+            AppendLog($"OK      {T("Elenco dei BTP: {0} titoli, {1} nel tuo conto con il nome di Borsa Italiana.", result.Bonds.Count, named)}");
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            AppendLog($"{T("ERRORE"),-8}{T("Elenco dei BTP: {0}", ex.Message)}");
         }
     }
 

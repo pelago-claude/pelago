@@ -416,7 +416,7 @@ public static class HelpTexts
         E("asof.cat.INTEREST", "Interessi", "Gli interessi netti incassati fino a quel giorno, uno per riga.", keywords: "interessi");
 
         // ---- Quotazioni
-        E("update.all", "Aggiorna tutto", "Scarica i prezzi di crypto, azioni, fondi e del cambio EUR/USD, fino a 5 richieste in parallelo.", keywords: "aggiorna tutto prezzi scarica");
+        E("update.all", "Aggiorna tutto", "Scarica i prezzi di crypto, azioni, fondi e del cambio EUR/USD, fino a 5 richieste in parallelo. Se nel conto ci sono BTP, scarica anche l'elenco dei BTP da Borsa Italiana (una richiesta sola) e ne ricorda i nomi.", keywords: "aggiorna tutto prezzi scarica");
         E("update.crypto", "Aggiorna Crypto", "Prende i prezzi delle crypto da CoinGecko.", keywords: "aggiorna crypto coingecko");
         E("update.stocks", "Aggiorna Azioni e Fondi", "Prende i prezzi da Yahoo Finance. Le quotazioni in dollari sono convertite in euro.", keywords: "aggiorna azioni fondi yahoo");
         E("update.fx", "Aggiorna Cambio", "Prende il cambio EUR/USD da Frankfurter (dati BCE), usato per convertire i prezzi in dollari.", keywords: "aggiorna cambio eurusd frankfurter");

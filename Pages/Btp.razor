@@ -117,6 +117,7 @@
             _skipped = result.SkippedNoPrice;
             _unrecognized = result.Unrecognized;
             BtpStore.Save(_data);
+            State.LearnBondNames(result.Bonds);   // i BTP del conto prendono il nome di Borsa Italiana nelle liste
         }
         catch (OperationCanceledException)
         {

@@ -757,6 +757,20 @@
       "Coupon": 0.0215,
       "Maturity": "2072-03-01",
       "Price": 52.85
+    },
+    {
+      "Isin": "IT00DEMOBTP29",
+      "Description": "BTP 2,2% Set29",
+      "Coupon": 0.022,
+      "Maturity": "2029-09-01",
+      "Price": 100.4
+    },
+    {
+      "Isin": "IT00DEMOBTP35",
+      "Description": "BTP 3,5% Mar35",
+      "Coupon": 0.035,
+      "Maturity": "2035-03-01",
+      "Price": 99.8
     }
   ],
   "Inputs": {

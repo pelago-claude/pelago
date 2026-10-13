@@ -102,7 +102,7 @@
 </div>
 
 @code {
-    private sealed record Row(string Key, string Name, string Class, string Issuer, DateTime Opened, DateTime Closed, int Days, int Trades, int Cycles,
+    private sealed record Row(string Key, string Name, string Class, string Issuer, string? IssuerCountry, DateTime Opened, DateTime Closed, int Days, int Trades, int Cycles,
         decimal Invested, decimal Proceeds, decimal Fees, decimal Taxes, decimal Result, double? ReturnPct, string Status);
 
     private sealed record YearRow(int Year, int Count, int Winners, int Losers, decimal Result, decimal Fees, decimal Taxes);
@@ -128,7 +128,7 @@
     {
         Col.Name<Row>("Titolo", r => r.Name, r => r.Key),
         Col.Isin<Row>("Codice", r => r.Key),
-        Col.Text<Row>("Emittente", r => r.Issuer),
+        Col.IssuerFlag<Row>(r => r.Issuer, r => r.IssuerCountry),
         Col.Badge<Row>("Categoria", r => r.Class),
         Col.Date<Row>("Chiusa il", r => r.Closed),
         Col.Money<Row>("Risultato", r => r.Result, signColor: true, total: rows => rows.Sum(r => r.Result), bar: true),
@@ -178,11 +178,11 @@
 
         _rows = _byUnderlying
             ? shown.GroupBy(p => (p.AssetClass, Name: ClosedPositionCalculator.Underlying(p.Name))).Select(g =>
-                new Row("", g.Key.Name, Fmt.ClassLabel(g.Key.AssetClass), IssuersOf(g), g.Min(p => p.Opened), g.Max(p => p.Closed),
+                new Row("", g.Key.Name, Fmt.ClassLabel(g.Key.AssetClass), IssuersOf(g), null, g.Min(p => p.Opened), g.Max(p => p.Closed),
                     (int)(g.Max(p => p.Closed).Date - g.Min(p => p.Opened).Date).TotalDays, g.Sum(p => p.Trades), g.Sum(p => p.Cycles.Count),
                     g.Sum(p => p.Invested), g.Sum(p => p.Proceeds), g.Sum(p => p.Fees), g.Sum(p => p.TaxesPaid), g.Sum(p => p.Result),
                     g.Sum(p => p.Invested) > 0m ? (double)(g.Sum(p => p.Result) / g.Sum(p => p.Invested)) : null, StatusOf(g))).ToList()
-            : shown.Select(p => new Row(p.Key, p.Name, Fmt.ClassLabel(p.AssetClass), Issuers.ShortName(p.Key, p.AssetClass), p.Opened, p.Closed, (int)(p.Closed.Date - p.Opened.Date).TotalDays,
+            : shown.Select(p => new Row(p.Key, p.Name, Fmt.ClassLabel(p.AssetClass), Issuers.ShortName(p.Key, p.AssetClass), Issuers.CountryCode(p.Key, p.AssetClass), p.Opened, p.Closed, (int)(p.Closed.Date - p.Opened.Date).TotalDays,
                 p.Trades, p.Cycles.Count, p.Invested, p.Proceeds, p.Fees, p.TaxesPaid, p.Result, p.ReturnPct, StatusOf(new[] { p }))).ToList();
 
         _count = shown.Count;

@@ -13,6 +13,7 @@ internal static class TestEnvironment
         Environment.SetEnvironmentVariable("PELAGO_DATA", Path.Combine(Path.GetTempPath(), "pelago-tests-" + Guid.NewGuid().ToString("N")));
 }
 
+[Collection("AppState")]   // scrive e comprime la cartella dati, la stessa che usano gli altri test: uno alla volta
 public class BackupServiceTests
 {
     private static string NewFolder() => Path.Combine(Path.GetTempPath(), "pelago-backup-test-" + Guid.NewGuid().ToString("N"));

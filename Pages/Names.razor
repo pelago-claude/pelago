@@ -4,7 +4,7 @@
 
 <div class="page">
     <h1><i class="ti ti-tag"></i>@T("Nomi dei titoli")</h1>
-    <p class="sub">@T("I nomi dei titoli: quelli che hai scelto tu e, per i derivati, quelli letti dal sito dell'emittente. Cliccando un codice, in qualsiasi pagina, puoi cambiare il nome: da quel momento quel codice si chiama così in tutto il programma.")</p>
+    <p class="sub">@T("I nomi dei titoli: quelli che hai scelto tu e, per i derivati e per i BTP, quelli letti dal sito dell'emittente o da Borsa Italiana. Cliccando un codice, in qualsiasi pagina, puoi cambiare il nome: da quel momento quel codice si chiama così in tutto il programma.")</p>
 
     <NeedData>
         <div class="chips" style="margin-bottom:12px">
@@ -34,7 +34,7 @@
 </div>
 
 @code {
-    private sealed record Row(string Code, string Issuer, string Original, string? FromIssuer, string? Custom, string Class, DateTime? Changed, string Owned);
+    private sealed record Row(string Code, string Issuer, string? IssuerCountry, string Original, string? FromIssuer, string? Custom, string Class, DateTime? Changed, string Owned);
 
     private bool _showAll;
     private List<Row> _rows = new();
@@ -42,7 +42,7 @@
     private static readonly List<Column<Row>> _columns = new()
     {
         Col.Isin<Row>("Codice", r => r.Code),
-        Col.Text<Row>("Emittente", r => r.Issuer),
+        Col.IssuerFlag<Row>(r => r.Issuer, r => r.IssuerCountry),
         Col.Text<Row>("Nome nel file", r => r.Original),
         Col.Text<Row>("Nome dell'emittente", r => r.FromIssuer),
         Col.Text<Row>("Il tuo nome", r => r.Custom, cellCss: "strong"),
@@ -75,6 +75,7 @@
             return new Row(
                 key,
                 Issuers.ShortName(key, holding?.AssetClass),
+                Issuers.CountryCode(key, holding?.AssetClass),
                 State.OriginalNameOf(key, ""),
                 State.IssuerNameOf(key),
                 entry?.Name,

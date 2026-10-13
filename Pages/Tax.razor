@@ -236,7 +236,7 @@
 @code {
     private sealed record YearRow(int Year, Dictionary<TaxCategory, decimal> ByCategory, decimal Interest, decimal Taxes, decimal? YearEndValue);
     private sealed record InstrumentRow(string Name, string Category, int Sales, decimal Proceeds, decimal Cost, decimal Result, decimal TaxPaid);
-    private sealed record SaleRow(DateOnly Date, string Key, string Name, string Issuer, string Category, string Type, decimal Shares, decimal Proceeds, decimal Cost, decimal Result, decimal TaxPaid, decimal Unmatched);
+    private sealed record SaleRow(DateOnly Date, string Key, string Name, string Issuer, string? IssuerCountry, string Category, string Type, decimal Shares, decimal Proceeds, decimal Cost, decimal Result, decimal TaxPaid, decimal Unmatched);
     private sealed record FundRow(string Key, string Name, TaxCategory Category);
 
     private static readonly TaxCategory[] Categories = Enum.GetValues<TaxCategory>();
@@ -270,7 +270,7 @@
         Col.Date<SaleRow>("Data", r => r.Date.ToDateTime(TimeOnly.MinValue)),
         Col.Name<SaleRow>("Titolo", r => r.Name, r => r.Key),
         Col.Isin<SaleRow>("Codice", r => r.Key),
-        Col.Text<SaleRow>("Emittente", r => r.Issuer),
+        Col.IssuerFlag<SaleRow>(r => r.Issuer, r => r.IssuerCountry),
         Col.Badge<SaleRow>("Trattamento", r => T(r.Category)),
         Col.Text<SaleRow>("Tipo", r => r.Type),
         Col.Num<SaleRow>("Quantità", r => r.Shares),
@@ -344,7 +344,7 @@
         _instrumentRows = groups.Select(g => new InstrumentRow(g.Key.Name, TaxCategories.Label(g.Key.Category), g.Count(), g.Sum(s => s.Proceeds), g.Sum(s => s.CostBasis),
             g.Sum(s => s.Result), g.Sum(s => s.TaxWithheld))).ToList();
 
-        _saleRows = sales.Select(s => new SaleRow(s.Date, s.Key, State.FullNameOf(s.Key, s.Name), Issuers.ShortName(s.Key, s.AssetClass), TaxCategories.Label(s.Category), s.Type, s.Shares, s.Proceeds, s.CostBasis, s.Result, s.TaxWithheld, s.Unmatched)).ToList();
+        _saleRows = sales.Select(s => new SaleRow(s.Date, s.Key, State.FullNameOf(s.Key, s.Name), Issuers.ShortName(s.Key, s.AssetClass), Issuers.CountryCode(s.Key, s.AssetClass), TaxCategories.Label(s.Category), s.Type, s.Shares, s.Proceeds, s.CostBasis, s.Result, s.TaxWithheld, s.Unmatched)).ToList();
     }
 
     private static string Cell(decimal value) => value == 0m ? "—" : Fmt.Money(value);

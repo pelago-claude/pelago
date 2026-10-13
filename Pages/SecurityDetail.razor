@@ -12,7 +12,7 @@
         else
         {
             <h1><NameCell Name="@_name" Code="@Key" /></h1>
-            <p class="sub">@if (!string.IsNullOrWhiteSpace(_symbol)) {<Isin Code="@_symbol" /> <text>· </text>}@_classLabel@(_issuer.Length > 0 ? " · " + _issuer : "")@(_asOf is { } d ? T(" · movimenti fino al {0:dd/MM/yyyy}", d) : "")</p>
+            <p class="sub">@if (!string.IsNullOrWhiteSpace(_symbol)) {<Isin Code="@_symbol" /> <text>· </text>}@_classLabel@IssuerPart@(_asOf is { } d ? T(" · movimenti fino al {0:dd/MM/yyyy}", d) : "")</p>
 
             <div class="cards">
                 <div class="card" data-help="sec.shares"><div class="label">@T("Quantità netta")</div><div class="value">@Fmt.Num(_shares)</div></div>
@@ -81,6 +81,24 @@
     private string _symbol = "";
     private string _classLabel = "";
     private string _issuer = "";
+    private string? _issuerCountry;
+
+    /// <summary>L'emittente accanto alla categoria: la banca per un derivato, il paese con la bandiera per un'obbligazione.</summary>
+    private RenderFragment IssuerPart => builder =>
+    {
+        if (_issuer.Length == 0)
+        {
+            return;
+        }
+        builder.AddContent(0, " · ");
+        if (_issuerCountry is not null)
+        {
+            builder.OpenComponent<Flag>(1);
+            builder.AddAttribute(2, nameof(Flag.Code), _issuerCountry);
+            builder.CloseComponent();
+        }
+        builder.AddContent(3, _issuer);
+    };
     private string _exportName = "movimenti";
     private decimal _shares;
     private decimal _value;
@@ -127,6 +145,7 @@
         _symbol = first.Symbol;
         _classLabel = Fmt.ClassLabel(first.AssetClass);
         _issuer = Issuers.ShortName(first.Symbol, first.AssetClass);
+        _issuerCountry = Issuers.CountryCode(first.Symbol, first.AssetClass);
         _name = State.ChosenNameOf(first.PositionKey) ?? AssetNameResolver.ResolveDisplayName(first.Name, first.AssetClass, _history.Select(o => o.Description));
         _exportName = "movimenti-" + string.Concat(_name.Where(char.IsLetterOrDigit)).ToLowerInvariant();
 

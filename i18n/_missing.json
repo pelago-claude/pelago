@@ -1,6 +1,19 @@
 [
-  "Apri il file CSV delle transazioni di Trade Republic con «Apri CSV…».",
-  "Chi apre Pelago per la prima volta, o ha perso il file, vedeva solo un riquadro vuoto. Ora la Panoramica dice cosa fare, ricorda che i dati restano sul PC, che Pelago non è affiliato al broker e che i valori sono stime, e che il codice è libero.",
-  "I tuoi dati restano su questo PC: il file non viene mai modificato né inviato. Per i prezzi, l'app chiede a siti pubblici solo i codici dei titoli.",
-  "Software libero (GPL-3.0), senza alcuna garanzia. Dettagli in <a href=\"credits\">{0}</a>."
+  "13 ottobre 2026 — I BTP del conto prendono il nome di Borsa Italiana, e nella colonna Emittente le obbligazioni mostrano il paese con la sua bandiera.",
+  "Aggiorna i prezzi da CoinGecko, Yahoo Finance e Frankfurter, e l'elenco dei BTP da Borsa Italiana. Fino a 5 richieste in parallelo.",
+  "Elenco dei BTP: {0}",
+  "Elenco dei BTP: {0} titoli, {1} nel tuo conto con il nome di Borsa Italiana.",
+  "I BTP con nome e bandiera",
+  "I BTP del conto prendono il nome di Borsa Italiana (per esempio «BTP 4,3% Ott54») al posto di quello del file",
+  "I BTP del conto prendono il nome di Borsa Italiana, e nella colonna Emittente le obbligazioni mostrano il paese con la sua bandiera.",
+  "I nomi dei titoli: quelli che hai scelto tu e, per i derivati e per i BTP, quelli letti dal sito dell'emittente o da Borsa Italiana. Cliccando un codice, in qualsiasi pagina, puoi cambiare il nome: da quel momento quel codice si chiama così in tutto il programma.",
+  "I nomi delle obbligazioni nel file del broker sono in tedesco e dicono solo mese e anno («Okt. 2054»). Borsa Italiana scrive «BTP 4,3% Ott54», con dentro anche la cedola e la scadenza. Ora, quando l'elenco dei BTP si aggiorna, i BTP che hai nel conto prendono il nome di Borsa Italiana nelle liste: come per i derivati, vale sempre prima il nome che scegli tu, e il tuo CSV non si tocca. Il nome resta ricordato anche dopo la scadenza. Un BTP con cedola e scadenza nel nome è già unico, e non serve l'etichetta del file in coda.",
+  "L'elenco dei BTP si aggiorna anche con «Aggiorna tutto» e all'apertura, solo se nel conto ci sono BTP",
+  "Nella colonna Emittente le obbligazioni mostrano il paese con la bandiera",
+  "Nella colonna «Emittente» le obbligazioni mostrano il paese, ricavato dall'inizio del codice ISIN (IT → Italia), con la sua bandiera: anche nella scheda del titolo, nei nomi, nelle posizioni chiuse e nello zainetto fiscale. L'elenco dei BTP si scarica anche con «Aggiorna tutto» e all'apertura dell'app insieme ai prezzi, ma solo se nel conto ci sono BTP: è una richiesta sola a Borsa Italiana.",
+  "Nuovi test automatici per i nomi dei BTP e per il paese delle obbligazioni",
+  "Scarica i prezzi di crypto, azioni, fondi e del cambio EUR/USD, fino a 5 richieste in parallelo. Se nel conto ci sono BTP, scarica anche l'elenco dei BTP da Borsa Italiana (una richiesta sola) e ne ricorda i nomi.",
+  "Scarico l'elenco dei BTP da Borsa Italiana…",
+  "Versione 2.17: I BTP con nome e bandiera",
+  "versione storia novita I BTP con nome e bandiera I BTP del conto prendono il nome di Borsa Italiana, e nella colonna Emittente le obbligazioni mostrano il paese con la sua bandiera."
 ]

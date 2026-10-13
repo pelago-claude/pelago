@@ -36,7 +36,7 @@ Per i prezzi l'app fa richieste a servizi pubblici e **invia solo codici di tito
 | `query1/query2.finance.yahoo.com` (Yahoo Finance) | prezzi di azioni e fondi, cambi |
 | `api.coingecko.com` (CoinGecko) | prezzi delle crypto |
 | `api.frankfurter.dev` (dati BCE) | cambi di riferimento e storico |
-| `borsaitaliana.it` | elenco e prezzi dei BTP |
+| `borsaitaliana.it` | elenco, prezzi e nomi dei BTP: una richiesta sola, e solo se nel conto ci sono BTP (anche con «Aggiorna tutto» e all'apertura) |
 | `data-api.ecb.europa.eu` (BCE), `api.statistiken.bundesbank.de` (Bundesbank), `home.treasury.gov` e `treasurydirect.gov` (Tesoro USA) | curve dei rendimenti |
 | `markets.vontobel.com` | prezzo e nome dei derivati Vontobel — **spento di default**, si attiva da Quotazioni |
 | `prodotti.societegenerale.it` | prezzo e nome dei derivati Société Générale — **spento di default**, si attiva da Quotazioni con un banner che riporta le Note Legali del sito |

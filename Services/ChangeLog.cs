@@ -16,6 +16,20 @@ public static class ChangeLog
 
     public static readonly IReadOnlyList<Release> Releases = new[]
     {
+        new Release("2.17", new DateOnly(2026, 10, 13), "I BTP con nome e bandiera",
+            "I BTP del conto prendono il nome di Borsa Italiana, e nella colonna Emittente le obbligazioni mostrano il paese con la sua bandiera.",
+            new[]
+            {
+                "I nomi delle obbligazioni nel file del broker sono in tedesco e dicono solo mese e anno («Okt. 2054»). Borsa Italiana scrive «BTP 4,3% Ott54», con dentro anche la cedola e la scadenza. Ora, quando l'elenco dei BTP si aggiorna, i BTP che hai nel conto prendono il nome di Borsa Italiana nelle liste: come per i derivati, vale sempre prima il nome che scegli tu, e il tuo CSV non si tocca. Il nome resta ricordato anche dopo la scadenza. Un BTP con cedola e scadenza nel nome è già unico, e non serve l'etichetta del file in coda.",
+                "Nella colonna «Emittente» le obbligazioni mostrano il paese, ricavato dall'inizio del codice ISIN (IT → Italia), con la sua bandiera: anche nella scheda del titolo, nei nomi, nelle posizioni chiuse e nello zainetto fiscale. L'elenco dei BTP si scarica anche con «Aggiorna tutto» e all'apertura dell'app insieme ai prezzi, ma solo se nel conto ci sono BTP: è una richiesta sola a Borsa Italiana.",
+            },
+            new[]
+            {
+                "I BTP del conto prendono il nome di Borsa Italiana (per esempio «BTP 4,3% Ott54») al posto di quello del file",
+                "Nella colonna Emittente le obbligazioni mostrano il paese con la bandiera",
+                "L'elenco dei BTP si aggiorna anche con «Aggiorna tutto» e all'apertura, solo se nel conto ci sono BTP",
+                "Nuovi test automatici per i nomi dei BTP e per il paese delle obbligazioni",
+            }),
         new Release("2.16", new DateOnly(2026, 10, 13), "Un conto per provare",
             "Senza un file caricato, la Panoramica avverte che i valori sono stime e permette di provare Pelago con un conto di esempio.",
             new[]

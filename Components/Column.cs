@@ -117,14 +117,32 @@ public static class Col
     };
 
     /// <summary>
-    /// L'emittente di un derivato (Vontobel, Société Générale), che si capisce dal prefisso del codice ISIN; vuoto per azioni, fondi e il resto.
-    /// Serve la categoria perché alcuni ISIN di azioni tedesche cominciano come quelli dei derivati.
+    /// L'emittente di un titolo: la banca per un derivato (Vontobel, Société Générale), che si capisce dal prefisso del codice ISIN, e il paese con la
+    /// sua bandiera per un'obbligazione (Italia); vuoto per azioni, fondi e il resto. Serve la categoria perché alcuni ISIN di azioni tedesche
+    /// cominciano come quelli dei derivati.
     /// </summary>
-    public static Column<T> Issuer<T>(Func<T, string?> code, Func<T, string?> assetClass) => new()
+    public static Column<T> Issuer<T>(Func<T, string?> code, Func<T, string?> assetClass) =>
+        IssuerFlag<T>(x => Issuers.ShortName(code(x), assetClass(x)), x => Issuers.CountryCode(code(x), assetClass(x)));
+
+    /// <summary>
+    /// Come <see cref="Issuer{T}"/> per le righe che hanno già il testo dell'emittente (e, per le obbligazioni, il codice del paese):
+    /// con il paese si vede anche la bandiera. Il testo serve per ordinare, filtrare ed esportare.
+    /// </summary>
+    public static Column<T> IssuerFlag<T>(Func<T, string> text, Func<T, string?> countryCode) => new()
     {
         Title = "Emittente",
-        SortValue = x => Issuers.ShortName(code(x), assetClass(x)),
-        Text = x => Issuers.ShortName(code(x), assetClass(x)),
+        SortValue = x => text(x),
+        Text = x => text(x),
+        Render = x => builder =>
+        {
+            if (countryCode(x) is { Length: > 0 } country)
+            {
+                builder.OpenComponent<Flag>(0);
+                builder.AddAttribute(1, nameof(Flag.Code), country);
+                builder.CloseComponent();
+            }
+            builder.AddContent(2, text(x));
+        },
     };
 
     /// <summary>Il nome di un titolo con la matita per cambiarlo (il codice serve per sapere quale titolo rinominare).</summary>

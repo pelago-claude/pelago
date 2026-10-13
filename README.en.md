@@ -31,7 +31,7 @@ To get prices, the app calls public services and **sends only instrument codes a
 | `query1/query2.finance.yahoo.com` (Yahoo Finance) | stock and fund prices, FX rates |
 | `api.coingecko.com` (CoinGecko) | crypto prices |
 | `api.frankfurter.dev` (ECB data) | reference FX rates and history |
-| `borsaitaliana.it` | Italian government bond list and prices |
+| `borsaitaliana.it` | Italian government bond (BTP) list, prices and names: a single request, and only if the account holds BTPs (also with "Update all" and on startup) |
 | `data-api.ecb.europa.eu` (ECB), `api.statistiken.bundesbank.de` (Bundesbank), `home.treasury.gov` and `treasurydirect.gov` (US Treasury) | yield curves |
 | `markets.vontobel.com` | price and name of Vontobel derivatives — **off by default**, enabled from the Quotes page |
 | `prodotti.societegenerale.it` | price and name of Société Générale derivatives — **off by default**, enabled from the Quotes page with a banner quoting the site's legal notice |

@@ -41,7 +41,27 @@ public static class Issuers
         _ => "",
     };
 
-    /// <summary>L'emittente di un titolo per le liste: solo per i derivati, altrimenti vuoto.</summary>
-    public static string ShortName(string? isin, string? assetClass) =>
-        string.Equals(assetClass, "DERIVATIVE", StringComparison.OrdinalIgnoreCase) && OfIsin(isin) is { } issuer ? Name(issuer) : "";
+    /// <summary>
+    /// Il paese di un'obbligazione, dalle prime due lettere del codice ISIN (IT… → Italia). Solo per la categoria BOND e solo per i paesi della tabella dei
+    /// titoli di Stato: i codici senza paese (XS… per gli eurobond) restano senza. Per azioni e fondi il prefisso non dice chi emette, quindi non vale.
+    /// </summary>
+    public static GovCountry? CountryOfBond(string? isin, string? assetClass) =>
+        string.Equals(assetClass, "BOND", StringComparison.OrdinalIgnoreCase) && isin is { Length: >= 2 }
+        && GovBonds.Find(isin[..2]) is { Kind: not GovKind.EuroAggregate } country ? country : null;
+
+    /// <summary>Il codice del paese di un'obbligazione («IT»), per la bandiera; null se non c'è.</summary>
+    public static string? CountryCode(string? isin, string? assetClass) => CountryOfBond(isin, assetClass)?.Code;
+
+    /// <summary>
+    /// L'emittente di un titolo per le liste: per i derivati la banca («Vontobel»), per le obbligazioni il paese («Italia», nella lingua dell'app),
+    /// altrimenti vuoto.
+    /// </summary>
+    public static string ShortName(string? isin, string? assetClass)
+    {
+        if (CountryOfBond(isin, assetClass) is { } country)
+        {
+            return Loc.T(country.Name);
+        }
+        return string.Equals(assetClass, "DERIVATIVE", StringComparison.OrdinalIgnoreCase) && OfIsin(isin) is { } issuer ? Name(issuer) : "";
+    }
 }
