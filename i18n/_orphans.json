@@ -1,5 +1,3 @@
 [
-  "Aggiorna i prezzi da CoinGecko, Yahoo Finance e Frankfurter. Fino a 5 richieste in parallelo.",
-  "I nomi dei titoli: quelli che hai scelto tu e, per i derivati, quelli letti dal sito dell'emittente. Cliccando un codice, in qualsiasi pagina, puoi cambiare il nome: da quel momento quel codice si chiama così in tutto il programma.",
-  "Scarica i prezzi di crypto, azioni, fondi e del cambio EUR/USD, fino a 5 richieste in parallelo."
+  "Non è consulenza fiscale né un modello da riportare in dichiarazione: le regole cambiano e hanno eccezioni, e il file del broker non dice tutto (per esempio se un fondo è un ETF o un ETC). Fai sempre verificare i numeri da un commercialista."
 ]

@@ -16,6 +16,22 @@ public static class ChangeLog
 
     public static readonly IReadOnlyList<Release> Releases = new[]
     {
+        new Release("2.18", new DateOnly(2026, 10, 13), "Avvertenze più chiare",
+            "Una finestra «Ho capito» alla prima visita della parte fiscale, una frase sulla responsabilità in Crediti e un avviso nei file Excel dei prospetti fiscali.",
+            new[]
+            {
+                "Gli importi dello Zainetto fiscale sono stime e c'era già un riquadro che lo diceva, ma chi usa Pelago per la dichiarazione dei redditi merita un avviso che non si possa saltare. Ora la prima volta che apri una pagina del gruppo Fisco, con un file caricato, compare una finestra che spiega i limiti e chiede un «Ho capito»; poi non si ripete. Nella pagina Crediti c'è una frase sulla responsabilità (il programma è fornito senza garanzie, e la responsabilità di ciò che si dichiara resta di chi lo dichiara), e il riquadro dello Zainetto fiscale lo ripete in modo più netto.",
+                "I file esportati viaggiano senza l'app, e con loro deve viaggiare l'avviso: l'Excel dello Zainetto fiscale e delle plusvalenze ora ha in fondo una riga di avvertenza. Tra «Come sono calcolati i numeri» abbiamo aggiunto ciò che il prospetto non gestisce: IVAFE e quadro RW, imposte estere, regime fiscale, altre operazioni societarie.",
+            },
+            new[]
+            {
+                "Finestra «Ho capito» la prima volta che si apre una pagina del gruppo Fisco (Zainetto fiscale, Costi e tasse, Cedole e scadenze)",
+                "Pagina Crediti: «Avvertenze e responsabilità», con la frase sulla responsabilità",
+                "Zainetto fiscale: l'avviso in cima dice più chiaramente che la responsabilità di ciò che si dichiara è dell'utente",
+                "L'Excel dello Zainetto fiscale e delle plusvalenze ha in fondo una riga di avvertenza",
+                "«Come sono calcolati i numeri» elenca anche ciò che non è gestito (IVAFE, quadro RW, imposte estere, regime fiscale)",
+                "Nuovi test automatici per la finestra, per l'avviso nell'Excel e per il conto di esempio",
+            }),
         new Release("2.17", new DateOnly(2026, 10, 13), "I BTP con nome e bandiera",
             "I BTP del conto prendono il nome di Borsa Italiana, e nella colonna Emittente le obbligazioni mostrano il paese con la sua bandiera.",
             new[]

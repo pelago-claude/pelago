@@ -95,6 +95,10 @@
     [Parameter, EditorRequired] public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
     [Parameter, EditorRequired] public List<Column<TItem>> Columns { get; set; } = new();
     [Parameter] public string ExportName { get; set; } = "export";
+
+    /// <summary>Un'avvertenza (già tradotta) che l'esportazione in Excel scrive in fondo al foglio: per i prospetti fiscali, che nel file viaggiano senza l'app.</summary>
+    [Parameter] public string? ExportNote { get; set; }
+
     [Parameter] public string FooterLabel { get; set; } = "Totale";
     [Parameter] public string? DefaultSortTitle { get; set; }
     [Parameter] public bool DefaultDescending { get; set; }
@@ -235,7 +239,7 @@
         }
 
         var rows = _view.Select(row => Columns.Select(c => c.Kind == ColumnKind.Text ? c.Text(row) : (object?)c.SortValue(row)).ToArray());
-        XlsxWriter.Write(path, ExportName, Columns.Select(c => T(c.Title)).ToList(), Columns.Select(c => c.Kind).ToList(), rows);
+        XlsxWriter.Write(path, ExportName, Columns.Select(c => T(c.Title)).ToList(), Columns.Select(c => c.Kind).ToList(), rows, ExportNote);
     }
 
     private static string Quote(string value)

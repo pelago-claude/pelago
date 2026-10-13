@@ -82,6 +82,21 @@ L'eseguibile finale è `publish/win-x64/pelago.exe`. L'app è in C# (.NET 8, Win
 
 Le segnalazioni e i suggerimenti sono benvenuti: apri una [*Issue*](https://github.com/pelago-claude/pelago/issues/new/choose) di questo repository, oppure scrivi a **pelago_claude@gmail.com** (senza allegare il tuo CSV). Mi interessa soprattutto sapere **che cosa ti serve di più, che cosa non si capisce, che cosa manca**. Vedi anche [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Avvertenze e responsabilità
+
+Pelago calcola valori, rendimenti e prospetti fiscali a partire dal file CSV che gli fornisci, con formule semplificate: **sono stime**, possono contenere errori o non tenere conto di tutti i casi. Non sono un saldo ufficiale, né consulenza finanziaria, legale o fiscale, e non sostituiscono i documenti ufficiali del tuo broker né un professionista. **Verifica sempre i numeri prima di usarli, in particolare per la dichiarazione dei redditi: la responsabilità di ciò che dichiari è tua.**
+
+La prima volta che apri la parte fiscale (Zainetto fiscale, Costi e tasse, Cedole e scadenze), Pelago mostra una finestra con queste avvertenze e chiede un «Ho capito». I file Excel dei prospetti fiscali e delle plusvalenze riportano l'avviso in fondo.
+
+Pelago è fornito «così com'è», senza garanzie di alcun tipo (GPL-3.0, art. 15-16): nei limiti consentiti dalla legge, l'autore non risponde dei danni derivanti dall'uso del programma o dei suoi risultati.
+
+### Limiti noti dello Zainetto fiscale
+
+- Non sono gestiti l'**IVAFE** e il **quadro RW** (c'è solo il valore a fine anno), le **imposte pagate all'estero** e il **regime fiscale** scelto.
+- Altre operazioni societarie, come frazionamenti e scorpori, possono non essere trattate correttamente.
+- Il file del broker non dice se un «fondo» è un ETF o un ETC/ETN: Pelago prova a dedurlo dal nome, e la classificazione va controllata (si può correggere).
+- Aliquote, soglie ed esenzioni non sono calcolate: il prospetto riporta gli importi, non l'imposta dovuta.
+
 ## Licenza
 
 Copyright © 2026 David. Pelago è software libero, distribuito secondo i termini della **GNU General Public License versione 3** ([LICENSE](LICENSE)), **senza alcuna garanzia**. Le librerie di terzi incluse mantengono le loro licenze: vedi [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

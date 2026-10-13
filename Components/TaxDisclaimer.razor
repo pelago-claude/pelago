@@ -1,0 +1,29 @@
+@inject AppState State
+@implements IDisposable
+
+@if (State.TaxDisclaimerPending)
+{
+    <div class="modal-back">
+        <div class="modal tax-disclaimer" role="dialog" aria-modal="true" aria-labelledby="tax-disclaimer-title">
+            <h2 id="tax-disclaimer-title"><i class="ti ti-alert-triangle"></i> @T("Prima di usare la parte fiscale")</h2>
+            <p>@T("Questi prospetti sono solo informativi: Pelago stima plusvalenze, minusvalenze e imposte a partire dal tuo file CSV, con formule semplificate.")</p>
+            <ul>
+                <li>@T("Possono contenere errori o non tenere conto di tutti i casi: operazioni societarie, regime fiscale, imposte estere, fondi da classificare.")</li>
+                <li>@T("Non sono consulenza fiscale né un modello da riportare nella dichiarazione dei redditi: controlla i numeri con i documenti ufficiali del tuo broker e con un commercialista.")</li>
+                <li>@T("Pelago è software libero, fornito senza garanzie: nei limiti consentiti dalla legge, l'autore non risponde dei danni derivanti dall'uso del programma o dei suoi risultati. La responsabilità di ciò che dichiari è tua.")</li>
+            </ul>
+            <div class="actions" style="justify-content:space-between;align-items:center">
+                <a href="credits">@T("Avvertenze complete")</a>
+                <button class="btn primary" @onclick="State.AcceptTaxDisclaimer"><i class="ti ti-check"></i> @T("Ho capito")</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized() => State.Changed += OnChanged;
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => State.Changed -= OnChanged;
+}

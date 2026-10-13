@@ -15,7 +15,9 @@ public static class XlsxWriter
     // Indici degli stili in styles.xml
     private const int StyleDateTime = 1, StyleMoney = 2, StylePercent = 3, StyleDate = 4, StyleHeader = 5;
 
-    public static void Write(string path, string sheetName, IReadOnlyList<string> headers, IReadOnlyList<ColumnKind> kinds, IEnumerable<object?[]> rows)
+    /// <param name="note">Un'avvertenza da scrivere in fondo al foglio, dopo una riga vuota (per esempio «solo a scopo informativo» sui prospetti fiscali):
+    /// il file esportato viaggia senza l'app, e con lui deve viaggiare l'avviso. Non conta nella larghezza delle colonne.</param>
+    public static void Write(string path, string sheetName, IReadOnlyList<string> headers, IReadOnlyList<ColumnKind> kinds, IEnumerable<object?[]> rows, string? note = null)
     {
         if (File.Exists(path))
         {
@@ -83,6 +85,12 @@ public static class XlsxWriter
             }
             sheet.Append("</row>");
             r++;
+        }
+
+        if (!string.IsNullOrWhiteSpace(note))
+        {
+            r++;
+            sheet.Append("<row r=\"").Append(r).Append("\">").Append(StringCell(0, r, note, 0)).Append("</row>");
         }
         sheet.Append("</sheetData></worksheet>");
         Add(zip, "xl/worksheets/sheet1.xml", sheet.ToString());

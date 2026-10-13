@@ -12,7 +12,8 @@
             <div class="card" data-help="gains.losses"><div class="label">@T("Cessioni in perdita")</div><div class="value neg">@(_rows.Count - _wins)</div></div>
         </div>
         <DataTable TableId="gains" Items="_rows" Columns="_columns" ExportName="plusvalenze"
-                   DefaultSortTitle="Data" DefaultDescending="true" FooterLabel="SALDO" />
+                   DefaultSortTitle="Data" DefaultDescending="true" FooterLabel="SALDO"
+                   ExportNote="@T("Solo a scopo informativo: stime calcolate dal file CSV, non consulenza fiscale né un modello per la dichiarazione dei redditi. Verifica i numeri con i documenti ufficiali del broker e con un commercialista. Pelago è fornito senza garanzie.")" />
     </NeedData>
 </div>
 

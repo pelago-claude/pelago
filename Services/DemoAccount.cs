@@ -27,7 +27,7 @@ public static class DemoAccount
     /// Prepara la cartella dati dell'esempio: i file inventati, i prezzi con l'ultima data portata a «adesso» (altrimenti dopo una settimana
     /// l'esempio segnalerebbe «Prezzi vecchi»), il CSV da aprire e la lingua e il tema di chi lo apre. Restituisce il percorso del CSV.
     /// </summary>
-    public static string Prepare(string folder, string? language, string? theme, DateTime nowUtc)
+    public static string Prepare(string folder, string? language, string? theme, DateTime nowUtc, bool taxDisclaimerAccepted = false)
     {
         Directory.CreateDirectory(folder);
         var assembly = typeof(DemoAccount).Assembly;
@@ -56,15 +56,20 @@ public static class DemoAccount
         {
             prefs["theme"] = theme;
         }
+        if (taxDisclaimerAccepted)
+        {
+            // chi ha già premuto «Ho capito» sulla parte fiscale non deve premerlo di nuovo nell'esempio
+            prefs[AppState.TaxDisclaimerPreference] = "1";
+        }
         File.WriteAllText(Path.Combine(folder, "webprefs.json"), prefs.ToJsonString());
         return csv;
     }
 
     /// <summary>Apre la seconda finestra con il conto di esempio. Lancia un'eccezione se non riesce ad avviarla.</summary>
-    public static void Launch(string? language, string? theme)
+    public static void Launch(string? language, string? theme, bool taxDisclaimerAccepted = false)
     {
         var folder = Path.Combine(Path.GetTempPath(), FolderPrefix + DateTime.Now.ToString("yyyyMMdd-HHmmss"));
-        Prepare(folder, language, theme, DateTime.UtcNow);
+        Prepare(folder, language, theme, DateTime.UtcNow, taxDisclaimerAccepted);
 
         var start = new ProcessStartInfo(Environment.ProcessPath ?? throw new InvalidOperationException("Percorso del programma sconosciuto"))
         {

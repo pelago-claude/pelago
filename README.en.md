@@ -77,6 +77,21 @@ The result is `publish/win-x64/pelago.exe`. The app is written in C# (.NET 8, Wi
 
 Bug reports and suggestions are welcome: open an [*Issue*](https://github.com/pelago-claude/pelago/issues/new/choose), or write to **pelago_claude@gmail.com** (without attaching your CSV). I'm especially interested in **what you need most, what is unclear, what is missing**. See also [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Warnings and liability
+
+Pelago calculates values, returns and tax summaries from the CSV file you give it, using simplified formulas: **they are estimates**, may contain errors or fail to account for every case. They are not an official balance, nor financial, legal or tax advice, and they do not replace your broker's official documents or a professional. **Always check the numbers before using them, in particular for your tax return: you are responsible for what you declare.**
+
+The first time you open the tax section (Tax backpack, Costs and taxes, Coupons and maturities), Pelago shows a window with these warnings and asks for a "Got it". The Excel files of the tax summaries and of the capital gains carry the warning at the bottom.
+
+Pelago is provided "as is", without warranties of any kind (GPL-3.0, sections 15-16): to the extent permitted by law, the author is not liable for any damage arising from the use of the program or its results.
+
+### Known limits of the tax backpack
+
+- Not handled: **IVAFE** and **form RW** (only the year-end value is shown), **taxes paid abroad** and the **tax regime** chosen.
+- Other corporate actions, such as splits and spin-offs, may not be treated correctly.
+- The broker's file does not say whether a "fund" is an ETF or an ETC/ETN: Pelago tries to guess from the name, and the classification must be checked (it can be corrected).
+- Tax rates, thresholds and exemptions are not calculated: the summary shows amounts, not the tax due.
+
 ## License
 
 Copyright © 2026 David. Pelago is free software, distributed under the terms of the **GNU General Public License version 3** ([LICENSE](LICENSE)), **without any warranty**. Bundled third-party libraries keep their own licenses: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

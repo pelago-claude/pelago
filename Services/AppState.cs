@@ -95,6 +95,21 @@ public sealed class AppState : IDisposable
     /// <summary>Questa finestra è il conto di esempio (dati inventati, in una cartella a parte), non i dati dell'utente.</summary>
     public bool IsDemo => DemoAccount.IsActive;
 
+    /// <summary>La preferenza che ricorda «Ho capito» sull'avvertenza fiscale. Se un giorno il testo cambia in modo importante, si passa a «v2» e la finestra ricompare.</summary>
+    public const string TaxDisclaimerPreference = "tax.disclaimer.v1";
+
+    /// <summary>
+    /// La finestra con l'avvertenza sulla parte fiscale (Zainetto fiscale, Costi e tasse, Cedole e scadenze) si mostra la prima volta che se ne apre una pagina,
+    /// con un file caricato (senza dati non c'è nulla che si possa usare male): finché l'utente non preme «Ho capito».
+    /// </summary>
+    public bool TaxDisclaimerPending => HasData && _prefs.Get(TaxDisclaimerPreference) != "1";
+
+    public void AcceptTaxDisclaimer()
+    {
+        _prefs.Set(TaxDisclaimerPreference, "1");
+        Changed?.Invoke();
+    }
+
     public bool IsLoading { get; private set; }
     public bool IsUpdating { get; private set; }
     public string? UpdateTitle { get; private set; }

@@ -30,6 +30,7 @@ $prefsPath = Join-Path $Data 'webprefs.json'
 $prefs = @{}
 if (Test-Path -LiteralPath $prefsPath) { (Get-Content -LiteralPath $prefsPath -Raw -Encoding UTF8 | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $prefs[$_.Name] = $_.Value } }
 $prefs['lang'] = $Lang; $prefs['theme'] = 'light'
+$prefs['tax.disclaimer.v1'] = '1'   # la finestra «Ho capito» della parte fiscale non deve coprire le pagine che si controllano
 ($prefs | ConvertTo-Json) | Set-Content -LiteralPath $prefsPath -Encoding UTF8
 
 $env:PELAGO_TEST = '1'; $env:PELAGO_CDP_PORT = "$Port"; $env:PELAGO_DATA = $Data

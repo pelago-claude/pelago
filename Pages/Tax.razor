@@ -2,6 +2,7 @@
 @inherits StatePage
 
 <div class="page">
+    <TaxDisclaimer />
     <h1><i class="ti ti-backpack"></i>@T("Zainetto fiscale")</h1>
     <p class="sub">@T("Anno per anno, cosa potresti dover dichiarare divisa per tipo di reddito, e lo zainetto delle minusvalenze da riportare negli anni successivi.")</p>
 
@@ -9,7 +10,7 @@
         <i class="ti ti-alert-triangle"></i>
         <div>
             <b>@T("Solo a scopo informativo.")</b>
-            @T("Non è consulenza fiscale né un modello da riportare in dichiarazione: le regole cambiano e hanno eccezioni, e il file del broker non dice tutto (per esempio se un fondo è un ETF o un ETC). Fai sempre verificare i numeri da un commercialista.")
+            @T("Non è consulenza fiscale né un modello da riportare in dichiarazione: le regole cambiano e hanno eccezioni, e il file del broker non dice tutto (per esempio se un fondo è un ETF o un ETC). Non usare questo prospetto per la dichiarazione dei redditi senza averlo controllato con i documenti ufficiali del broker e con un commercialista: la responsabilità di ciò che dichiari è tua.")
         </div>
     </div>
 
@@ -171,7 +172,8 @@
                         @T("Raggruppa per sottostante")
                     </label>
                 </div>
-                <DataTable TableId="taxinst" Items="_instrumentRows" Columns="_instrumentColumns" ExportName="@("zainetto-fiscale-strumenti-" + _year)" DefaultSortTitle="Risultato" DefaultDescending="true" FooterLabel="Totale" />
+                <DataTable TableId="taxinst" Items="_instrumentRows" Columns="_instrumentColumns" ExportName="@("zainetto-fiscale-strumenti-" + _year)" DefaultSortTitle="Risultato" DefaultDescending="true" FooterLabel="Totale"
+                           ExportNote="@T("Solo a scopo informativo: stime calcolate dal file CSV, non consulenza fiscale né un modello per la dichiarazione dei redditi. Verifica i numeri con i documenti ufficiali del broker e con un commercialista. Pelago è fornito senza garanzie.")" />
 
                 @if (_incomeRows.Count > 0)
                 {
@@ -189,7 +191,8 @@
 
                 <h3 style="margin:16px 0 6px">@T("Dettaglio delle vendite")</h3>
                 <p class="muted" style="margin:0 0 8px">@T("Ogni vendita con il costo abbinato: è il materiale da passare al commercialista (usa «CSV» o «Excel» qui sotto).")</p>
-                <DataTable TableId="taxsales" Items="_saleRows" Columns="_saleColumns" ExportName="@("zainetto-fiscale-vendite-" + _year)" DefaultSortTitle="Data" FooterLabel="Totale" />
+                <DataTable TableId="taxsales" Items="_saleRows" Columns="_saleColumns" ExportName="@("zainetto-fiscale-vendite-" + _year)" DefaultSortTitle="Data" FooterLabel="Totale"
+                           ExportNote="@T("Solo a scopo informativo: stime calcolate dal file CSV, non consulenza fiscale né un modello per la dichiarazione dei redditi. Verifica i numeri con i documenti ufficiali del broker e con un commercialista. Pelago è fornito senza garanzie.")" />
             </div>
 
             @if (_funds.Count > 0)
@@ -227,6 +230,7 @@
                     <li>@T("Le fusioni di fondi e le vendite annullate nel file si compensano e non contano come vendite; le cripto ricevute gratis (premi) hanno costo zero.")</li>
                     <li>@T("I turbo andati a zero senza una vendita registrata nel file non sono inclusi: la minusvalenza si realizza quando il broker li chiude. Importi in euro come nel file.")</li>
                     <li>@T("Aliquote, soglie ed esenzioni non sono calcolate: qui trovi gli importi, non l'imposta dovuta. Le regole cambiano negli anni: verifica sempre quelle in vigore.")</li>
+                    <li>@T("Non sono gestiti: l'IVAFE e il quadro RW (c'è solo il valore a fine anno), le imposte pagate all'estero, il regime fiscale scelto; altre operazioni societarie, come frazionamenti e scorpori, possono non essere trattate correttamente.")</li>
                 </ul>
             </div>
         }
