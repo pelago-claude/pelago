@@ -16,6 +16,18 @@ public static class ChangeLog
 
     public static readonly IReadOnlyList<Release> Releases = new[]
     {
+        new Release("2.15", new DateOnly(2026, 10, 13), "Tutto si chiama Pelago",
+            "Il titolo della finestra mostra la versione, e anche la cartella dei dati sul PC si chiama Pelago.",
+            new[]
+            {
+                "Nel titolo della finestra ora c'è il numero di versione, preso dalla Storia: non resta indietro a ogni aggiornamento. Si vede anche nella barra delle applicazioni, utile quando si hanno più finestre aperte o si deve dire a qualcuno quale versione si usa.",
+                "Abbiamo anche dato lo stesso nome a tutto il resto: il progetto, il codice e la cartella in cui l'app salva i dati sul PC, che ora è %LOCALAPPDATA%\\Pelago. Chi aveva già un archivio di prezzi e nomi in un'altra cartella può copiarne il contenuto in questa; il file CSV delle operazioni non si sposta mai, perché l'app non lo modifica.",
+            },
+            new[]
+            {
+                "Il titolo della finestra mostra la versione",
+                "La cartella dei dati sul PC è %LOCALAPPDATA%\\Pelago",
+            }),
         new Release("2.14", new DateOnly(2026, 10, 12), "Le crypto in una richiesta sola",
             "Le crypto si chiedono a CoinGecko tutte insieme: prima le ultime della lista restavano spesso senza prezzo.",
             new[]
@@ -29,7 +41,6 @@ public static class ChangeLog
                 "Se CoinGecko limita le richieste, il registro lo dice in chiaro e suggerisce di riprovare tra un minuto",
                 "Un id CoinGecko scritto male nel catalogo viene segnalato e non mandato al sito",
                 "Nuovi test automatici sulla richiesta unica, sull'errore «troppe richieste» e sulla ricerca dell'id",
-                "Il titolo della finestra mostra la versione",
             }),
         new Release("2.13", new DateOnly(2026, 10, 12), "Crypto che si trovano da sole",
             "Le crypto che l'app non conosceva trovano da sole il loro id su CoinGecko, e quindi il prezzo.",

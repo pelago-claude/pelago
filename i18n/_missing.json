@@ -1,3 +1,10 @@
 [
-  "Il titolo della finestra mostra la versione"
+  "13 ottobre 2026 — Il titolo della finestra mostra la versione, e anche la cartella dei dati sul PC si chiama Pelago.",
+  "Abbiamo anche dato lo stesso nome a tutto il resto: il progetto, il codice e la cartella in cui l'app salva i dati sul PC, che ora è %LOCALAPPDATA%\\Pelago. Chi aveva già un archivio di prezzi e nomi in un'altra cartella può copiarne il contenuto in questa; il file CSV delle operazioni non si sposta mai, perché l'app non lo modifica.",
+  "Il titolo della finestra mostra la versione, e anche la cartella dei dati sul PC si chiama Pelago.",
+  "La cartella dei dati sul PC è %LOCALAPPDATA%\\Pelago",
+  "Nel titolo della finestra ora c'è il numero di versione, preso dalla Storia: non resta indietro a ogni aggiornamento. Si vede anche nella barra delle applicazioni, utile quando si hanno più finestre aperte o si deve dire a qualcuno quale versione si usa.",
+  "Tutto si chiama Pelago",
+  "Versione 2.15: Tutto si chiama Pelago",
+  "versione storia novita Tutto si chiama Pelago Il titolo della finestra mostra la versione, e anche la cartella dei dati sul PC si chiama Pelago."
 ]
