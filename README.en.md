@@ -81,7 +81,7 @@ Bug reports and suggestions are welcome: open an [*Issue*](https://github.com/pe
 
 Pelago calculates values, returns and tax summaries from the CSV file you give it, using simplified formulas: **they are estimates**, may contain errors or fail to account for every case. They are not an official balance, nor financial, legal or tax advice, and they do not replace your broker's official documents or a professional. **Always check the numbers before using them, in particular for your tax return: you are responsible for what you declare.**
 
-The first time you open the tax section (Tax backpack, Costs and taxes, Coupons and maturities), Pelago shows a window with these warnings and asks for a "Got it". The Excel files of the tax summaries and of the capital gains carry the warning at the bottom.
+At every start, the first time you open the tax section (Tax backpack, Costs and taxes, Coupons and maturities), Pelago shows a window with these warnings and asks for a "Got it"; it does not remember the choice, and shows up again the next time you start the program. The Excel files of the tax summaries and of the capital gains carry the warning at the bottom.
 
 Pelago is provided "as is", without warranties of any kind (GPL-3.0, sections 15-16): to the extent permitted by law, the author is not liable for any damage arising from the use of the program or its results.
 

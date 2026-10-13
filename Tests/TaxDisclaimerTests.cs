@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using System.Text.Json.Nodes;
 using Pelago.Services;
 using Xunit;
 
@@ -14,13 +13,15 @@ public class TaxDisclaimerTests
         $"\"2026-09-01T10:00:00.000Z\",\"2026-09-01\",\"DEFAULT\",\"TRADING\",\"BUY\",\"STOCK\",\"Titolo {symbol}\",\"{symbol}\",\"10\",\"5\",\"-50\",\"\",\"\",\"EUR\",\"Buy trade {symbol}\",\"{id}\"";
 
     [Fact]
-    public async Task The_tax_warning_waits_for_a_loaded_file_and_stays_gone_once_understood()
+    public async Task The_tax_warning_waits_for_a_loaded_file_and_comes_back_at_every_start()
     {
         var folder = Path.Combine(Path.GetTempPath(), "pelago-taxwarn-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(folder);
         var prefsFile = Path.Combine(DataLocations.Root, "webprefs.json");
-        var previous = Environment.GetEnvironmentVariable("PELAGO_TEST");
+        var previousTest = Environment.GetEnvironmentVariable("PELAGO_TEST");
+        var previousAccepted = Environment.GetEnvironmentVariable("PELAGO_TAX_ACCEPTED");
         Environment.SetEnvironmentVariable("PELAGO_TEST", "1");
+        Environment.SetEnvironmentVariable("PELAGO_TAX_ACCEPTED", null);
         try
         {
             Directory.CreateDirectory(DataLocations.Root);
@@ -40,36 +41,49 @@ public class TaxDisclaimerTests
             Assert.False(state.TaxDisclaimerPending);
             Assert.True(notified > 0);                                // le pagine si aggiornano e la finestra sparisce
 
-            // «Ho capito» si ricorda: una nuova sessione (stesso file di preferenze) non la mostra più
+            // finché il programma resta aperto non ricompare, nemmeno caricando un altro file
+            Assert.True(await state.LoadFileAsync(csv));
+            Assert.False(state.TaxDisclaimerPending);
+
+            // «Ho capito» non si ricorda: un nuovo avvio, anche subito dopo, la mostra di nuovo (e non lascia tracce nelle preferenze)
+            Assert.False(File.Exists(prefsFile) && File.ReadAllText(prefsFile).Contains("disclaimer", StringComparison.OrdinalIgnoreCase));
             using var next = new AppState(new UiPrefs());
             Assert.True(await next.LoadFileAsync(csv));
-            Assert.False(next.TaxDisclaimerPending);
+            Assert.True(next.TaxDisclaimerPending);
         }
         finally
         {
-            Environment.SetEnvironmentVariable("PELAGO_TEST", previous);
+            Environment.SetEnvironmentVariable("PELAGO_TEST", previousTest);
+            Environment.SetEnvironmentVariable("PELAGO_TAX_ACCEPTED", previousAccepted);
             File.Delete(prefsFile);
             Directory.Delete(folder, recursive: true);
         }
     }
 
     [Fact]
-    public void The_example_inherits_the_acceptance_of_the_warning()
+    public async Task The_automatic_checks_can_skip_the_tax_warning()
     {
-        var accepted = Path.Combine(Path.GetTempPath(), "pelago-demo-tax-" + Guid.NewGuid().ToString("N"));
-        var fresh = Path.Combine(Path.GetTempPath(), "pelago-demo-tax-" + Guid.NewGuid().ToString("N"));
+        var folder = Path.Combine(Path.GetTempPath(), "pelago-taxwarn-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        var previousTest = Environment.GetEnvironmentVariable("PELAGO_TEST");
+        var previousAccepted = Environment.GetEnvironmentVariable("PELAGO_TAX_ACCEPTED");
+        Environment.SetEnvironmentVariable("PELAGO_TEST", "1");
+        Environment.SetEnvironmentVariable("PELAGO_TAX_ACCEPTED", "1");
         try
         {
-            DemoAccount.Prepare(accepted, "it", null, DateTime.UtcNow, taxDisclaimerAccepted: true);
-            DemoAccount.Prepare(fresh, "it", null, DateTime.UtcNow);
+            Directory.CreateDirectory(DataLocations.Root);
+            var csv = Path.Combine(folder, "t.csv");
+            File.WriteAllLines(csv, new[] { Header, Buy("US00TEST0001", "t1") });
 
-            Assert.Equal("1", (string?)JsonNode.Parse(File.ReadAllText(Path.Combine(accepted, "webprefs.json")))![AppState.TaxDisclaimerPreference]);
-            Assert.Null(JsonNode.Parse(File.ReadAllText(Path.Combine(fresh, "webprefs.json")))![AppState.TaxDisclaimerPreference]);
+            using var state = new AppState(new UiPrefs());
+            Assert.True(await state.LoadFileAsync(csv));
+            Assert.False(state.TaxDisclaimerPending);                 // la prova automatica non è coperta dalla finestra
         }
         finally
         {
-            Directory.Delete(accepted, recursive: true);
-            Directory.Delete(fresh, recursive: true);
+            Environment.SetEnvironmentVariable("PELAGO_TEST", previousTest);
+            Environment.SetEnvironmentVariable("PELAGO_TAX_ACCEPTED", previousAccepted);
+            Directory.Delete(folder, recursive: true);
         }
     }
 

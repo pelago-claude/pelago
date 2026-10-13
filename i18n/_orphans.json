@@ -1,3 +1,5 @@
 [
-  "Non è consulenza fiscale né un modello da riportare in dichiarazione: le regole cambiano e hanno eccezioni, e il file del broker non dice tutto (per esempio se un fondo è un ETF o un ETC). Fai sempre verificare i numeri da un commercialista."
+  "Finestra «Ho capito» la prima volta che si apre una pagina del gruppo Fisco (Zainetto fiscale, Costi e tasse, Cedole e scadenze)",
+  "Gli importi dello Zainetto fiscale sono stime e c'era già un riquadro che lo diceva, ma chi usa Pelago per la dichiarazione dei redditi merita un avviso che non si possa saltare. Ora la prima volta che apri una pagina del gruppo Fisco, con un file caricato, compare una finestra che spiega i limiti e chiede un «Ho capito»; poi non si ripete. Nella pagina Crediti c'è una frase sulla responsabilità (il programma è fornito senza garanzie, e la responsabilità di ciò che si dichiara resta di chi lo dichiara), e il riquadro dello Zainetto fiscale lo ripete in modo più netto.",
+  "Nuovi test automatici per la finestra, per l'avviso nell'Excel e per il conto di esempio"
 ]

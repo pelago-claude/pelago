@@ -76,7 +76,7 @@ else
         _demoError = null;
         try
         {
-            DemoAccount.Launch(Loc.Culture.TwoLetterISOLanguageName, Prefs.Get("theme"), Prefs.Get(AppState.TaxDisclaimerPreference) == "1");
+            DemoAccount.Launch(Loc.Culture.TwoLetterISOLanguageName, Prefs.Get("theme"));
         }
         catch (Exception ex)
         {

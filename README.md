@@ -86,7 +86,7 @@ Le segnalazioni e i suggerimenti sono benvenuti: apri una [*Issue*](https://gith
 
 Pelago calcola valori, rendimenti e prospetti fiscali a partire dal file CSV che gli fornisci, con formule semplificate: **sono stime**, possono contenere errori o non tenere conto di tutti i casi. Non sono un saldo ufficiale, né consulenza finanziaria, legale o fiscale, e non sostituiscono i documenti ufficiali del tuo broker né un professionista. **Verifica sempre i numeri prima di usarli, in particolare per la dichiarazione dei redditi: la responsabilità di ciò che dichiari è tua.**
 
-La prima volta che apri la parte fiscale (Zainetto fiscale, Costi e tasse, Cedole e scadenze), Pelago mostra una finestra con queste avvertenze e chiede un «Ho capito». I file Excel dei prospetti fiscali e delle plusvalenze riportano l'avviso in fondo.
+A ogni avvio, la prima volta che apri la parte fiscale (Zainetto fiscale, Costi e tasse, Cedole e scadenze), Pelago mostra una finestra con queste avvertenze e chiede un «Ho capito»; non ricorda la scelta, e ricompare al successivo avvio. I file Excel dei prospetti fiscali e delle plusvalenze riportano l'avviso in fondo.
 
 Pelago è fornito «così com'è», senza garanzie di alcun tipo (GPL-3.0, art. 15-16): nei limiti consentiti dalla legge, l'autore non risponde dei danni derivanti dall'uso del programma o dei suoi risultati.
 

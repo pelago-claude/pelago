@@ -95,18 +95,20 @@ public sealed class AppState : IDisposable
     /// <summary>Questa finestra è il conto di esempio (dati inventati, in una cartella a parte), non i dati dell'utente.</summary>
     public bool IsDemo => DemoAccount.IsActive;
 
-    /// <summary>La preferenza che ricorda «Ho capito» sull'avvertenza fiscale. Se un giorno il testo cambia in modo importante, si passa a «v2» e la finestra ricompare.</summary>
-    public const string TaxDisclaimerPreference = "tax.disclaimer.v1";
+    // «Ho capito» vale solo per questa esecuzione del programma: non si salva da nessuna parte, quindi a ogni avvio la finestra ricompare.
+    // Le prove automatiche (PELAGO_TEST=1 con PELAGO_TAX_ACCEPTED=1) la saltano, altrimenti coprirebbe le pagine che devono fotografare.
+    private bool _taxDisclaimerAccepted = Environment.GetEnvironmentVariable("PELAGO_TEST") == "1" && Environment.GetEnvironmentVariable("PELAGO_TAX_ACCEPTED") == "1";
 
     /// <summary>
-    /// La finestra con l'avvertenza sulla parte fiscale (Zainetto fiscale, Costi e tasse, Cedole e scadenze) si mostra la prima volta che se ne apre una pagina,
-    /// con un file caricato (senza dati non c'è nulla che si possa usare male): finché l'utente non preme «Ho capito».
+    /// La finestra con l'avvertenza sulla parte fiscale (Zainetto fiscale, Costi e tasse, Cedole e scadenze) si mostra la prima volta che se ne apre una pagina
+    /// dopo l'avvio del programma, con un file caricato (senza dati non c'è nulla che si possa usare male): finché l'utente non preme «Ho capito».
+    /// Navigando altrove e tornando non ricompare; chiudendo e riaprendo il programma sì, anche subito.
     /// </summary>
-    public bool TaxDisclaimerPending => HasData && _prefs.Get(TaxDisclaimerPreference) != "1";
+    public bool TaxDisclaimerPending => HasData && !_taxDisclaimerAccepted;
 
     public void AcceptTaxDisclaimer()
     {
-        _prefs.Set(TaxDisclaimerPreference, "1");
+        _taxDisclaimerAccepted = true;
         Changed?.Invoke();
     }
 

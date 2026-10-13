@@ -30,10 +30,10 @@ $prefsPath = Join-Path $Data 'webprefs.json'
 $prefs = @{}
 if (Test-Path -LiteralPath $prefsPath) { (Get-Content -LiteralPath $prefsPath -Raw -Encoding UTF8 | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $prefs[$_.Name] = $_.Value } }
 $prefs['lang'] = $Lang; $prefs['theme'] = 'light'
-$prefs['tax.disclaimer.v1'] = '1'   # la finestra «Ho capito» della parte fiscale non deve coprire le pagine che si controllano
 ($prefs | ConvertTo-Json) | Set-Content -LiteralPath $prefsPath -Encoding UTF8
 
-$env:PELAGO_TEST = '1'; $env:PELAGO_CDP_PORT = "$Port"; $env:PELAGO_DATA = $Data
+# PELAGO_TAX_ACCEPTED: la finestra «Ho capito» della parte fiscale non deve coprire le pagine che si controllano
+$env:PELAGO_TEST = '1'; $env:PELAGO_TAX_ACCEPTED = '1'; $env:PELAGO_CDP_PORT = "$Port"; $env:PELAGO_DATA = $Data
 $proc = Start-Process $Exe -PassThru
 $problems = New-Object System.Collections.Generic.List[string]
 try {
@@ -92,7 +92,7 @@ try {
 }
 finally {
     if ($proc -and -not $proc.HasExited) { $proc.Kill() }
-    Remove-Item Env:\PELAGO_DATA, Env:\PELAGO_TEST, Env:\PELAGO_CDP_PORT -ErrorAction SilentlyContinue
+    Remove-Item Env:\PELAGO_DATA, Env:\PELAGO_TEST, Env:\PELAGO_TAX_ACCEPTED, Env:\PELAGO_CDP_PORT -ErrorAction SilentlyContinue
 }
 
 if ($problems.Count -gt 0) { ''; $problems | ForEach-Object { "PROBLEMA: $_" }; exit 1 }
