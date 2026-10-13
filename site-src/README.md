@@ -17,6 +17,14 @@ Per rigenerare le pagine dopo una modifica (da PowerShell, nella cartella del pr
 
 Lo script scrive `site/index.html` (italiano) e `site/<lingua>/index.html`, copia stile, carattere e bandiere, e controlla: segnaposto rimasti, chiavi mancanti in una lingua, file e collegamenti locali inesistenti, risorse caricate da altri siti, immagini senza testo alternativo. Esce con errore se trova qualcosa.
 
+## Anteprima prima di pubblicare
+
+```powershell
+.\tools\preview-site.ps1
+```
+
+Avvia un piccolo server che risponde solo a questo computer, mostra `site/` allo stesso percorso di GitHub Pages (`http://localhost:8080/pelago/`) e apre il browser. Non pubblica nulla. Ctrl+C per fermarlo; dopo una modifica basta rigenerare con `build-site.ps1` e ricaricare la pagina.
+
 ## Principi
 
 - **Nessuna risorsa da altri siti**: né caratteri, né script, né statistiche, né cookie. È ciò che la pagina dichiara nel piè di pagina: se un giorno cambia, va cambiato anche quel testo.
