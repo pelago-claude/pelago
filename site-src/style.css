@@ -98,7 +98,15 @@ p { margin: 0 0 14px; }
 .hero-media { margin: 0; }
 .hero-media video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #0e2233; border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
 .hero-media figcaption { color: var(--muted); font-size: .88rem; margin-top: 10px; }
-@media (min-width: 960px) { .hero { padding: 72px 0 80px; } .hero-grid { grid-template-columns: 1fr 1.12fr; gap: 44px; } .hero .cta { gap: 10px; } .hero .btn { padding: 8px 16px; } }
+/* i due pulsanti secondari vanno a capo insieme se non ci stanno (testi piu' lunghi in francese, tedesco, spagnolo): mai uno orfano */
+.cta-more { display: flex; gap: 12px; }
+@media (min-width: 960px) {
+    .hero { padding: 72px 0 80px; }
+    .hero-grid { grid-template-columns: 1.15fr 1fr; gap: 44px; }
+    .hero .cta { gap: 10px; }
+    .cta-more { gap: 10px; }
+    .hero .btn { padding: 8px 14px; font-size: .94rem; }
+}
 
 /* richiamo sopra i pulsanti della copertina */
 .teaser { margin: 22px 0 0; font-size: .98rem; }
