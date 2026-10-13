@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /pelago/provalo/demo/
 
 Sitemap: https://pelago-claude.github.io/pelago/sitemap.xml

@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="../assets/style.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Pelago","applicationCategory":"FinanceApplication","operatingSystem":"Windows 10, Windows 11","description":"A free, open-source Windows app that turns your Trade Republic CSV file into a portfolio map with a slider to go back to any day. Everything stays on your PC.","inLanguage":"en","url":"https://pelago-claude.github.io/pelago/en/","downloadUrl":"https://github.com/pelago-claude/pelago/releases/latest","license":"https://www.gnu.org/licenses/gpl-3.0.html","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"David"},"image":"https://pelago-claude.github.io/pelago/assets/img/og-en.jpg"}</script>
 </head>
+
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
@@ -54,6 +55,7 @@
   </div>
 </header>
 
+
 <main id="main">
   <section class="hero">
     <div class="wrap hero-grid">
@@ -61,8 +63,10 @@
         <h1>How has your portfolio changed over time?</h1>
         <p class="lead">The Trade Republic CSV file doesn't tell you. Pelago does: a colored tile map of your portfolio, with a slider to go back to any day in the past.</p>
         <p class="sub">Free, no ads, free software. Everything stays on your PC.</p>
+        <p class="teaser"><a href="#why">Anachronistic? Yes, on purpose</a></p>
         <p class="cta">
           <a class="btn primary" href="https://github.com/pelago-claude/pelago/releases/latest">Download for Windows</a>
+          <a class="btn" href="provalo/">Try it</a>
           <a class="btn" href="https://github.com/pelago-claude/pelago">View the code</a>
         </p>
         <p class="meta">64-bit Windows 10/11 · GPL-3.0 · not affiliated with Trade Republic</p>
@@ -131,6 +135,24 @@
     </div>
   </section>
 
+  <section id="why">
+    <div class="wrap">
+      <h2>Anachronistic? Yes, on purpose.</h2>
+      <p class="intro">Yes, it is a Windows program. In 2026 that looks like a choice from another era, and in a way it is: but not out of nostalgia. It is the simplest way to keep your data where it belongs.</p>
+      <ul class="reasons">
+        <li><h3>Nobody holds your data, because there is nobody to give it to.</h3><p>No server, no account, no “cloud”: your CSV stays on your disk, where you saved it.</p></li>
+        <li><h3>The file you download is always the same, and you can verify it.</h3><p>A web page can change at every visit without you knowing. <code>pelago.exe</code> has a public SHA-256 fingerprint and the code is open: what you checked is what runs, even a year from now, even offline.</p></li>
+        <li><h3>Your PC asks for the prices, not an intermediary.</h3><p>Many price services do not accept requests from web pages (Borsa Italiana, for example): a website would have to go through its own server, which would see which securities you hold. The program asks for them directly from your home and sends only security codes and dates.</p></li>
+        <li><h3>It works without us, too.</h3><p>No subscription, no service that can shut down: if the site disappeared tomorrow, the program and your data would still be there.</p></li>
+      </ul>
+      <div class="price">
+        <h3>The price of this choice</h3>
+        <p>It only runs on Windows, you have to download a file (that is why there is a way to verify it), Windows shows a warning until the file is signed, and updates are manual. To try it without downloading anything there is the demo in the browser, with invented data.</p>
+        <p><a class="btn" href="provalo/">Try it in the browser</a></p>
+      </div>
+    </div>
+  </section>
+
   <section id="start">
     <div class="wrap">
       <h2>How to use it</h2>
@@ -144,7 +166,10 @@
       <div class="callout">
         <h3>Want to try it without your own data?</h3>
         <p>Start Pelago without opening any file and press “Try an example account”: a second window opens with an invented account (about 160 transactions), in a temporary folder that disappears when you close it. If you prefer, download the example CSV and open it with “Open CSV”.</p>
-        <p><a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Download the example CSV</a></p>
+        <p class="cta">
+          <a class="btn primary" href="provalo/">Try it in the browser</a>
+          <a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Download the example CSV</a>
+        </p>
       </div>
     </div>
   </section>
@@ -186,6 +211,8 @@
       <h2>Frequently asked questions</h2>
       <div class="faq">
         <details><summary>Is Pelago official, or connected to Trade Republic?</summary><p>No. It is a personal, unofficial project: it is not affiliated with or approved by Trade Republic, and it has no access to your account.</p></details>
+        <details><summary>Why isn't it a website?</summary><p>Because this way your data stays on your PC and the program you verified is always the same one. The full reasoning is <a href="#why">here</a>.</p></details>
+        <details><summary>Can I try it without downloading anything?</summary><p>Yes: the <a href="provalo/">demo in the browser</a> uses an account with invented data and makes no requests to the internet.</p></details>
         <details><summary>How much does it cost?</summary><p>Nothing. It is free, with no ads and not for profit: free software (GPL-3.0).</p></details>
         <details><summary>Are the numbers accurate?</summary><p>They are estimates calculated from the file: they are not an official balance. Prices come from public services and may be late or missing.</p></details>
         <details><summary>Can I use it for my tax return?</summary><p>Not as your only source. The tax summaries are informational estimates, using simplified formulas: check them against your broker's official documents and with a tax adviser. You are responsible for what you declare.</p></details>
@@ -223,5 +250,6 @@
     </ul>
   </div>
 </footer>
+
 </body>
 </html>

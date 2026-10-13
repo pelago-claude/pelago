@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Pelago: Page not found / Pagina non trovata</title>
+<script>
+/* La demo nel browser e' una sola pagina: se si ricarica o si apre un suo indirizzo interno (che qui non esiste), si riparte dalla demo. */
+if (location.pathname.indexOf('/pelago/provalo/demo/') === 0) { location.replace('/pelago/provalo/demo/' + location.search); }
+</script>
 <style>
 :root { color-scheme: light dark; }
 body { font: 17px/1.6 system-ui, "Segoe UI", sans-serif; max-width: 34em; margin: 12vh auto; padding: 0 20px; background: Canvas; color: CanvasText; }

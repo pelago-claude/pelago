@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="../assets/style.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Pelago","applicationCategory":"FinanceApplication","operatingSystem":"Windows 10, Windows 11","description":"Une application Windows gratuite et open source qui transforme le fichier CSV de Trade Republic en carte du portefeuille, avec un curseur pour revenir à n\u0027importe quel jour. Tout reste sur ton PC.","inLanguage":"fr","url":"https://pelago-claude.github.io/pelago/fr/","downloadUrl":"https://github.com/pelago-claude/pelago/releases/latest","license":"https://www.gnu.org/licenses/gpl-3.0.html","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"David"},"image":"https://pelago-claude.github.io/pelago/assets/img/og-fr.jpg"}</script>
 </head>
+
 <body>
 <a class="skip" href="#main">Aller au contenu</a>
 
@@ -54,6 +55,7 @@
   </div>
 </header>
 
+
 <main id="main">
   <section class="hero">
     <div class="wrap hero-grid">
@@ -61,8 +63,10 @@
         <h1>Comment ton portefeuille a-t-il évolué dans le temps ?</h1>
         <p class="lead">Le fichier CSV de Trade Republic ne le dit pas. Pelago, oui : une carte de tuiles colorées de ton portefeuille, avec un curseur pour revenir à n'importe quel jour du passé.</p>
         <p class="sub">Gratuite, sans publicité, logiciel libre. Tout reste sur ton PC.</p>
+        <p class="teaser"><a href="#why">Anachronique ? Oui, exprès</a></p>
         <p class="cta">
           <a class="btn primary" href="https://github.com/pelago-claude/pelago/releases/latest">Télécharger pour Windows</a>
+          <a class="btn" href="provalo/">Essayer</a>
           <a class="btn" href="https://github.com/pelago-claude/pelago">Voir le code</a>
         </p>
         <p class="meta">Windows 10/11 64 bits · GPL-3.0 · non affiliée à Trade Republic</p>
@@ -131,6 +135,24 @@
     </div>
   </section>
 
+  <section id="why">
+    <div class="wrap">
+      <h2>Anachronique ? Oui, exprès.</h2>
+      <p class="intro">Oui, c'est un programme pour Windows. En 2026, cela ressemble à un choix d'un autre temps, et d'une certaine façon c'est le cas : mais pas par nostalgie. C'est la façon la plus simple de garder tes données là où elles doivent rester.</p>
+      <ul class="reasons">
+        <li><h3>Personne ne détient tes données, parce qu'il n'y a personne à qui les confier.</h3><p>Pas de serveur, pas de compte, pas de « cloud » : ton CSV reste sur ton disque, là où tu l'as enregistré.</p></li>
+        <li><h3>Le fichier que tu télécharges est toujours le même, et tu peux le vérifier.</h3><p>Une page web peut changer à chaque visite sans que tu le saches. <code>pelago.exe</code> a une empreinte SHA-256 publique et le code est ouvert : ce que tu as contrôlé est ce qui s'exécute, même dans un an, même sans internet.</p></li>
+        <li><h3>C'est ton PC qui demande les prix, pas un intermédiaire.</h3><p>Beaucoup de services de prix n'acceptent pas les requêtes des pages web (Borsa Italiana, par exemple) : un site devrait passer par son propre serveur, qui verrait quels titres tu possèdes. Le programme les demande directement depuis chez toi et n'envoie que des codes de titres et des dates.</p></li>
+        <li><h3>Il fonctionne aussi sans nous.</h3><p>Aucun abonnement, aucun service qui peut s'arrêter : si le site disparaissait demain, le programme et tes données seraient toujours là.</p></li>
+      </ul>
+      <div class="price">
+        <h3>Le prix de ce choix</h3>
+        <p>Il ne fonctionne que sous Windows, tu dois télécharger un fichier (c'est pourquoi il y a une vérification), Windows affiche un avertissement tant que le fichier n'est pas signé, et les mises à jour sont manuelles. Pour l'essayer sans rien télécharger, il y a la démo dans le navigateur, avec des données inventées.</p>
+        <p><a class="btn" href="provalo/">Essayer dans le navigateur</a></p>
+      </div>
+    </div>
+  </section>
+
   <section id="start">
     <div class="wrap">
       <h2>Comment l'utiliser</h2>
@@ -144,7 +166,10 @@
       <div class="callout">
         <h3>Tu veux l'essayer sans tes données ?</h3>
         <p>Lance Pelago sans ouvrir de fichier et appuie sur « Essayer avec un compte d'exemple » : une deuxième fenêtre s'ouvre avec un compte inventé (environ 160 opérations), dans un dossier temporaire qui disparaît à la fermeture. Si tu préfères, télécharge le CSV d'exemple et ouvre-le avec « Ouvrir le CSV… ».</p>
-        <p><a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Télécharger le CSV d'exemple</a></p>
+        <p class="cta">
+          <a class="btn primary" href="provalo/">Essayer dans le navigateur</a>
+          <a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Télécharger le CSV d'exemple</a>
+        </p>
       </div>
     </div>
   </section>
@@ -186,6 +211,8 @@
       <h2>Questions fréquentes</h2>
       <div class="faq">
         <details><summary>Pelago est-elle officielle, ou liée à Trade Republic ?</summary><p>Non. C'est un projet personnel et non officiel : elle n'est ni affiliée à Trade Republic ni approuvée par elle, et n'a aucun accès à ton compte.</p></details>
+        <details><summary>Pourquoi n'est-ce pas un site web ?</summary><p>Parce que, comme ça, tes données restent sur ton PC et le programme que tu as vérifié est toujours le même. Le raisonnement complet est <a href="#why">ici</a>.</p></details>
+        <details><summary>Puis-je l'essayer sans rien télécharger ?</summary><p>Oui : la <a href="provalo/">démo dans le navigateur</a> utilise un compte aux données inventées et ne fait aucune requête sur internet.</p></details>
         <details><summary>Combien ça coûte ?</summary><p>Rien. Elle est gratuite, sans publicité et sans but lucratif : logiciel libre (GPL-3.0).</p></details>
         <details><summary>Les chiffres sont-ils précis ?</summary><p>Ce sont des estimations calculées à partir du fichier : ce n'est pas un solde officiel. Les prix viennent de services publics et peuvent être en retard ou manquer.</p></details>
         <details><summary>Puis-je l'utiliser pour ma déclaration de revenus ?</summary><p>Pas comme seule source. Les bilans fiscaux sont des estimations informatives, avec des formules simplifiées : contrôle-les avec les documents officiels de ton courtier et avec un comptable. Tu es responsable de ce que tu déclares.</p></details>
@@ -223,5 +250,6 @@
     </ul>
   </div>
 </footer>
+
 </body>
 </html>

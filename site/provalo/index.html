@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Provalo: Pelago nel browser, con dati inventati</title>
+<meta name="description" content="Prova Pelago senza i tuoi dati: la demo nel browser con un conto inventato, oppure il programma sul tuo PC con il conto di esempio.">
+<link rel="canonical" href="https://pelago-claude.github.io/pelago/provalo/">
+<link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/provalo/">
+<link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/provalo/">
+<link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/provalo/">
+<link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/provalo/">
+<link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/provalo/">
+<link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/provalo/">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1620" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pelago">
+<meta property="og:title" content="Provalo: Pelago nel browser, con dati inventati">
+<meta property="og:description" content="Prova Pelago senza i tuoi dati: la demo nel browser con un conto inventato, oppure il programma sul tuo PC con il conto di esempio.">
+<meta property="og:url" content="https://pelago-claude.github.io/pelago/provalo/">
+<meta property="og:locale" content="it_IT">
+<meta property="og:image" content="https://pelago-claude.github.io/pelago/assets/img/og-it.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/pelago-32.png">
+<link rel="apple-touch-icon" href="../assets/img/pelago-180.png">
+<link rel="preload" href="../assets/fonts/InstrumentSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Provalo: Pelago nel browser, con dati inventati","description":"Prova Pelago senza i tuoi dati: la demo nel browser con un conto inventato, oppure il programma sul tuo PC con il conto di esempio.","inLanguage":"it","url":"https://pelago-claude.github.io/pelago/provalo/","isPartOf":{"@type":"WebSite","name":"Pelago","url":"https://pelago-claude.github.io/pelago/"}}</script>
+<script>
+/* Prima visita senza una scelta esplicita: porta alla lingua del browser. Non salva nulla. */
+(function () { try {
+  if (location.hash || /[?&]lang=/.test(location.search)) return;
+  var r = document.referrer; if (r && r.indexOf(location.origin) === 0) return;
+  var l = ((navigator.languages && navigator.languages[0]) || navigator.language || 'it').slice(0, 2).toLowerCase();
+  var to = { en: '../en/provalo/', fr: '../fr/provalo/', de: '../de/provalo/', es: '../es/provalo/' }[l];
+  if (to) location.replace(to);
+} catch (e) {} })();
+</script>
+</head>
+
+<body>
+<a class="skip" href="#main">Vai al contenuto</a>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="../" aria-label="Pelago, inizio pagina"><img src="../assets/img/pelago-64.png" alt="" width="32" height="32"><span>Pelago</span></a>
+    <nav class="menu" aria-label="Sezioni della pagina">
+      <a href="../#features">Cosa fa</a>
+      <a href="../#start">Come si usa</a>
+      <a href="../#privacy">Privacy</a>
+      <a href="../#verify">Verifica</a>
+      <a href="../#faq">Domande</a>
+    </nav>
+    <nav class="langs" aria-label="Lingua">
+      <a href="./" hreflang="it" lang="it" title="Italiano" aria-label="Italiano" aria-current="page"><img src="../assets/img/flags/it.svg" alt="" width="24" height="18"></a>
+      <a href="../en/provalo/" hreflang="en" lang="en" title="English" aria-label="English"><img src="../assets/img/flags/gb.svg" alt="" width="24" height="18"></a>
+      <a href="../fr/provalo/" hreflang="fr" lang="fr" title="Français" aria-label="Français"><img src="../assets/img/flags/fr.svg" alt="" width="24" height="18"></a>
+      <a href="../de/provalo/" hreflang="de" lang="de" title="Deutsch" aria-label="Deutsch"><img src="../assets/img/flags/de.svg" alt="" width="24" height="18"></a>
+      <a href="../es/provalo/" hreflang="es" lang="es" title="Español" aria-label="Español"><img src="../assets/img/flags/es.svg" alt="" width="24" height="18"></a>
+    </nav>
+  </div>
+</header>
+
+
+<main id="main">
+  <section class="try-head">
+    <div class="wrap">
+      <p class="crumb"><a href="../">← Pagina principale</a></p>
+      <h1>Provalo</h1>
+      <p class="lead">Senza i tuoi dati, e senza scaricare nulla se vuoi.</p>
+    </div>
+  </section>
+
+  <section class="ways-section">
+    <div class="wrap">
+      <ul class="ways">
+        <li class="way main">
+          <h2>Nel browser</h2>
+          <p>Il programma vero in una pagina web, con il conto di esempio: dati inventati, nessuna richiesta a internet e, chiusa la pagina, non resta nulla.</p>
+          <p><a class="btn primary" href="../provalo/demo/?lang=it">Apri la demo</a></p>
+          <p class="small">Al primo caricamento scarica circa 12 MB, poi resta nella memoria del browser. È pensata per un computer. Alcune funzioni sono spente: aprire file, esportare, aggiornare i prezzi.</p>
+        </li>
+        <li class="way">
+          <h2>Sul tuo PC</h2>
+          <p>Scarica Pelago, avvialo senza aprire nessun file e premi «Prova con un conto di esempio»: si apre una seconda finestra con un conto inventato, in una cartella temporanea che sparisce alla chiusura.</p>
+          <p><a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest">Scarica per Windows</a></p>
+        </li>
+        <li class="way">
+          <h2>Con il CSV di esempio</h2>
+          <p>Scarica il CSV inventato e aprilo nel programma con «Apri CSV…».</p>
+          <p><a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Scarica il CSV di esempio</a></p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Cinque cose da provare</h2>
+      <ol class="todo">
+        <li><b>Mappa del portafoglio</b> → «Riproduci»: guarda i titoli comparire, crescere e sparire.</li>
+        <li>Sposta lo slider su un giorno del passato: la mappa e la <b>Composizione a una data</b> mostrano il conto com'era.</li>
+        <li>Accendi la <b>Modalità assistita</b> (in basso a sinistra) e passa il mouse su una colonna o su un numero.</li>
+        <li>Cambia <b>lingua</b> e <b>tema</b>, sempre in basso a sinistra.</li>
+        <li>Apri lo <b>Zainetto fiscale</b>: sono stime informative, e il programma te lo ricorda con un avviso.</li>
+      </ol>
+      <p class="note">La demo non è il programma: non salva nulla e non legge i tuoi file. Per usare i tuoi dati serve il programma, che gira sul tuo PC. <a href="../#why">Perché un programma e non un sito</a>.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <p>© 2026 David. Software libero (GPL-3.0), senza alcuna garanzia.</p>
+      <p>«Trade Republic» è un marchio dei rispettivi titolari, citato solo per indicare il formato del file letto da Pelago. Pelago non è affiliata a Trade Republic.</p>
+      <p>Questo sito non usa cookie né strumenti di statistica e non carica risorse da altri siti. È ospitato su GitHub Pages, che registra l'indirizzo IP dei visitatori per motivi di sicurezza.</p>
+      <p>Bandiere: flag-icons (MIT). Carattere: Instrument Sans (SIL OFL).</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="https://github.com/pelago-claude/pelago">Codice</a></li>
+      <li><a href="https://github.com/pelago-claude/pelago/releases/latest">Versioni</a></li>
+      <li><a href="https://github.com/pelago-claude/pelago/issues/new/choose">Segnalazioni</a></li>
+      <li><a href="mailto:pelago_claude@gmail.com">Contatto</a></li>
+    </ul>
+  </div>
+</footer>
+
+</body>
+</html>

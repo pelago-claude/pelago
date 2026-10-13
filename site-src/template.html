@@ -1,49 +1,6 @@
-<!doctype html>
-<html lang="{{lang}}">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{meta.title}}</title>
-<meta name="description" content="{{meta.desc}}">
-<link rel="canonical" href="{{canonical}}">
-{{hreflangs}}
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f4f7f8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b1620" media="(prefers-color-scheme: dark)">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Pelago">
-<meta property="og:title" content="{{meta.title}}">
-<meta property="og:description" content="{{meta.desc}}">
-<meta property="og:url" content="{{canonical}}">
-<meta property="og:locale" content="{{locale}}">
-<meta property="og:image" content="{{base}}assets/img/og-{{lang}}.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" sizes="32x32" href="{{root}}assets/img/pelago-32.png">
-<link rel="apple-touch-icon" href="{{root}}assets/img/pelago-180.png">
-<link rel="preload" href="{{root}}assets/fonts/InstrumentSans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{{root}}assets/style.css">
-<script type="application/ld+json">{{jsonld}}</script>
-{{redirect}}</head>
+{{partial.head}}
 <body>
-<a class="skip" href="#main">{{skip}}</a>
-
-<header class="top">
-  <div class="wrap bar">
-    <a class="brand" href="./" aria-label="{{brand.home}}"><img src="{{root}}assets/img/pelago-64.png" alt="" width="32" height="32"><span>Pelago</span></a>
-    <nav class="menu" aria-label="{{nav.label}}">
-      <a href="#features">{{nav.features}}</a>
-      <a href="#start">{{nav.start}}</a>
-      <a href="#privacy">{{nav.privacy}}</a>
-      <a href="#verify">{{nav.verify}}</a>
-      <a href="#faq">{{nav.faq}}</a>
-    </nav>
-    <nav class="langs" aria-label="{{lang.label}}">
-{{langlinks}}
-    </nav>
-  </div>
-</header>
+{{partial.header}}
 
 <main id="main">
   <section class="hero">
@@ -52,8 +9,10 @@
         <h1>{{hero.h1}}</h1>
         <p class="lead">{{hero.lead}}</p>
         <p class="sub">{{hero.sub}}</p>
+        <p class="teaser"><a href="#why">{{hero.why}}</a></p>
         <p class="cta">
           <a class="btn primary" href="{{releases}}">{{hero.download}}</a>
+          <a class="btn" href="{{tryurl}}">{{hero.try}}</a>
           <a class="btn" href="{{repo}}">{{hero.code}}</a>
         </p>
         <p class="meta">{{hero.meta}}</p>
@@ -78,6 +37,24 @@
     </div>
   </section>
 
+  <section id="why">
+    <div class="wrap">
+      <h2>{{why.h}}</h2>
+      <p class="intro">{{why.lead}}</p>
+      <ul class="reasons">
+        <li><h3>{{why.1.t}}</h3><p>{{why.1.d}}</p></li>
+        <li><h3>{{why.2.t}}</h3><p>{{why.2.d}}</p></li>
+        <li><h3>{{why.3.t}}</h3><p>{{why.3.d}}</p></li>
+        <li><h3>{{why.4.t}}</h3><p>{{why.4.d}}</p></li>
+      </ul>
+      <div class="price">
+        <h3>{{why.price.t}}</h3>
+        <p>{{why.price.d}}</p>
+        <p><a class="btn" href="{{tryurl}}">{{why.try}}</a></p>
+      </div>
+    </div>
+  </section>
+
   <section id="start">
     <div class="wrap">
       <h2>{{start.h}}</h2>
@@ -91,7 +68,10 @@
       <div class="callout">
         <h3>{{start.try.h}}</h3>
         <p>{{start.try.p}}</p>
-        <p><a class="btn" href="{{samplecsv}}">{{start.try.csv}}</a></p>
+        <p class="cta">
+          <a class="btn primary" href="{{tryurl}}">{{start.try.web}}</a>
+          <a class="btn" href="{{samplecsv}}">{{start.try.csv}}</a>
+        </p>
       </div>
     </div>
   </section>
@@ -133,6 +113,8 @@
       <h2>{{faq.h}}</h2>
       <div class="faq">
         <details><summary>{{faq.1.q}}</summary><p>{{faq.1.a}}</p></details>
+        <details><summary>{{faq.8.q}}</summary><p>{{faq.8.a}}</p></details>
+        <details><summary>{{faq.9.q}}</summary><p>{{faq.9.a}}</p></details>
         <details><summary>{{faq.2.q}}</summary><p>{{faq.2.a}}</p></details>
         <details><summary>{{faq.3.q}}</summary><p>{{faq.3.a}}</p></details>
         <details><summary>{{faq.4.q}}</summary><p>{{faq.4.a}}</p></details>
@@ -154,21 +136,6 @@
   </section>
 </main>
 
-<footer class="foot">
-  <div class="wrap foot-grid">
-    <div>
-      <p>{{footer.copy}}</p>
-      <p>{{footer.tm}}</p>
-      <p>{{footer.privacy}}</p>
-      <p>{{footer.credits}}</p>
-    </div>
-    <ul class="foot-links">
-      <li><a href="{{repo}}">{{footer.l.code}}</a></li>
-      <li><a href="{{releases}}">{{footer.l.releases}}</a></li>
-      <li><a href="{{issues}}">{{footer.l.issues}}</a></li>
-      <li><a href="mailto:{{email}}">{{footer.l.mail}}</a></li>
-    </ul>
-  </div>
-</footer>
+{{partial.footer}}
 </body>
 </html>

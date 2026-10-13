@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="../assets/style.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Pelago","applicationCategory":"FinanceApplication","operatingSystem":"Windows 10, Windows 11","description":"Eine kostenlose Open-Source-App für Windows, die die CSV-Datei von Trade Republic in eine Depot-Karte mit Zeitregler verwandelt, um zu jedem beliebigen Tag zurückzugehen. Alles bleibt auf deinem PC.","inLanguage":"de","url":"https://pelago-claude.github.io/pelago/de/","downloadUrl":"https://github.com/pelago-claude/pelago/releases/latest","license":"https://www.gnu.org/licenses/gpl-3.0.html","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"David"},"image":"https://pelago-claude.github.io/pelago/assets/img/og-de.jpg"}</script>
 </head>
+
 <body>
 <a class="skip" href="#main">Zum Inhalt springen</a>
 
@@ -54,6 +55,7 @@
   </div>
 </header>
 
+
 <main id="main">
   <section class="hero">
     <div class="wrap hero-grid">
@@ -61,8 +63,10 @@
         <h1>Wie hat sich dein Depot im Lauf der Zeit verändert?</h1>
         <p class="lead">Die CSV-Datei von Trade Republic sagt es dir nicht. Pelago schon: eine Karte aus farbigen Kacheln deines Depots, mit einem Regler, um zu jedem Tag der Vergangenheit zurückzugehen.</p>
         <p class="sub">Kostenlos, ohne Werbung, freie Software. Alles bleibt auf deinem PC.</p>
+        <p class="teaser"><a href="#why">Anachronistisch? Ja, mit Absicht</a></p>
         <p class="cta">
           <a class="btn primary" href="https://github.com/pelago-claude/pelago/releases/latest">Für Windows herunterladen</a>
+          <a class="btn" href="provalo/">Ausprobieren</a>
           <a class="btn" href="https://github.com/pelago-claude/pelago">Code ansehen</a>
         </p>
         <p class="meta">Windows 10/11 (64 Bit) · GPL-3.0 · nicht mit Trade Republic verbunden</p>
@@ -131,6 +135,24 @@
     </div>
   </section>
 
+  <section id="why">
+    <div class="wrap">
+      <h2>Anachronistisch? Ja, mit Absicht.</h2>
+      <p class="intro">Ja, es ist ein Programm für Windows. Im Jahr 2026 wirkt das wie eine Entscheidung aus einer anderen Zeit, und in gewisser Weise ist es das auch: aber nicht aus Nostalgie. Es ist der einfachste Weg, deine Daten dort zu halten, wo sie hingehören.</p>
+      <ul class="reasons">
+        <li><h3>Niemand hält deine Daten, weil es niemanden gibt, dem du sie geben müsstest.</h3><p>Kein Server, kein Konto, keine „Cloud“: Deine CSV-Datei bleibt auf deiner Festplatte, dort, wo du sie gespeichert hast.</p></li>
+        <li><h3>Die Datei, die du herunterlädst, ist immer dieselbe, und du kannst sie prüfen.</h3><p>Eine Webseite kann sich bei jedem Besuch ändern, ohne dass du es merkst. <code>pelago.exe</code> hat einen öffentlichen SHA-256-Fingerabdruck, und der Code ist offen: Was du geprüft hast, ist das, was läuft, auch in einem Jahr, auch ohne Internet.</p></li>
+        <li><h3>Dein PC fragt die Kurse ab, kein Vermittler.</h3><p>Viele Kursdienste nehmen keine Anfragen von Webseiten an (zum Beispiel Borsa Italiana): Eine Website müsste über einen eigenen Server gehen, der sehen würde, welche Wertpapiere du besitzt. Das Programm fragt sie direkt von dir zu Hause ab und sendet nur Wertpapierkennungen und Daten.</p></li>
+        <li><h3>Es funktioniert auch ohne uns.</h3><p>Kein Abonnement, kein Dienst, der abgeschaltet werden kann: Wenn die Website morgen verschwände, wären das Programm und deine Daten weiterhin da.</p></li>
+      </ul>
+      <div class="price">
+        <h3>Der Preis dieser Entscheidung</h3>
+        <p>Es läuft nur unter Windows, du musst eine Datei herunterladen (deshalb gibt es die Prüfung), Windows zeigt eine Warnung, solange die Datei nicht signiert ist, und Updates sind manuell. Zum Ausprobieren ohne Download gibt es die Demo im Browser, mit erfundenen Daten.</p>
+        <p><a class="btn" href="provalo/">Im Browser ausprobieren</a></p>
+      </div>
+    </div>
+  </section>
+
   <section id="start">
     <div class="wrap">
       <h2>So geht's</h2>
@@ -144,7 +166,10 @@
       <div class="callout">
         <h3>Willst du es ohne eigene Daten ausprobieren?</h3>
         <p>Starte Pelago, ohne eine Datei zu öffnen, und klick auf „Mit einem Beispielkonto ausprobieren“: Es öffnet sich ein zweites Fenster mit einem erfundenen Konto (etwa 160 Transaktionen) in einem temporären Ordner, der beim Schließen verschwindet. Wenn du möchtest, lade die Beispiel-CSV herunter und öffne sie mit „CSV öffnen…“.</p>
-        <p><a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Beispiel-CSV herunterladen</a></p>
+        <p class="cta">
+          <a class="btn primary" href="provalo/">Im Browser ausprobieren</a>
+          <a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Beispiel-CSV herunterladen</a>
+        </p>
       </div>
     </div>
   </section>
@@ -186,6 +211,8 @@
       <h2>Häufige Fragen</h2>
       <div class="faq">
         <details><summary>Ist Pelago offiziell oder mit Trade Republic verbunden?</summary><p>Nein. Es ist ein privates, inoffizielles Projekt: Es ist weder mit Trade Republic verbunden noch von Trade Republic genehmigt und hat keinen Zugriff auf dein Konto.</p></details>
+        <details><summary>Warum ist es keine Website?</summary><p>Weil so deine Daten auf deinem PC bleiben und das Programm, das du geprüft hast, immer dasselbe ist. Die ganze Überlegung steht <a href="#why">hier</a>.</p></details>
+        <details><summary>Kann ich es ausprobieren, ohne etwas herunterzuladen?</summary><p>Ja: Die <a href="provalo/">Demo im Browser</a> verwendet ein Konto mit erfundenen Daten und stellt keine Anfragen ins Internet.</p></details>
         <details><summary>Was kostet sie?</summary><p>Nichts. Sie ist kostenlos, ohne Werbung und ohne Gewinnabsicht: freie Software (GPL-3.0).</p></details>
         <details><summary>Sind die Zahlen genau?</summary><p>Es sind aus der Datei berechnete Schätzungen: kein offizieller Kontostand. Die Kurse stammen aus öffentlichen Diensten und können verspätet sein oder fehlen.</p></details>
         <details><summary>Kann ich sie für die Steuererklärung nutzen?</summary><p>Nicht als einzige Quelle. Die Steuerübersichten sind informative Schätzungen mit vereinfachten Formeln: Prüfe sie mit den offiziellen Unterlagen deines Brokers und mit einem Steuerberater. Für das, was du erklärst, bist du verantwortlich.</p></details>
@@ -223,5 +250,6 @@
     </ul>
   </div>
 </footer>
+
 </body>
 </html>

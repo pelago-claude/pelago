@@ -1,0 +1,54 @@
+{{partial.head}}
+<body>
+{{partial.header}}
+
+<main id="main">
+  <section class="try-head">
+    <div class="wrap">
+      <p class="crumb"><a href="{{homelink}}">{{try.back}}</a></p>
+      <h1>{{try.h}}</h1>
+      <p class="lead">{{try.lead}}</p>
+    </div>
+  </section>
+
+  <section class="ways-section">
+    <div class="wrap">
+      <ul class="ways">
+        <li class="way main">
+          <h2>{{try.web.h}}</h2>
+          <p>{{try.web.d}}</p>
+          <p><a class="btn primary" href="{{demourl}}">{{try.web.btn}}</a></p>
+          <p class="small">{{try.web.note}}</p>
+        </li>
+        <li class="way">
+          <h2>{{try.pc.h}}</h2>
+          <p>{{try.pc.d}}</p>
+          <p><a class="btn" href="{{releases}}">{{hero.download}}</a></p>
+        </li>
+        <li class="way">
+          <h2>{{try.csv.h}}</h2>
+          <p>{{try.csv.d}}</p>
+          <p><a class="btn" href="{{samplecsv}}">{{start.try.csv}}</a></p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>{{try.what.h}}</h2>
+      <ol class="todo">
+        <li>{{try.what.1}}</li>
+        <li>{{try.what.2}}</li>
+        <li>{{try.what.3}}</li>
+        <li>{{try.what.4}}</li>
+        <li>{{try.what.5}}</li>
+      </ol>
+      <p class="note">{{try.why}} <a href="{{homeurl}}#why">{{try.why.link}}</a>.</p>
+    </div>
+  </section>
+</main>
+
+{{partial.footer}}
+</body>
+</html>

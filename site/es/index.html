@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="../assets/style.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Pelago","applicationCategory":"FinanceApplication","operatingSystem":"Windows 10, Windows 11","description":"Una aplicación gratuita y de código abierto para Windows que convierte el archivo CSV de Trade Republic en un mapa de la cartera con un control deslizante para volver a cualquier día. Todo se queda en tu PC.","inLanguage":"es","url":"https://pelago-claude.github.io/pelago/es/","downloadUrl":"https://github.com/pelago-claude/pelago/releases/latest","license":"https://www.gnu.org/licenses/gpl-3.0.html","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"David"},"image":"https://pelago-claude.github.io/pelago/assets/img/og-es.jpg"}</script>
 </head>
+
 <body>
 <a class="skip" href="#main">Ir al contenido</a>
 
@@ -54,6 +55,7 @@
   </div>
 </header>
 
+
 <main id="main">
   <section class="hero">
     <div class="wrap hero-grid">
@@ -61,8 +63,10 @@
         <h1>¿Cómo ha cambiado tu cartera con el tiempo?</h1>
         <p class="lead">El archivo CSV de Trade Republic no lo dice. Pelago sí: un mapa de recuadros de colores de tu cartera, con un control deslizante para volver a cualquier día del pasado.</p>
         <p class="sub">Gratis, sin publicidad, software libre. Todo se queda en tu PC.</p>
+        <p class="teaser"><a href="#why">¿Anacrónico? Sí, a propósito</a></p>
         <p class="cta">
           <a class="btn primary" href="https://github.com/pelago-claude/pelago/releases/latest">Descargar para Windows</a>
+          <a class="btn" href="provalo/">Pruébalo</a>
           <a class="btn" href="https://github.com/pelago-claude/pelago">Ver el código</a>
         </p>
         <p class="meta">Windows 10/11 de 64 bits · GPL-3.0 · no afiliada a Trade Republic</p>
@@ -131,6 +135,24 @@
     </div>
   </section>
 
+  <section id="why">
+    <div class="wrap">
+      <h2>¿Anacrónico? Sí, a propósito.</h2>
+      <p class="intro">Sí, es un programa para Windows. En 2026 parece una decisión de otra época, y en cierto modo lo es: pero no por nostalgia. Es la forma más sencilla de mantener tus datos donde deben estar.</p>
+      <ul class="reasons">
+        <li><h3>Nadie guarda tus datos, porque no hay nadie a quien dárselos.</h3><p>Sin servidor, sin cuenta, sin «nube»: tu CSV se queda en tu disco, donde lo guardaste.</p></li>
+        <li><h3>El archivo que descargas es siempre el mismo, y puedes comprobarlo.</h3><p>Una página web puede cambiar en cada visita sin que lo sepas. <code>pelago.exe</code> tiene una huella SHA-256 pública y el código es abierto: lo que has comprobado es lo que se ejecuta, también dentro de un año, también sin internet.</p></li>
+        <li><h3>Los precios los pide tu PC, no un intermediario.</h3><p>Muchos servicios de precios no aceptan peticiones desde páginas web (Borsa Italiana, por ejemplo): un sitio tendría que pasar por un servidor propio, que vería qué valores posees. El programa los pide directamente desde tu casa y envía solo códigos de valores y fechas.</p></li>
+        <li><h3>Funciona también sin nosotros.</h3><p>Sin suscripción, sin ningún servicio que pueda apagarse: si mañana desapareciera el sitio, el programa y tus datos seguirían ahí.</p></li>
+      </ul>
+      <div class="price">
+        <h3>El precio de la elección</h3>
+        <p>Solo funciona en Windows, tienes que descargar un archivo (por eso existe la verificación), Windows muestra un aviso mientras el archivo no esté firmado y las actualizaciones son manuales. Para probarlo sin descargar nada está la demo en el navegador, con datos inventados.</p>
+        <p><a class="btn" href="provalo/">Pruébalo en el navegador</a></p>
+      </div>
+    </div>
+  </section>
+
   <section id="start">
     <div class="wrap">
       <h2>Cómo se usa</h2>
@@ -144,7 +166,10 @@
       <div class="callout">
         <h3>¿Quieres probarla sin tus datos?</h3>
         <p>Inicia Pelago sin abrir ningún archivo y pulsa «Probar con una cuenta de ejemplo»: se abre una segunda ventana con una cuenta inventada (unas 160 operaciones), en una carpeta temporal que desaparece al cerrarla. Si prefieres, descarga el CSV de ejemplo y ábrelo con «Abrir CSV…».</p>
-        <p><a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Descargar el CSV de ejemplo</a></p>
+        <p class="cta">
+          <a class="btn primary" href="provalo/">Pruébalo en el navegador</a>
+          <a class="btn" href="https://github.com/pelago-claude/pelago/releases/latest/download/esempio-operazioni.csv">Descargar el CSV de ejemplo</a>
+        </p>
       </div>
     </div>
   </section>
@@ -186,6 +211,8 @@
       <h2>Preguntas frecuentes</h2>
       <div class="faq">
         <details><summary>¿Pelago es oficial o está vinculada a Trade Republic?</summary><p>No. Es un proyecto personal y no oficial: no está afiliada a Trade Republic ni aprobada por ella, y no tiene ningún acceso a tu cuenta.</p></details>
+        <details><summary>¿Por qué no es un sitio web?</summary><p>Porque así tus datos se quedan en tu PC y el programa que has comprobado es siempre el mismo. El razonamiento completo está <a href="#why">aquí</a>.</p></details>
+        <details><summary>¿Puedo probarla sin descargar nada?</summary><p>Sí: la <a href="provalo/">demo en el navegador</a> usa una cuenta con datos inventados y no hace ninguna petición a internet.</p></details>
         <details><summary>¿Cuánto cuesta?</summary><p>Nada. Es gratuita, sin publicidad y sin ánimo de lucro: software libre (GPL-3.0).</p></details>
         <details><summary>¿Los números son exactos?</summary><p>Son estimaciones calculadas a partir del archivo: no son un saldo oficial. Los precios proceden de servicios públicos y pueden llegar con retraso o faltar.</p></details>
         <details><summary>¿Puedo usarla para la declaración de la renta?</summary><p>No como única fuente. Los resúmenes fiscales son estimaciones informativas, con fórmulas simplificadas: compruébalos con los documentos oficiales de tu bróker y con un asesor fiscal. Eres responsable de lo que declaras.</p></details>
@@ -223,5 +250,6 @@
     </ul>
   </div>
 </footer>
+
 </body>
 </html>

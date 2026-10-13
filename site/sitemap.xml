@@ -45,4 +45,49 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/"/>
   </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/provalo/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/provalo/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/en/provalo/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/provalo/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/fr/provalo/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/provalo/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/de/provalo/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/provalo/"/>
+  </url>
+  <url>
+    <loc>https://pelago-claude.github.io/pelago/es/provalo/</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pelago-claude.github.io/pelago/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pelago-claude.github.io/pelago/en/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pelago-claude.github.io/pelago/fr/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pelago-claude.github.io/pelago/de/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pelago-claude.github.io/pelago/es/provalo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pelago-claude.github.io/pelago/provalo/"/>
+  </url>
 </urlset>
